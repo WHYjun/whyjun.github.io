@@ -1,0 +1,22 @@
+# Setup
+title: Developer Blog
+tagline: ""
+description: 'Find more <a href="https://github.com/whyjun" target="_blank">@WHYjun</a>.'
+url: http://whyjun.github.io/poole/
+baseurl: ""
+paginate: 5
+permalink: pretty
+
+# About/contact
+author:
+  name: Young Choi
+  url: https://github.com/WHYjun
+  email: youngchoi.dev@gmail.com
+
+# Gems
+plugins:
+  - jekyll-paginate
+
+# Custom vars
+version: 1.0.0
+# google_analytics_id: #UA-XXXX-Y
