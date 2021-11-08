@@ -3,7 +3,7 @@ title: Developer Blog
 tagline: ""
 description: 'Find more <a href="https://github.com/whyjun" target="_blank">@WHYjun</a>.'
 url: ""
-baseurl: "whyjun.github.io/poole/"
+baseurl: ""
 paginate: 5
 permalink: pretty
 
