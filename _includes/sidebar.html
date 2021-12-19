@@ -24,7 +24,13 @@
       href="{{ node.url | absolute_url }}"
       >{{ node.title }}</a
     >
-    {% endif %} {% endif %} {% endfor %}
+    {% endif %} {% endif %} {% endfor %} {% assign sortedCategories =
+    site.categories | sort %} {% for category in sortedCategories %} {% assign
+    cat4url = category[0] | remove:' ' | downcase %}
+    <a class="sidebar-nav-item" href="{{site.baseurl}}/categories/{{cat4url}}">
+      {{category[0]}}
+    </a>
+    {% endfor %}
   </nav>
 
   <div class="sidebar-item">
