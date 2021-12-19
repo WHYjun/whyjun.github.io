@@ -1,5 +1,5 @@
 # Setup
-title: Developer Blog
+title: Young's Developer Notes
 tagline: ""
 description: 'Find more <a href="https://github.com/whyjun" target="_blank">@WHYjun</a>.'
 url: ""
@@ -19,4 +19,6 @@ plugins:
 
 # Custom vars
 version: 1.0.0
-# google_analytics_id: #UA-XXXX-Y
+
+# Category
+category_dir: _category/
