@@ -18,13 +18,13 @@ remote_theme: "mmistakes/so-simple-theme@3.2.0"
 skin: "/assets/css/skins/default.css"
 locale: ko-KR
 title: "개발 기록"
-description: 
+description: "개발자 경험(DX)을 향상시키고 싶은 개발자입니다."
 baseurl: # the subpath of your site, e.g. "/blog"
 url: "https://whyjun.github.io"
-logo: # path of site logo, e.g. "/images/logo.png"
+logo: "/assets/images/young-choi-gopher-image.png"
 date_format: "%B %-d, %Y"
-read_time: # reading time estimates, e.g. true
-words_per_minute: # 200
+read_time: true
+words_per_minute: 200
 mathjax:
   enable: # MathJax equations, e.g. true, false (default)
   combo:  # "tex-svg" (default), "tex-mml-chtml", etc.: docs.mathjax.org/en/latest/web/components/combined.html
@@ -92,7 +92,7 @@ defaults:
 # Site Author
 author:
   name: Young Choi
-  picture: /images/young-choi-gopher-image.png
+  picture: /assets/images/young-choi-gopher-image.png
   email:
   twitter:
   links:

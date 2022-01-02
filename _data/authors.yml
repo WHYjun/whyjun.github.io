@@ -3,7 +3,7 @@
 
 Billy Rick:
   name: Billy Rick
-  picture: /images/bio-photo-2.jpg
+  picture: /assets/images/bio-photo-2.jpg
   twitter: "@billyrick"
   links:
     - title: Twitter
@@ -12,5 +12,5 @@ Billy Rick:
 
 Cornelius Fiddlebone:
   name: Cornelius Fiddlebone
-  picture: /images/bio-photo.jpg
+  picture: /assets/images/bio-photo.jpg
   twitter: corneliusfiddlebone
