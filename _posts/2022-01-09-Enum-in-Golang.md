@@ -63,4 +63,4 @@ type Request struct {
 }
 ```
 
-`Status` 필드에 아무런 데이터가 들어가있지 않기 때문에 Request의 Status 값은 0이 될 것이다. 첫 `enum`이 `StatusUnknown`이 아니라 `StatusOK`였다면 `Status` 데이터가 없는 모든 Request들은 아무도 모르게 버그를 일으킬 것이다. 그렇기 때문에 Go에서 `enum`을 사용할 때는 `Zero Value`를 염두에 두고 꼭 첫 `enum`을 Unknown이나 Nil을 나타내는 값으로 지정하는 습관을 가져야 한다.
+`Status` 필드에 아무런 데이터가 들어가있지 않기 때문에 Request의 Status 값은 `int`의 `Zero Value`인 0이 될 것이다. 첫 `enum`이 `StatusUnknown`이 아니라 `StatusOK`였다면 `Status` 데이터가 없는 모든 Request들은 아무도 모르게 버그를 일으킬 것이다. 그렇기 때문에 Go에서 `enum`을 사용할 때는 `Zero Value`를 염두에 두고 꼭 첫 `enum`을 Unknown이나 Nil을 나타내는 값으로 지정하는 습관을 가져야 한다.
