@@ -6,6 +6,8 @@ categories:
 tags:
   - golang
   - data structure
+sharing:
+  twitter: @golang 언어에서 HashSet 구현하기
 ---
 
 12월 18일 기준 가장 최근 버전인 Go 1.17에도 아직 `Set`이라는 자료구조가 없다. 알고리즘 문제나 Advent of Code 문제를 풀 때 `Set`을 필요로 하는 경우가 생각보다 많았어서 직접 구현해보았다.

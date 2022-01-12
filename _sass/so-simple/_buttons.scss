@@ -62,28 +62,3 @@
     font-size: 0.75rem;
   }
 }
-
-.bmc-button {
-  /* default */
-  display: inline-block;
-  font-family: $sans-serif-font-family;
-  font-size: 1rem;
-  font-weight: bold;
-  text-align: center;
-  text-decoration: none;
-  border-width: 0;
-  border-radius: $border-radius;
-  cursor: pointer;
-
-  img {
-    height: 33.75px;
-    box-shadow: none;
-    border: none;
-    vertical-align: middle;
-  }
-
-  /* small button */
-  &--small {
-    font-size: 0.75rem;
-  }
-}
