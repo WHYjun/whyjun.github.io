@@ -1,12 +1,12 @@
 ---
 layout: post
-title: Go 언어에서 Enum 사용하기 그리고 주의할 점
+title: Go에서 Enum 사용하기 그리고 주의할 점
 categories:
   - Golang
 tags:
   - golang
 sharing:
-  twitter: @golang 언어에서 Enum 사용하기 그리고 주의할 점
+  twitter: Go에서 Enum 사용하기 그리고 주의할 점
 ---
 
 Go 언어는 `enum` 타입을 제공하지 않지만 `Enum`으로 사용할 데이터 타입을 따로 생성 후 `iota`를 이용해서 비슷하게 사용할 수 있다. [(예시 코드)](https://go.dev/play/p/5C0w6YGPyys)
