@@ -12,8 +12,6 @@ sharing:
 
 클린 코드, 애자일 소프트웨어 장인 정신: Day 00 - 추천사 & 들어가면서
 
-![book-front-cover-clean-code](/assets/images/book-front-cover-clean-code.jpeg){: .align-center}
-
 > Java 언어를 기반으로 쓰여진 이 책의 내용들을 어떻게 Go 언어에 적용할 수 있을까를 고민하며 읽었습니다.
 
 ## 😀 책에서 기억하고 싶은 내용을 써보세요.
