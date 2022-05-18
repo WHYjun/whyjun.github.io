@@ -2,7 +2,7 @@
 layout: post
 title: Go 언어로 읽는 클린 코드 10장 - 클래스
 categories:
-  - books
+  - Books
 tags:
   - 노개북
   - 클린 코드

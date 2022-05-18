@@ -2,7 +2,7 @@
 layout: post
 title: Go 언어로 읽는 클린 코드 2장 - 의미 있는 이름
 categories:
-  - books
+  - Books
 tags:
   - 노개북
   - 클린 코드

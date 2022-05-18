@@ -2,7 +2,7 @@
 layout: post
 title: Go 언어로 읽는 클린 코드 5장 - 형식 맞추기
 categories:
-  - books
+  - Books
 tags:
   - 노개북
   - 클린 코드
