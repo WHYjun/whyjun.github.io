@@ -48,6 +48,17 @@ golangci-lint run
 
 위 명령어를 입력하면 `golangci-lint` 기본으로 설정되어 있는 Lint 도구들로 코드를 분석합니다. 어떠한 도구들을 사용하는지 확인하고 싶으면 `golangci-lint help linters`로 확인할 수 있습니다. `golangci-lint`를 직접 설정하고 싶다면 [공식 문서](https://golangci-lint.run/usage/configuration/)를 참고해서 `.golangci.yml` 파일을 작성하시면 됩니다.
 
+## Visual Studio Code에 추가하기
+
+Visual Studio Code 설정에 들어가서 `settings.json`을 연 다음, 아래 설정을 추가하면 Visual Studio Code에서 Warning 메세지를 확인할 수 있습니다.
+
+```json
+"go.lintTool": "golangci-lint"
+"go.lintFlags": [
+    "--fast"
+]
+```
+
 ## 사용 후기
 
 실제로 적용해보니 코드 리뷰로 잡아내지 못한 이슈들이 꽤 있었습니다. 대표적으로 error를 `fmt.Errorf`로 래핑할 때, `%w`를 사용하지 않았던 부분입니다. `errors` 패키지를 잘 활용하지 않았다보니 알아차리지 못했지만 프로젝트의 사이즈가 커지면서 어떤 error인지를 확인해야 하는 경우가 빈번하게 발생했는데 `%w`가 아닌 `%s`나 `%v`를 사용했을 때는 `errors.UnWrap()` 함수를 사용할 수 없고 그 때문에 `errors.Is`와 `errors.As`도 활용할 수 없다는 것을 알게 되었습니다. 이처럼 Linter는 하나의 정해진 코드 규칙을 모든 개발자가 지킬 수 있게 해준다는 점을 넘어서 코드에 있는 버그들을 개발자들이 일찍 알아차릴 수 있게 해줍니다.
