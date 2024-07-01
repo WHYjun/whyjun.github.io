@@ -15,5 +15,7 @@
 {% endif %}
 
 {%- for entry in entries -%}
-  {% include entry.html %}
+  {% if site.active_lang == page.lang %}
+    {% include entry.html %}
+  {% endif %}
 {%- endfor -%}

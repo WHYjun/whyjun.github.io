@@ -1,5 +1,7 @@
 ---
 layout: post
+lang: ko
+permalink: books/Read-Clean-Code-In-Go-02
 title: Go 언어로 읽는 클린 코드 2장 - 의미 있는 이름
 categories:
   - Books

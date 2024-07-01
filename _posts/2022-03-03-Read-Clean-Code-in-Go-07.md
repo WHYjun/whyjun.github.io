@@ -1,5 +1,7 @@
 ---
 layout: post
+lang: ko
+permalink: books/Read-Clean-Code-In-Go-07
 title: Go 언어로 읽는 클린 코드 7장 - 오류처리
 categories:
   - Books

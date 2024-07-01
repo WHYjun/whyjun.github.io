@@ -5,8 +5,8 @@
     <description>개발자 경험(DX)을 생각하는 개발자입니다.</description>
     <link>https://whyjun.github.io/</link>
     <atom:link href="https://whyjun.github.io/twitter.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Sun, 30 Jun 2024 17:12:57 -0500</pubDate>
-    <lastBuildDate>Sun, 30 Jun 2024 17:12:57 -0500</lastBuildDate>
+    <pubDate>Sun, 30 Jun 2024 19:42:30 -0500</pubDate>
+    <lastBuildDate>Sun, 30 Jun 2024 19:42:30 -0500</lastBuildDate>
     <generator>Jekyll v3.9.2</generator>
     
     
@@ -41,8 +41,8 @@
       <item>
         <title>Go 언어로 읽는 클린 코드 10장 - 클래스</title>
         <pubDate>Tue, 08 Mar 2022 00:00:00 -0600</pubDate>
-        <link>https://whyjun.github.io/books/Read-Clean-Code-in-Go-09</link>
-        <guid isPermaLink="true">https://whyjun.github.io/books/Read-Clean-Code-in-Go-09</guid>
+        <link>https://whyjun.github.io/books/Read-Clean-Code-In-Go-09</link>
+        <guid isPermaLink="true">https://whyjun.github.io/books/Read-Clean-Code-In-Go-09</guid>
       </item>
     
   </channel>

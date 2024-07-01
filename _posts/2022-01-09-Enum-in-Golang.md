@@ -1,5 +1,7 @@
 ---
 layout: post
+lang: ko
+permalink: golang/Enum-in-Golang
 title: Go에서 Enum 사용하기 그리고 주의할 점
 categories:
   - Golang

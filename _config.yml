@@ -45,7 +45,6 @@ liquid:
   error_mode: strict
 
 # Build settings
-permalink: /:categories/:title
 markdown: kramdown
 feed:
   path: atom.xml
@@ -56,6 +55,12 @@ paginate_path: /page:num/
 
 # Search
 search_full_content: true # can have performance implications for large sites
+
+# Polyglot
+languages: ["ko"]
+default_lang: "ko"
+exclude_from_localization: ["assets"]
+parallel_localizaion: false
 
 # Taxonomy pages
 category_archive_path: "/categories/#"
@@ -75,9 +80,9 @@ tag_archive_path: "/tags/#"
 
 plugins:
   - jekyll-seo-tag
-  - jekyll-sitemap
   - jekyll-feed
   - jekyll-paginate
+  - jekyll-polyglot
 
 # Front Matter Defaults
 defaults:
@@ -94,7 +99,7 @@ author:
   name: Young Choi
   picture: /assets/images/young-choi-gopher-image.png
   email:
-  twitter:
+  twitter: https://x.com/youngchoi_dev
   links:
     - title: GitHub
       url: https://github.com/whyjun

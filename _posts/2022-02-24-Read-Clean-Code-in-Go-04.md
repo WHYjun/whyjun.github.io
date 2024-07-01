@@ -1,5 +1,7 @@
 ---
 layout: post
+lang: ko
+permalink: books/Read-Clean-Code-In-Go-04
 title: Go 언어로 읽는 클린 코드 4장 - 주석
 categories:
   - Books

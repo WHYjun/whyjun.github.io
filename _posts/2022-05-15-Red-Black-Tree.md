@@ -1,5 +1,7 @@
 ---
 layout: post
+lang: ko
+permalink: algorithm/Red-Black-Tree
 title: 알고리즘 공부 - Red-Black Tree
 categories:
   - Algorithm

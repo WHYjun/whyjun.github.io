@@ -1,5 +1,7 @@
 ---
 layout: post
+lang: ko
+permalink: books/Read-Clean-Code-In-Go-08
 title: Go 언어로 읽는 클린 코드 9장 - 단위 테스트
 categories:
   - Books

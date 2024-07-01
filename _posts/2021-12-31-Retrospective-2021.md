@@ -1,5 +1,7 @@
 ---
 layout: post
+lang: ko
+permalink: retrospective/Retrospective-2021
 title: 2021년 회고
 categories:
   - Retrospective

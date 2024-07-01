@@ -1,5 +1,7 @@
 ---
 layout: post
+lang: ko
+permalink: golang/Golang-Omitempty-Tag
 title: Go에서 omitempty 태그 사용하기
 categories:
   - Golang

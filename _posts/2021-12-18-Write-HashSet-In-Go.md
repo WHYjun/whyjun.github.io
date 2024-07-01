@@ -1,5 +1,7 @@
 ---
 layout: post
+lang: ko
+permalink: golang/Write-Hashset-in-Go
 title: Go에서 HashSet 구현하기
 categories:
   - Golang

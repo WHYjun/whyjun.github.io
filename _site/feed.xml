@@ -5,8 +5,8 @@
     <description>개발자 경험(DX)을 생각하는 개발자입니다.</description>
     <link>https://whyjun.github.io/</link>
     <atom:link href="https://whyjun.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 30 Jun 2024 17:12:57 -0500</pubDate>
-    <lastBuildDate>Sun, 30 Jun 2024 17:12:57 -0500</lastBuildDate>
+    <pubDate>Sun, 30 Jun 2024 19:42:30 -0500</pubDate>
+    <lastBuildDate>Sun, 30 Jun 2024 19:42:30 -0500</lastBuildDate>
     <generator>Jekyll v3.9.2</generator>
     
       <item>
@@ -259,8 +259,8 @@ golangci-lint &lt;span class=&quot;nt&quot;&gt;--version&lt;/span&gt;
 &lt;/ul&gt;
 </description>
         <pubDate>Tue, 08 Mar 2022 00:00:00 -0600</pubDate>
-        <link>https://whyjun.github.io/books/Read-Clean-Code-in-Go-09</link>
-        <guid isPermaLink="true">https://whyjun.github.io/books/Read-Clean-Code-in-Go-09</guid>
+        <link>https://whyjun.github.io/books/Read-Clean-Code-In-Go-09</link>
+        <guid isPermaLink="true">https://whyjun.github.io/books/Read-Clean-Code-In-Go-09</guid>
         
         <category>노개북</category>
         
@@ -317,8 +317,8 @@ golangci-lint &lt;span class=&quot;nt&quot;&gt;--version&lt;/span&gt;
 &lt;/ul&gt;
 </description>
         <pubDate>Sat, 05 Mar 2022 00:00:00 -0600</pubDate>
-        <link>https://whyjun.github.io/books/Read-Clean-Code-in-Go-08</link>
-        <guid isPermaLink="true">https://whyjun.github.io/books/Read-Clean-Code-in-Go-08</guid>
+        <link>https://whyjun.github.io/books/Read-Clean-Code-In-Go-08</link>
+        <guid isPermaLink="true">https://whyjun.github.io/books/Read-Clean-Code-In-Go-08</guid>
         
         <category>노개북</category>
         
@@ -421,8 +421,8 @@ golangci-lint &lt;span class=&quot;nt&quot;&gt;--version&lt;/span&gt;
 &lt;/ul&gt;
 </description>
         <pubDate>Thu, 03 Mar 2022 00:00:00 -0600</pubDate>
-        <link>https://whyjun.github.io/books/Read-Clean-Code-in-Go-07</link>
-        <guid isPermaLink="true">https://whyjun.github.io/books/Read-Clean-Code-in-Go-07</guid>
+        <link>https://whyjun.github.io/books/Read-Clean-Code-In-Go-07</link>
+        <guid isPermaLink="true">https://whyjun.github.io/books/Read-Clean-Code-In-Go-07</guid>
         
         <category>노개북</category>
         
@@ -468,8 +468,8 @@ golangci-lint &lt;span class=&quot;nt&quot;&gt;--version&lt;/span&gt;
 &lt;/ul&gt;
 </description>
         <pubDate>Tue, 01 Mar 2022 00:00:00 -0600</pubDate>
-        <link>https://whyjun.github.io/books/Read-Clean-Code-in-Go-06</link>
-        <guid isPermaLink="true">https://whyjun.github.io/books/Read-Clean-Code-in-Go-06</guid>
+        <link>https://whyjun.github.io/books/Read-Clean-Code-In-Go-06</link>
+        <guid isPermaLink="true">https://whyjun.github.io/books/Read-Clean-Code-In-Go-06</guid>
         
         <category>노개북</category>
         
@@ -537,8 +537,8 @@ golangci-lint &lt;span class=&quot;nt&quot;&gt;--version&lt;/span&gt;
 &lt;p&gt;다양한 스타일의 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;eslint&lt;/code&gt;가 있는 Javascript와 달리, Go는 언어를 설치할 때 형식을 자동화하는 툴이 같이 설치한다. 이는 대부분의 형식을 개발자들 대신 자동으로 맞춰주고 팀의 형식을 정하기 위해 시간을 낭비하지 않도록 도와준다. 형식을 정하는게 얼마나 큰 대수냐라고 할 수 있지만, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;tab&lt;/code&gt;과 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;space&lt;/code&gt;를 가지고는 많은 개발자들의 논쟁이 있었고 Python에서는 들여쓰기가 둘 중 하나로 통일되지 않으면 파일이 실행되지 않기도 한다.&lt;/p&gt;
 </description>
         <pubDate>Mon, 28 Feb 2022 00:00:00 -0600</pubDate>
-        <link>https://whyjun.github.io/books/Read-Clean-Code-in-Go-05</link>
-        <guid isPermaLink="true">https://whyjun.github.io/books/Read-Clean-Code-in-Go-05</guid>
+        <link>https://whyjun.github.io/books/Read-Clean-Code-In-Go-05</link>
+        <guid isPermaLink="true">https://whyjun.github.io/books/Read-Clean-Code-In-Go-05</guid>
         
         <category>노개북</category>
         
@@ -600,8 +600,8 @@ golangci-lint &lt;span class=&quot;nt&quot;&gt;--version&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 </description>
         <pubDate>Thu, 24 Feb 2022 00:00:00 -0600</pubDate>
-        <link>https://whyjun.github.io/books/Read-Clean-Code-in-Go-04</link>
-        <guid isPermaLink="true">https://whyjun.github.io/books/Read-Clean-Code-in-Go-04</guid>
+        <link>https://whyjun.github.io/books/Read-Clean-Code-In-Go-04</link>
+        <guid isPermaLink="true">https://whyjun.github.io/books/Read-Clean-Code-In-Go-04</guid>
         
         <category>노개북</category>
         
@@ -667,8 +667,8 @@ golangci-lint &lt;span class=&quot;nt&quot;&gt;--version&lt;/span&gt;
 &lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Generic&lt;/code&gt;이 1.18 버전에 들어오기는 하지만 실제로 사용하기까지는 시간이 좀 걸릴 것으로 생각이 된다. 그리고 없었다보니 지금까지의 Go 코드들은 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Generic&lt;/code&gt;이 없어서 발생하는 중복들을 어느 정도 눈감아주기도 했다. 실제로 코드의 의존성을 늘리는 것보다 단순한 로직의 경우에는 코드를 복사/붙여넣기 해서 가져오는 것을 더 선호하는 Go 개발자들도 있다. 그리고 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Generic&lt;/code&gt; 없이 코딩하던 것들이 모여 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Go&lt;/code&gt;만이 가지고 있는 새로운 코딩 관습들을 만들었다고 생각한다. 지금의 패러다임이 많은 사람들이 원했던 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Generic&lt;/code&gt;이 실제로 생기게 되면서 어떻게 바뀔 지 기대가 된다.&lt;/p&gt;
 </description>
         <pubDate>Mon, 21 Feb 2022 00:00:00 -0600</pubDate>
-        <link>https://whyjun.github.io/books/Read-Clean-Code-in-Go-03</link>
-        <guid isPermaLink="true">https://whyjun.github.io/books/Read-Clean-Code-in-Go-03</guid>
+        <link>https://whyjun.github.io/books/Read-Clean-Code-In-Go-03</link>
+        <guid isPermaLink="true">https://whyjun.github.io/books/Read-Clean-Code-In-Go-03</guid>
         
         <category>노개북</category>
         
@@ -718,8 +718,8 @@ golangci-lint &lt;span class=&quot;nt&quot;&gt;--version&lt;/span&gt;
 &lt;p&gt;다른 언어들과 달리 Go 언어는 첫 글자가 대문자이냐 소문자이냐에 따라 외부로 내보낼 수 있냐 없냐가 결정된다. 그렇기 때문에 모든 이름은 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mixedCap&lt;/code&gt;이어야 한다 (상수도 예외가 아니다). 그리고 Go 언어는 예외가 없는 대신 에러 처리를 직접 할 수 있다. 그렇기 때문에 에러 처리를 하지 않고 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;panic&lt;/code&gt;을 해야 한다면 그 함수 이름을 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Must&lt;/code&gt;로 시작하게 지은 것을 Go 언어 Standard Library에서 볼 수 있다. 이것은 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Effective Go&lt;/code&gt;나 공식 문서에 있지는 않지만 따라서 나쁘지는 않을 것 같은 규칙이다.&lt;/p&gt;
 </description>
         <pubDate>Sat, 19 Feb 2022 00:00:00 -0600</pubDate>
-        <link>https://whyjun.github.io/books/Read-Clean-Code-in-Go-02</link>
-        <guid isPermaLink="true">https://whyjun.github.io/books/Read-Clean-Code-in-Go-02</guid>
+        <link>https://whyjun.github.io/books/Read-Clean-Code-In-Go-02</link>
+        <guid isPermaLink="true">https://whyjun.github.io/books/Read-Clean-Code-In-Go-02</guid>
         
         <category>노개북</category>
         
@@ -839,8 +839,8 @@ golangci-lint &lt;span class=&quot;nt&quot;&gt;--version&lt;/span&gt;
 &lt;p&gt;이렇게 추상화된 함수들은 나중에 이 배열이 다른 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;struct&lt;/code&gt;로 바뀐다고 할 지라도 실제 구현만 바꿔서 사용할 수 있고 이 추상화된 함수를 테스트하던 테스트 코드들도 그대로 활용할 수 있을 것이다. 모든 코드를 다 추상화해서 사용할 필요는 없지만 이처럼 반복된 기능을 수행하거나 다른 API나 시스템에서 호출될 기능들이라면 추상화해서 제공함으로써 다른 개발자들이 손쉽게 이 기능들을 사용할 수 있을 것 같다. 그리고 또 하나의 장점으로 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Receiver Function&lt;/code&gt;은 내가 만든 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;type&lt;/code&gt;에 함수를 만드는 것이기 때문에 다른 코드에서 쉽게 자동 완성으로 불러낼 수 있다는 점이다. 이를 이용하면 다른 개발자들이 중복된 함수를 만드는 것을 방지할 수 있지 않을까라는 생각도 해보았다.&lt;/p&gt;
 </description>
         <pubDate>Fri, 18 Feb 2022 00:00:00 -0600</pubDate>
-        <link>https://whyjun.github.io/books/Read-Clean-Code-in-Go-01</link>
-        <guid isPermaLink="true">https://whyjun.github.io/books/Read-Clean-Code-in-Go-01</guid>
+        <link>https://whyjun.github.io/books/Read-Clean-Code-In-Go-01</link>
+        <guid isPermaLink="true">https://whyjun.github.io/books/Read-Clean-Code-In-Go-01</guid>
         
         <category>노개북</category>
         
@@ -1058,8 +1058,8 @@ golangci-lint &lt;span class=&quot;nt&quot;&gt;--version&lt;/span&gt;
 &lt;p&gt;위의 코드들은 &lt;a href=&quot;https://go.dev/play/p/XthHr8HUHHL&quot;&gt;Go Playground&lt;/a&gt;에서 직접 사용해보실 수 있다.&lt;/p&gt;
 </description>
         <pubDate>Sat, 18 Dec 2021 00:00:00 -0600</pubDate>
-        <link>https://whyjun.github.io/golang/Write-HashSet-In-Go</link>
-        <guid isPermaLink="true">https://whyjun.github.io/golang/Write-HashSet-In-Go</guid>
+        <link>https://whyjun.github.io/golang/Write-Hashset-in-Go</link>
+        <guid isPermaLink="true">https://whyjun.github.io/golang/Write-Hashset-in-Go</guid>
         
         <category>golang</category>
         

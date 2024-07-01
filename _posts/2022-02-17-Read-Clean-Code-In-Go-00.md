@@ -1,5 +1,7 @@
 ---
 layout: post
+lang: ko
+permalink: books/Read-Clean-Code-In-Go-00
 title: Go 언어로 읽는 클린 코드 0장 - 들어가면서
 categories:
   - Books

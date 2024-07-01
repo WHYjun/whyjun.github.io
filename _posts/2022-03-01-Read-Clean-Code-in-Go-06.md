@@ -1,5 +1,7 @@
 ---
 layout: post
+lang: ko
+permalink: books/Read-Clean-Code-In-Go-06
 title: Go 언어로 읽는 클린 코드 6장 - 객체와 자료 구조
 categories:
   - Books

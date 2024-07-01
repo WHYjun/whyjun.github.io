@@ -1,5 +1,7 @@
 ---
 layout: post
+lang: ko
+permalink: golang/Use-GolangCI-Lint
 title: golangcli-lint로 Go 코드 규칙 적용하기
 categories:
   - Golang

@@ -1,5 +1,7 @@
 ---
 layout: post
+lang: ko
+permalink: algorithm/Reverse-Array
 title: 알고리즘 공부 - Go에서 배열 역순으로 정렬하기 (reverse)
 categories:
   - Algorithm
