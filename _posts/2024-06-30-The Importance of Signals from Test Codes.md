@@ -7,7 +7,7 @@ title: The Importance of Signals from Test Codes
 categories:
   - dev
 tags:
-  - test code
+  - test
 sharing:
   twitter: The Importance of Signals from Test Codes
 ---
@@ -26,31 +26,31 @@ Test codes are like a mirror for your main code. They show you its strengths and
 
 ### Excessive Mocking
 
-**What It Is**: Mocking means creating fake objects that mimic real ones.
-**The Signal**: Needing too many mocks usually means your classes are too dependent on each other.
-**The Solution**: Improve your code design. Break down large classes into smaller, independent ones.
+* **What It Is**: Mocking means creating fake objects that mimic real ones.
+* **The Signal**: Needing too many mocks usually means your classes are too dependent on each other.
+* **The Solution**: Improve your code design. Break down large classes into smaller, independent ones.
 
 ### Long Setup Times
 
-**What It Is**: Setting up tests should be quick and easy.
-**The Signal**: Long setup times can mean your code has too many dependencies or lacks modularity.
-**The Solution**: Simplify your code. Use dependency injection to reduce setup complexity.
+* **What It Is**: Setting up tests should be quick and easy.
+* **The Signal**: Long setup times can mean your code has too many dependencies or lacks modularity.
+* **The Solution**: Simplify your code. Use dependency injection to reduce setup complexity.
 
 ### Difficulty Isolating Tests
 
-**What It Is**: Each test should run independently.
-**The Signal**: If tests affect each other, your code might have hidden dependencies.
-**The Solution**: Make your code more modular. Ensure each part of your code does one thing well.
+* **What It Is**: Each test should run independently.
+* **The Signal**: If tests affect each other, your code might have hidden dependencies.
+* **The Solution**: Make your code more modular. Ensure each part of your code does one thing well.
 
 ### Hidden Dependencies
 
-**What It Is**: Hidden dependencies are those that are not immediately obvious, such as using Instant.now directly within a method.
-**The Signal**: If you find that certain parts of your code rely on hidden dependencies, it can be hard to maintain or extend.
-**The Solution**: Use the port-adapter pattern with dependency inversion. For example, instead of setting the current timestamp using Instant.now directly, inject a clock interface and use it to get the current time. This decouples your code from the specific implementation and makes it easier to test.
+* **What It Is**: Hidden dependencies are those that are not immediately obvious, such as using Instant.now directly within a method.
+* **The Signal**: If you find that certain parts of your code rely on hidden dependencies, it's hard to write unit tests without mocks.
+* **The Solution**: Use dependency inversion. For example, instead of setting the current timestamp using Instant.now directly, inject a clock interface and use it to get the current time. This decouples your code from the specific implementation and makes it easier to test.
 
 #### Implementing Dependency Inversion
 
-Here's a practical example to illustrate how to handle hidden dependencies using the port-adapter pattern with dependency inversion:
+Here's a practical example to illustrate how to handle hidden dependencies using dependency inversion:
 
 Before:
 
