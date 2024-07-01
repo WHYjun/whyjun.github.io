@@ -1,8 +1,7 @@
-
 ---
 layout: post
 lang: en
-permalink: dev/the-importance-of-signals-from-test-codes
+permalink: dev/The-Importance-of-Signals-from-Test-Codes
 title: The Importance of Signals from Test Codes
 categories:
   - dev
