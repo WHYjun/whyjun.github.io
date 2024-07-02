@@ -82,7 +82,7 @@ plugins:
   - jekyll-seo-tag
   - jekyll-feed
   - jekyll-paginate
-  - jekyll-polyglot
+  # - jekyll-polyglot
 
 # Front Matter Defaults
 defaults:
