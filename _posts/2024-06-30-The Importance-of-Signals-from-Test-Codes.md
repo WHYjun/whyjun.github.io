@@ -1,10 +1,10 @@
 ---
 layout: post
-lang: en
-permalink: dev/The-Importance-of-Signals-from-Test-Codes
+lang: ko
+permalink: blog/The-Importance-of-Signals-from-Test-Codes
 title: The Importance of Signals from Test Codes
 categories:
-  - dev
+  - development
 tags:
   - test
 sharing:
@@ -14,6 +14,7 @@ sharing:
 When you write test code, it can tell you a lot about your main code. If you find it hard to write tests, it often means there are problems in your code design. Let's explore why these signals are important and what they can teach you.
 
 ## Why Test Codes Matter
+
 Test codes are like a mirror for your main code. They show you its strengths and weaknesses. Here are some key signals to watch for:
 
 * Difficulty Writing Tests: If you struggle to write tests, your code might be too complex or not modular.

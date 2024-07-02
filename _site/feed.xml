@@ -5,9 +5,134 @@
     <description>개발자 경험(DX)을 생각하는 개발자입니다.</description>
     <link>https://whyjun.github.io/</link>
     <atom:link href="https://whyjun.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 30 Jun 2024 19:42:30 -0500</pubDate>
-    <lastBuildDate>Sun, 30 Jun 2024 19:42:30 -0500</lastBuildDate>
-    <generator>Jekyll v3.9.2</generator>
+    <pubDate>Mon, 01 Jul 2024 22:06:10 -0500</pubDate>
+    <lastBuildDate>Mon, 01 Jul 2024 22:06:10 -0500</lastBuildDate>
+    <generator>Jekyll v3.9.5</generator>
+    
+      <item>
+        <title>The Importance of Signals from Test Codes</title>
+        <description>&lt;p&gt;When you write test code, it can tell you a lot about your main code. If you find it hard to write tests, it often means there are problems in your code design. Let’s explore why these signals are important and what they can teach you.&lt;/p&gt;
+
+&lt;h2 id=&quot;why-test-codes-matter&quot;&gt;Why Test Codes Matter&lt;/h2&gt;
+
+&lt;p&gt;Test codes are like a mirror for your main code. They show you its strengths and weaknesses. Here are some key signals to watch for:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Difficulty Writing Tests: If you struggle to write tests, your code might be too complex or not modular.&lt;/li&gt;
+  &lt;li&gt;Excessive Mocking: If you need to mock too many things, your code might be tightly coupled.&lt;/li&gt;
+  &lt;li&gt;Long Setup Times: If setting up a test takes a long time, your code may have too many dependencies.&lt;/li&gt;
+  &lt;li&gt;Hidden Dependencies: If certain dependencies are not obvious, your code might be hard to maintain or extend.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;key-signals-and-what-they-mean&quot;&gt;Key Signals and What They Mean&lt;/h2&gt;
+
+&lt;h3 id=&quot;excessive-mocking&quot;&gt;Excessive Mocking&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;What It Is&lt;/strong&gt;: Mocking means creating fake objects that mimic real ones.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;The Signal&lt;/strong&gt;: Needing too many mocks usually means your classes are too dependent on each other.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;The Solution&lt;/strong&gt;: Improve your code design. Break down large classes into smaller, independent ones.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;long-setup-times&quot;&gt;Long Setup Times&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;What It Is&lt;/strong&gt;: Setting up tests should be quick and easy.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;The Signal&lt;/strong&gt;: Long setup times can mean your code has too many dependencies or lacks modularity.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;The Solution&lt;/strong&gt;: Simplify your code. Use dependency injection to reduce setup complexity.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;difficulty-isolating-tests&quot;&gt;Difficulty Isolating Tests&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;What It Is&lt;/strong&gt;: Each test should run independently.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;The Signal&lt;/strong&gt;: If tests affect each other, your code might have hidden dependencies.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;The Solution&lt;/strong&gt;: Make your code more modular. Ensure each part of your code does one thing well.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;hidden-dependencies&quot;&gt;Hidden Dependencies&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;What It Is&lt;/strong&gt;: Hidden dependencies are those that are not immediately obvious, such as using Instant.now directly within a method.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;The Signal&lt;/strong&gt;: If you find that certain parts of your code rely on hidden dependencies, it’s hard to write unit tests without mocks.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;The Solution&lt;/strong&gt;: Use dependency inversion. For example, instead of setting the current timestamp using Instant.now directly, inject a clock interface and use it to get the current time. This decouples your code from the specific implementation and makes it easier to test.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;implementing-dependency-inversion&quot;&gt;Implementing Dependency Inversion&lt;/h4&gt;
+
+&lt;p&gt;Here’s a practical example to illustrate how to handle hidden dependencies using dependency inversion:&lt;/p&gt;
+
+&lt;p&gt;Before:&lt;/p&gt;
+
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Event&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Instant&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;timestamp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Event&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;timestamp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Instant&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;now&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;After:&lt;/p&gt;
+
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;interface&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Clock&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nc&quot;&gt;Instant&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;now&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;SystemClock&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;implements&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Clock&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Instant&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;now&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Instant&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;now&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;FakeClock&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;implements&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Clock&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Instant&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;now&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Instant&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;parse&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;2007-12-03T10:15:30.00Z&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Event&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Instant&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;timestamp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Event&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nc&quot;&gt;Clock&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;clock&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;timestamp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;clock&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;now&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;benefits-of-listening-to-these-signals&quot;&gt;Benefits of Listening to These Signals&lt;/h2&gt;
+
+&lt;p&gt;By paying attention to these signals, you can improve your code design. This makes your code:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Easier to Understand: Clear, modular code is easier to read and maintain.&lt;/li&gt;
+  &lt;li&gt;More Reliable: Well-designed code has fewer bugs and is easier to test.&lt;/li&gt;
+  &lt;li&gt;More Flexible: Good design makes it easier to add new features.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;practical-steps-to-improve-your-code&quot;&gt;Practical Steps to Improve Your Code&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Refactor Regularly: Don’t wait until your code is a mess. Refactor as you go to keep your code clean.&lt;/li&gt;
+  &lt;li&gt;Use Dependency Injection: This reduces the need for mocks and makes your code more modular.&lt;/li&gt;
+  &lt;li&gt;Write Small, Focused Functions: Each function should do one thing and do it well. This makes them easier to test.&lt;/li&gt;
+  &lt;li&gt;Identify and Eliminate Hidden Dependencies: Use patterns like port-adapter and dependency inversion to decouple your code.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;Test codes are valuable tools. They don’t just check if your code works; they also show you where it needs improvement. By paying attention to the signals from your test codes, you can make your code more robust, easier to maintain, and more enjoyable to work with. Keep your tests simple, listen to what they’re telling you, and your code will thank you.&lt;/p&gt;
+</description>
+        <pubDate>Sun, 30 Jun 2024 00:00:00 -0500</pubDate>
+        <link>https://whyjun.github.io/blog/The-Importance-of-Signals-from-Test-Codes</link>
+        <guid isPermaLink="true">https://whyjun.github.io/blog/The-Importance-of-Signals-from-Test-Codes</guid>
+        
+        <category>test</category>
+        
+        
+        <category>development</category>
+        
+      </item>
     
       <item>
         <title>Go에서 omitempty 태그 사용하기</title>
