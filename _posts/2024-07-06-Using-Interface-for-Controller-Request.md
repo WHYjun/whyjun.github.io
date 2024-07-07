@@ -1,6 +1,6 @@
 ---
 layout: post
-lang: ko
+lang: en
 permalink: blog/Using-Interface-for-Controller-Requests-in-Java Spring-Framework
 title: Using Interface for Controller Requests in Java Spring Framework
 categories:

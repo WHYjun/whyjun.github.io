@@ -1,6 +1,4 @@
----
-layout: content
----
 User-agent: *
+Allow: /
 
 Sitemap: https://whyjun.github.io/sitemap.xml

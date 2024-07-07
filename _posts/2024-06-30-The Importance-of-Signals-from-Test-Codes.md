@@ -1,6 +1,6 @@
 ---
 layout: post
-lang: ko
+lang: en
 permalink: blog/The-Importance-of-Signals-from-Test-Codes
 title: The Importance of Signals from Test Codes
 categories:

@@ -16,10 +16,6 @@
     <link rel="canonical" href="{{ page.url | replace:'index.html', '' | absolute_url }}">
   {% endif %}
 
-  {% if site.plugins contains 'jekyll-polyglot' or site.gems contains 'jekyll-polyglot' %}
-    {% I18n_Headers %}
-  {% endif %}
-
   <script>
     /* Cut the mustard */
     if ( 'querySelector' in document && 'addEventListener' in window ) {
