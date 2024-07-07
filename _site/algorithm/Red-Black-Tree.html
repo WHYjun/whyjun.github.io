@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<!--
+    So Simple Jekyll Theme 3.2.0
+    Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+    Free for personal and commercial use under the MIT license
+    https://github.com/mmistakes/so-simple-theme/blob/master/LICENSE
+-->
+<html lang="ko" class="no-js">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+
+  
+    
+    <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>알고리즘 공부 - Red-Black Tree | 개발 기록</title>
+<meta name="generator" content="Jekyll v3.9.5" />
+<meta property="og:title" content="알고리즘 공부 - Red-Black Tree" />
+<meta name="author" content="Young Choi" />
+<meta property="og:locale" content="ko_KR" />
+<meta name="description" content="오랜만에 인터뷰 문제를 풀어볼 겸 LeetCode에 들어갔는데 인터뷰 가이드에 있는 문제들을 풀어보면 금방 풀겠지 하다가 한 문제에 잘못 걸렸다. 어찌저찌 구현은 했지만 다른 사람들이 풀은 방식 중에 듣기만 해보고 제대로 공부하지는 않았던 자료구조가 있어서 이렇게 따로 정리해보기로 했다. 고생시켰던 문제가 무엇인지 궁금하신 분은 이 링크로 가면 확인해볼 수 있다. 사실 Hard 난이도인 걸 가이드 페이지에 안 나와있어서 풀었지 실제로 알았다면 풀려고 하지 않았을 것 같다." />
+<meta property="og:description" content="오랜만에 인터뷰 문제를 풀어볼 겸 LeetCode에 들어갔는데 인터뷰 가이드에 있는 문제들을 풀어보면 금방 풀겠지 하다가 한 문제에 잘못 걸렸다. 어찌저찌 구현은 했지만 다른 사람들이 풀은 방식 중에 듣기만 해보고 제대로 공부하지는 않았던 자료구조가 있어서 이렇게 따로 정리해보기로 했다. 고생시켰던 문제가 무엇인지 궁금하신 분은 이 링크로 가면 확인해볼 수 있다. 사실 Hard 난이도인 걸 가이드 페이지에 안 나와있어서 풀었지 실제로 알았다면 풀려고 하지 않았을 것 같다." />
+<link rel="canonical" href="https://whyjun.github.io/algorithm/Red-Black-Tree" />
+<meta property="og:url" content="https://whyjun.github.io/algorithm/Red-Black-Tree" />
+<meta property="og:site_name" content="개발 기록" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-05-15T00:00:00-05:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="알고리즘 공부 - Red-Black Tree" />
+<meta name="twitter:site" content="@youngchoi_dev" />
+<meta name="twitter:creator" content="@https://x.com/youngchoi_dev" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Young Choi"},"dateModified":"2022-05-15T00:00:00-05:00","datePublished":"2022-05-15T00:00:00-05:00","description":"오랜만에 인터뷰 문제를 풀어볼 겸 LeetCode에 들어갔는데 인터뷰 가이드에 있는 문제들을 풀어보면 금방 풀겠지 하다가 한 문제에 잘못 걸렸다. 어찌저찌 구현은 했지만 다른 사람들이 풀은 방식 중에 듣기만 해보고 제대로 공부하지는 않았던 자료구조가 있어서 이렇게 따로 정리해보기로 했다. 고생시켰던 문제가 무엇인지 궁금하신 분은 이 링크로 가면 확인해볼 수 있다. 사실 Hard 난이도인 걸 가이드 페이지에 안 나와있어서 풀었지 실제로 알았다면 풀려고 하지 않았을 것 같다.","headline":"알고리즘 공부 - Red-Black Tree","mainEntityOfPage":{"@type":"WebPage","@id":"https://whyjun.github.io/algorithm/Red-Black-Tree"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://whyjun.github.io/assets/images/young-choi-gopher-image.png"},"name":"Young Choi"},"url":"https://whyjun.github.io/algorithm/Red-Black-Tree"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  
+
+  <script>
+    /* Cut the mustard */
+    if ( 'querySelector' in document && 'addEventListener' in window ) {
+      document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + 'js';
+    }
+  </script>
+
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/skins/default.css">
+  
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,700,700i|Lora:400,400i,700,700i">
+  <link rel="alternate" type="application/atom+xml" title="개발 기록" href="/atom.xml">
+<!-- start custom head snippets -->
+
+<!-- insert favicons. use http://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+</head>
+
+
+  <body class="layout--post  알고리즘-공부-red-black-tree">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#primary-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    
+  <div class="navigation-wrapper">
+    <a href="#menu-toggle" id="menu-toggle">Menu</a>
+    <nav id="primary-nav" class="site-nav animated drop">
+      <ul><li><a href="/posts/">Posts</a></li><li><a href="/categories/">Categories</a></li><li><a href="/tags/">Tags</a></li><li><a href="/search/">Search</a></li></ul>
+    </nav>
+  </div><!-- /.navigation-wrapper -->
+
+
+    <header class="masthead">
+  <div class="wrap">
+    
+      <a href="/" class="site-logo" rel="home" title="개발 기록">
+        <img src="/assets/images/young-choi-gopher-image.png" class="site-logo-img animated fadeInDown" alt="개발 기록">
+      </a>
+    
+    
+    
+      
+        <div class="site-title animated fadeIn"><a href="/">개발 기록</a></div>
+      
+      <p class="site-description animated fadeIn" itemprop="description">개발자 경험(DX)을 생각하는 개발자입니다.</p>
+    
+  </div>
+</header><!-- /.masthead -->
+
+
+    <main id="main" class="main-content" aria-label="Content">
+  <article class="h-entry">
+    
+
+    <div class="page-wrapper">
+      <header class="page-header">
+        
+        
+        <h1 id="page-title" class="page-title p-name">알고리즘 공부 - Red-Black Tree
+</h1>
+        
+      </header>
+
+      <div class="page-sidebar">
+        <div class="page-author h-card p-author"><img src="/assets/images/young-choi-gopher-image.png" class="author-avatar u-photo" alt="Young Choi"><div class="author-info"><div class="author-name">
+        <span class="p-name">Young Choi</span>
+      </div><ul class="author-links"><li class="author-link">
+            <a class="u-url" rel="me" href="https://github.com/whyjun"><i class="fab fa-github-square fa-lg" title="GitHub"></i></a>
+          </li></ul><!-- 
+
+<span class="read-time">2 min read</span>
+ -->
+    <time class="page-date dt-published" datetime="2022-05-15T00:00:00-05:00"><a class="u-url" href="">May 15, 2022</a>
+</time>
+
+  </div>
+</div>
+
+        
+  <h3 class="page-taxonomies-title">Categories</h3>
+  
+  <ul class="page-taxonomies"><li class="page-taxonomy"><a class="p-category" href="/categories/#algorithm" title="Pages filed under Algorithm">Algorithm</a></li>
+  </ul>
+
+
+        <!-- 
+  <h3 class="page-taxonomies-title">Tags</h3>
+  
+  <ul class="page-taxonomies"><li class="page-taxonomy"><a href="/tags/#algorithm" title="Pages tagged algorithm" rel="tag">algorithm</a></li>
+  </ul>
+ -->
+
+      </div>
+
+      <div class="page-content">
+        <div class="e-content">
+          <p>오랜만에 인터뷰 문제를 풀어볼 겸 LeetCode에 들어갔는데 인터뷰 가이드에 있는 문제들을 풀어보면 금방 풀겠지 하다가 한 문제에 잘못 걸렸다. 어찌저찌 구현은 했지만 다른 사람들이 풀은 방식 중에 듣기만 해보고 제대로 공부하지는 않았던 자료구조가 있어서 이렇게 따로 정리해보기로 했다. 고생시켰던 문제가 무엇인지 궁금하신 분은 이 <a href="https://leetcode.com/problems/odd-even-jump/">링크</a>로 가면 확인해볼 수 있다. 사실 Hard 난이도인 걸 가이드 페이지에 안 나와있어서 풀었지 실제로 알았다면 풀려고 하지 않았을 것 같다.</p>
+
+<h2 id="red-black-tree는">Red-Black Tree는?</h2>
+
+<p>위키피디아에 나온 정의로 설명하면, Red-Black Tree는 “Self-Balancing Binary Search Tree (스스로 균형을 맞추는 이진 탐색 트리)”입니다. 이는 Binary Search Tree의 특징을 그대로 가지고 있다는 뜻인데요. 새로운 Node가 이 자료구조에 들어오면 현재 Node보다 Key값이 작은 경우 그 Node의 왼쪽으로, 큰 경우에는 오른쪽으로 삽입하게 됩니다. 이러한 특징때문에 어떠한 값을 찾아야 하는 인터뷰 문제에서 자주 사용하게 되는 자료구조입니다. 여기에 더해 Red-Black Tree는 Node의 색깔이라는 개념을 추가해서 스스로 균형을 맞출 수 있도록 (어느 한 쪽으로 Node가 너무 많이 들어가지 않도록) 했습니다.</p>
+
+<p align="center"> 
+  <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Red-black_tree_example_with_NIL.svg" alt="figure 1: red-black-tree" />
+  <p align="center">이미지 출처: Wikipedia(https://en.wikipedia.org/wiki/Red%E2%80%93black_tree)</p>
+</p>
+
+<p>위 이미지에서 볼 수 있듯이, Red-Black Tree는 아래와 같은 특징을 가지고 있습니다.</p>
+
+<ul>
+  <li>Root Node의 색깔은 항상 검정이다.</li>
+  <li>모든 Nil Node의 색깔은 검정이라고 생각한다.</li>
+  <li>빨간 Node는 자신의 자식으로 빨간 Node를 가지지 않는다.</li>
+  <li>어느 Leaf Node에서 시작해도 Root Node까지 가는 길에 만나는 검정 Node의 개수는 같아야 한다.</li>
+</ul>
+
+<p>이러한 조건들에 맞게 새로운 Node가 삽입이 될 때마다 Red-Black Tree는 스스로 균형을 맞출 수 있다. 그리고 이렇게 맞춰진 균형이 완벽하지 않더라도 어떠한 Node를 찾는데 걸리는 시간 복잡도는 <code class="language-plaintext highlighter-rouge">O(logN)</code>이고 삽입과 제거 또한 <code class="language-plaintext highlighter-rouge">O(logN)</code> 시간 복잡도로 수행할 수 있다.</p>
+
+<h2 id="이-문제에서-red-black-tree가-필요한-이유는">이 문제에서 Red-Black Tree가 필요한 이유는?</h2>
+
+<p>이 문제에서 가장 시간을 많이 잡았던 부분은 배열을 역순으로 값을 확인하면서 그 값보다 크지만 가장 작거나 아니면 그 값보다 작지만 가장 큰 값을 그 값보다 우측에 있는 값들 중 찾아야 하는 부분이었다. 배열에 있는 값들을 하나하나 확인할 때마다 비교군에 새로운 값들이 추가되기 때문에 이를 자동으로 정렬해줄 수 있는 자료구조가 필요했고 어떤 자료구조를 사용하면 쉽고 빠르게 구현할 수 있을지에 대해서 생각하지 못했었다. 다행히 Discussion에서 treemap(Red-Black Tree를 기반으로 한 자료구조)을 사용하는 답변을 보아서 문제를 풀 수는 있었지만 지금 정리를 해놓지 않으면 나중에 이런 문제를 보게 되었을 때 Binary Search Tree를 생각해내지 못할 것 같았다.</p>
+
+<h2 id="어떤-경우에-또-사용할-수-있을까">어떤 경우에 또 사용할 수 있을까?</h2>
+
+<p>새로운 값을 계속해서 비교해야 하는 문제에서 특히 유용할 것 같다. 이 문제를 풀 때 Go 오픈소스 모듈 중 하나인 <code class="language-plaintext highlighter-rouge">gods</code>에서 제공하는 <code class="language-plaintext highlighter-rouge">treemap</code>을 사용했는데 이 모듈에서 제공하는 <code class="language-plaintext highlighter-rouge">Ceiling</code>하고 <code class="language-plaintext highlighter-rouge">Floor</code>함수는 내가 비교하려는 값에 제일 가까운 크거나 작은 값을 반환해준다. 이와 같은 기능이 필요한 문제라면 사용해야 할 자료구조라고 생각한다.</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="s">"github.com/emirpasic/gods/maps/treemap"</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">m</span> <span class="o">:=</span> <span class="n">treemap</span><span class="o">.</span><span class="n">NewWithIntComparator</span><span class="p">()</span> <span class="c">// empty (keys are of type int)</span>
+	<span class="n">m</span><span class="o">.</span><span class="n">Put</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="s">"x"</span><span class="p">)</span>                       <span class="c">// 1-&gt;x</span>
+	<span class="n">m</span><span class="o">.</span><span class="n">Put</span><span class="p">(</span><span class="m">2</span><span class="p">,</span> <span class="s">"b"</span><span class="p">)</span>                       <span class="c">// 1-&gt;x, 2-&gt;b (in order)</span>
+	<span class="n">m</span><span class="o">.</span><span class="n">Put</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="s">"a"</span><span class="p">)</span>                       <span class="c">// 1-&gt;a, 2-&gt;b (in order)</span>
+	<span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">Get</span><span class="p">(</span><span class="m">2</span><span class="p">)</span>                     <span class="c">// b, true</span>
+	<span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">Get</span><span class="p">(</span><span class="m">3</span><span class="p">)</span>                     <span class="c">// nil, false</span>
+	<span class="n">_</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">Values</span><span class="p">()</span>                      <span class="c">// []interface {}{"a", "b"} (in order)</span>
+	<span class="n">_</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">Keys</span><span class="p">()</span>                        <span class="c">// []interface {}{1, 2} (in order)</span>
+	<span class="n">m</span><span class="o">.</span><span class="n">Remove</span><span class="p">(</span><span class="m">1</span><span class="p">)</span>                         <span class="c">// 2-&gt;b</span>
+	<span class="n">m</span><span class="o">.</span><span class="n">Clear</span><span class="p">()</span>                           <span class="c">// empty</span>
+	<span class="n">m</span><span class="o">.</span><span class="n">Empty</span><span class="p">()</span>                           <span class="c">// true</span>
+	<span class="n">m</span><span class="o">.</span><span class="n">Size</span><span class="p">()</span>                            <span class="c">// 0</span>
+
+	<span class="c">// Other:</span>
+	<span class="n">m</span><span class="o">.</span><span class="n">Min</span><span class="p">()</span> <span class="c">// Returns the minimum key and its value from map.</span>
+	<span class="n">m</span><span class="o">.</span><span class="n">Max</span><span class="p">()</span> <span class="c">// Returns the maximum key and its value from map.</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">Ceiling</span><span class="p">()</span> <span class="c">// Returns the smallest key that is larger than or equal to the given key</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">Floor</span><span class="p">()</span> <span class="c">// Returns the largest key that is smaller than or equal to the given key</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+        </div>
+      
+        <a href="https://www.buymeacoffee.com/youngchoi"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=youngchoi&button_colour=FFDD00&font_colour=000000&font_family=Comic&outline_colour=000000&coffee_colour=ffffff"></a>
+
+        <script src="https://utteranc.es/client.js" repo="whyjun/whyjun.github.io" issue-term="title" label="💬 comment"
+          theme="github-light" crossorigin="anonymous" async>
+        </script>
+
+        <!-- 
+        <div class="page-share">
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwhyjun.github.io%2Falgorithm%2FRed-Black-Tree" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--facebook btn--small"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i> <span>Share</span></a>
+  <a href="https://twitter.com/intent/tweet?text=%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98+%EA%B3%B5%EB%B6%80+-+Red-Black+Tree%20https%3A%2F%2Fwhyjun.github.io%2Falgorithm%2FRed-Black-Tree" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--twitter btn--small"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i> <span>Tweet</span></a>
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fwhyjun.github.io%2Falgorithm%2FRed-Black-Tree" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--linkedin btn--small"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i> <span>LinkedIn</span></a>
+  <a href="https://reddit.com/submit?title=%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98+%EA%B3%B5%EB%B6%80+-+Red-Black+Tree&url=https%3A%2F%2Fwhyjun.github.io%2Falgorithm%2FRed-Black-Tree" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--reddit btn--small"><i class="fab fa-fw fa-reddit" aria-hidden="true"></i> <span>Reddit</span></a>
+</div>
+
+         -->
+
+        <nav class="page-pagination" role="navigation">
+  
+    <a class="page-previous" href="/books/Read-Clean-Code-In-Go-09">
+      <h4 class="page-pagination-label">Previous</h4>
+      <span class="page-pagination-title">
+        <i class="fas fa-arrow-left"></i> Go 언어로 읽는 클린 코드 10장 - 클래스
+
+      </span>
+    </a>
+  
+
+  
+    <a class="page-next" href="/algorithm/Reverse-Array">
+      <h4 class="page-pagination-label">Next</h4>
+      <span class="page-pagination-title">
+        알고리즘 공부 - Go에서 배열 역순으로 정렬하기 (reverse)
+ <i class="fas fa-arrow-right"></i>
+      </span>
+    </a>
+  
+</nav>
+
+      </div>
+    </div>
+  </article>
+</main>
+
+    <footer id="footer" class="site-footer">
+  <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+<div class="copyright">
+    
+      <p>&copy; 2024 개발 기록. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://github.com/mmistakes/so-simple-theme" rel="nofollow">So Simple</a>.</p>
+    
+  </div>
+</footer>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://use.fontawesome.com/releases/v5.0.12/js/all.js"></script>
+
+
+  </body>
+
+</html>

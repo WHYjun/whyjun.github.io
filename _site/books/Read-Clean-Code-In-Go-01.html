@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<!--
+    So Simple Jekyll Theme 3.2.0
+    Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+    Free for personal and commercial use under the MIT license
+    https://github.com/mmistakes/so-simple-theme/blob/master/LICENSE
+-->
+<html lang="ko" class="no-js">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+
+  
+    
+    <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Go 언어로 읽는 클린 코드 1장 - 깨끗한 코드 | 개발 기록</title>
+<meta name="generator" content="Jekyll v3.9.5" />
+<meta property="og:title" content="Go 언어로 읽는 클린 코드 1장 - 깨끗한 코드" />
+<meta name="author" content="Young Choi" />
+<meta property="og:locale" content="ko_KR" />
+<meta name="description" content="클린 코드, 애자일 소프트웨어 장인 정신: Day 01 - 깨끗한 코드" />
+<meta property="og:description" content="클린 코드, 애자일 소프트웨어 장인 정신: Day 01 - 깨끗한 코드" />
+<link rel="canonical" href="https://whyjun.github.io/books/Read-Clean-Code-In-Go-01" />
+<meta property="og:url" content="https://whyjun.github.io/books/Read-Clean-Code-In-Go-01" />
+<meta property="og:site_name" content="개발 기록" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-02-18T00:00:00-06:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Go 언어로 읽는 클린 코드 1장 - 깨끗한 코드" />
+<meta name="twitter:site" content="@youngchoi_dev" />
+<meta name="twitter:creator" content="@https://x.com/youngchoi_dev" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Young Choi"},"dateModified":"2022-02-18T00:00:00-06:00","datePublished":"2022-02-18T00:00:00-06:00","description":"클린 코드, 애자일 소프트웨어 장인 정신: Day 01 - 깨끗한 코드","headline":"Go 언어로 읽는 클린 코드 1장 - 깨끗한 코드","mainEntityOfPage":{"@type":"WebPage","@id":"https://whyjun.github.io/books/Read-Clean-Code-In-Go-01"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://whyjun.github.io/assets/images/young-choi-gopher-image.png"},"name":"Young Choi"},"url":"https://whyjun.github.io/books/Read-Clean-Code-In-Go-01"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  
+
+  <script>
+    /* Cut the mustard */
+    if ( 'querySelector' in document && 'addEventListener' in window ) {
+      document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + 'js';
+    }
+  </script>
+
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/skins/default.css">
+  
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,700,700i|Lora:400,400i,700,700i">
+  <link rel="alternate" type="application/atom+xml" title="개발 기록" href="/atom.xml">
+<!-- start custom head snippets -->
+
+<!-- insert favicons. use http://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+</head>
+
+
+  <body class="layout--post  go-언어로-읽는-클린-코드-1장-깨끗한-코드">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#primary-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    
+  <div class="navigation-wrapper">
+    <a href="#menu-toggle" id="menu-toggle">Menu</a>
+    <nav id="primary-nav" class="site-nav animated drop">
+      <ul><li><a href="/posts/">Posts</a></li><li><a href="/categories/">Categories</a></li><li><a href="/tags/">Tags</a></li><li><a href="/search/">Search</a></li></ul>
+    </nav>
+  </div><!-- /.navigation-wrapper -->
+
+
+    <header class="masthead">
+  <div class="wrap">
+    
+      <a href="/" class="site-logo" rel="home" title="개발 기록">
+        <img src="/assets/images/young-choi-gopher-image.png" class="site-logo-img animated fadeInDown" alt="개발 기록">
+      </a>
+    
+    
+    
+      
+        <div class="site-title animated fadeIn"><a href="/">개발 기록</a></div>
+      
+      <p class="site-description animated fadeIn" itemprop="description">개발자 경험(DX)을 생각하는 개발자입니다.</p>
+    
+  </div>
+</header><!-- /.masthead -->
+
+
+    <main id="main" class="main-content" aria-label="Content">
+  <article class="h-entry">
+    
+
+    <div class="page-wrapper">
+      <header class="page-header">
+        
+        
+        <h1 id="page-title" class="page-title p-name">Go 언어로 읽는 클린 코드 1장 - 깨끗한 코드
+</h1>
+        
+      </header>
+
+      <div class="page-sidebar">
+        <div class="page-author h-card p-author"><img src="/assets/images/young-choi-gopher-image.png" class="author-avatar u-photo" alt="Young Choi"><div class="author-info"><div class="author-name">
+        <span class="p-name">Young Choi</span>
+      </div><ul class="author-links"><li class="author-link">
+            <a class="u-url" rel="me" href="https://github.com/whyjun"><i class="fab fa-github-square fa-lg" title="GitHub"></i></a>
+          </li></ul><!-- 
+
+<span class="read-time">3 min read</span>
+ -->
+    <time class="page-date dt-published" datetime="2022-02-18T00:00:00-06:00"><a class="u-url" href="">February 18, 2022</a>
+</time>
+
+  </div>
+</div>
+
+        
+  <h3 class="page-taxonomies-title">Categories</h3>
+  
+  <ul class="page-taxonomies"><li class="page-taxonomy"><a class="p-category" href="/categories/#books" title="Pages filed under Books">Books</a></li>
+  </ul>
+
+
+        <!-- 
+  <h3 class="page-taxonomies-title">Tags</h3>
+  
+  <ul class="page-taxonomies"><li class="page-taxonomy"><a href="/tags/#%EB%85%B8%EA%B0%9C%EB%B6%81" title="Pages tagged 노개북" rel="tag">노개북</a></li><li class="page-taxonomy"><a href="/tags/#%ED%81%B4%EB%A6%B0-%EC%BD%94%EB%93%9C" title="Pages tagged 클린 코드" rel="tag">클린 코드</a></li>
+  </ul>
+ -->
+
+      </div>
+
+      <div class="page-content">
+        <div class="e-content">
+          <p>클린 코드, 애자일 소프트웨어 장인 정신: Day 01 - 깨끗한 코드</p>
+
+<blockquote>
+  <p>Java 언어를 기반으로 쓰여진 이 책의 내용들을 어떻게 Go 언어에 적용할 수 있을까를 고민하며 읽었습니다.</p>
+</blockquote>
+
+<h2 id="-책에서-기억하고-싶은-내용을-써보세요">😀 책에서 기억하고 싶은 내용을 써보세요.</h2>
+
+<p>“프로그래머도 마찬가지다. 나쁜 코드의 위험을 이해하지 못하는 관리자 말을 그대로 따르는 행동은 전문가답지 못하다.” (p.7)</p>
+
+<p>“테스트 케이스가 없는 코드는 깨끗한 코드가 아니 다. 아무리 코드가 우아해도, 아무리 가독성이 높아도, 테스트 케이스가 없으면 깨끗하지 않다.” (p.12)</p>
+
+<p>“간단한 코드는 1) 모든 테스트를 통과한다. 2) 중복이 없다. 3) 시스템 내 모든 설계 아이디어를 표현한다. 4) 클래스, 메서드, 함수 등을 최대한 줄인다.” (p.13)</p>
+
+<h2 id="-오늘-읽은-소감은-떠오르는-생각을-가볍게-적어보세요">🤔 오늘 읽은 소감은? 떠오르는 생각을 가볍게 적어보세요.</h2>
+
+<h3 id="나쁜-코드로-치르는-대가">나쁜 코드로 치르는 대가</h3>
+
+<p>회사에서 리팩토링을 하고 있는 중이었기 때문에 책에 나온 예시들이 너무 와닿았다. 그 잘못의 원인이 프로그래머라는 사실 또한 큰 공감이 되었다. 프로젝트 매니저들에게 왜 이것이 선행되어야 하는지 설명하는 과정은 쉽지 않았지만 다른 프로젝트들을 위해서 쉽게 확장을 하려면 필요하다는 사실을 모두 이해하며 진행하는 중이다. 그러다 보니 팀 전체적으로 코드 리뷰가 더 엄격해졌고 이 책에서 나온 좋은 코드의 정의에 대해 서로 많이 공유하는 문화가 생겼다. 특히 지금 코드 때문에 모두가 힘들었다보니 더 그런 것 같다.</p>
+
+<h3 id="좋은-코드의-정의">좋은 코드의 정의</h3>
+
+<p>책에 나와 있는 여러 정의들 가운데 나에게 가장 큰 울림을 준 정의는 론 제프리스와 켄트 벡의 정의다. 그리고 이는 효율적인 테스트로 이어진다고 믿는다. 중복이 없으면 한 가지 기능만 하는 최소한의 수의 함수들이 시스템 내 모든 설계 아이디어를 표현하고 있다면 테스트를 모두 통과하는 것으로 우리는 이 코드가 제대로 동작하고 있다고 믿을 수 있다. 새로운 기능을 추가하는 것도 간편해지며 다른 사람들도 코드를 읽을 때 테스트 코드를 직접 돌려보면서 이 코드가 어떻게 동작하는지 알 수 있게 된다. 큰 시스템을 개발해본 경험이 부족해서일 수 있지만 아직까지 나는 위와 같이 정의된 코드가 좋은 코드라고 생각한다. 머리로는 알고 꿈은 항상 크게 잡고 있지만 내 실력이 부족해서, 그리고 책에 나와있듯이 개발자로서의 프로의식이 부족해서 이런 코드들을 작성하지 못하고 있다. 스스로를 돌아보면 나한테 제일 필요한 것은 더 많은 개발 지식보다 개발자로서의 프로의식이 아닐까?</p>
+
+<h2 id="-소감-3줄-요약">👀 소감 3줄 요약</h2>
+
+<ul>
+  <li>개발 부채를 피할 수는 없지만 가장 적은 이자이면서 쉽게 환급할 수 있도록 코드를 작성해야겠다. 그러려면 읽기 쉽고 테스트하기 편한 코드를 작성해야 한다고 생각한다.</li>
+  <li>“중복을 피하라. 한 기능만 수행하라. 제대로 표현하라. 작게 추상화하라.” (p.14)</li>
+  <li>Go 언어에는 객체(<code class="language-plaintext highlighter-rouge">Object</code>)라는 개념이 없지만 <code class="language-plaintext highlighter-rouge">SRP</code>나 <code class="language-plaintext highlighter-rouge">Dependency Injection</code>은 여전히 쓰이고 있다. 책에서 설명할 설계 원칙들과 예시 코드들이 기대가 된다.</li>
+</ul>
+
+<h2 id="코드에-적용해보기">코드에 적용해보기</h2>
+
+<p>Java의 객체(<code class="language-plaintext highlighter-rouge">Object</code>)를 이용한 추상화는 할 수 없지만, Go 언어의 <code class="language-plaintext highlighter-rouge">Receiver Function</code>을 활용해서 실제 구현을 쉽게 추상화할 수 있을 것 같다. 예를 들어, 학생 정보가 들어가있는 배열이 있는데 그 배열에 있는 학생들의 이름을 전부 출력해보고 싶다면 어떻게 해야 할까? 가장 먼저 떠오르는 것은 반복문을 돌려서 배열안에 있는 학생의 이름을 전부 출력해보는 것이다. 그리고 이 기능이 여러번 반복된다면 함수로 만들 수 있을 것이다.</p>
+
+<p>하지만 아래 예시와 같이 Go 에서는 <code class="language-plaintext highlighter-rouge">type</code>을 새로 정의내리고  <code class="language-plaintext highlighter-rouge">Receiver Function</code>으로 이름을 출력하는 기능을 추상화할 수 있다. (실제 코드는 다음 <a href="https://go.dev/play/p/y56ZKWeZcLE">링크</a>에서 실제로 사용해볼 수 있다.)</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="s">"fmt"</span>
+
+<span class="k">type</span> <span class="n">student</span> <span class="k">struct</span> <span class="p">{</span>
+	<span class="n">ID</span>   <span class="kt">int</span>
+	<span class="n">Name</span> <span class="kt">string</span>
+<span class="p">}</span>
+
+<span class="k">type</span> <span class="n">studentArr</span> <span class="p">[]</span><span class="n">student</span>
+
+<span class="k">func</span> <span class="p">(</span><span class="n">arr</span> <span class="n">studentArr</span><span class="p">)</span> <span class="n">PrintNames</span><span class="p">()</span> <span class="p">{</span>
+	<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">s</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">arr</span> <span class="p">{</span>
+		<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">Name</span><span class="p">)</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="n">students</span> <span class="o">:=</span> <span class="n">studentArr</span><span class="p">{</span>
+		<span class="p">{</span><span class="n">ID</span><span class="o">:</span> <span class="m">1</span><span class="p">,</span> <span class="n">Name</span><span class="o">:</span> <span class="s">"Nico"</span><span class="p">},</span>
+		<span class="p">{</span><span class="n">ID</span><span class="o">:</span> <span class="m">2</span><span class="p">,</span> <span class="n">Name</span><span class="o">:</span> <span class="s">"Lynn"</span><span class="p">},</span>
+		<span class="p">{</span><span class="n">ID</span><span class="o">:</span> <span class="m">3</span><span class="p">,</span> <span class="n">Name</span><span class="o">:</span> <span class="s">"Young"</span><span class="p">},</span>
+	<span class="p">}</span>
+
+	<span class="n">students</span><span class="o">.</span><span class="n">PrintNames</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>막상 적어보니 이렇게까지 추상화해야 하나라는 생각이 들었다. 추상화가 있으면 좋을만한 예시를 생각해보다가 학생 정보에 학생들이 수강했던 강의 정보들까지 있다면 어떨까? 그리고 그 강의의 이름들을 출력하고 싶다면 어떻게 하면 좋을까?</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="s">"fmt"</span>
+
+<span class="k">type</span> <span class="n">student</span> <span class="k">struct</span> <span class="p">{</span>
+	<span class="n">ID</span>      <span class="kt">int</span>
+	<span class="n">Name</span>    <span class="kt">string</span>
+	<span class="n">Courses</span> <span class="p">[]</span><span class="kt">string</span>
+<span class="p">}</span>
+
+<span class="k">type</span> <span class="n">studentArr</span> <span class="p">[]</span><span class="n">student</span>
+
+<span class="k">func</span> <span class="p">(</span><span class="n">arr</span> <span class="n">studentArr</span><span class="p">)</span> <span class="n">PrintCourses</span><span class="p">()</span> <span class="p">{</span>
+	<span class="c">// Go 에서 HashSet을 구현하는 법은 아래 링크에서 확인할 수 있다.</span>
+	<span class="c">// https://whyjun.github.io/golang/Write-HashSet-In-Go</span>
+	<span class="n">courseSet</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="k">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="k">struct</span><span class="p">{})</span>
+	<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">s</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">arr</span> <span class="p">{</span>
+		<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">c</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">s</span><span class="o">.</span><span class="n">Courses</span> <span class="p">{</span>
+			<span class="k">if</span> <span class="n">_</span><span class="p">,</span> <span class="n">ok</span> <span class="o">:=</span> <span class="n">courseSet</span><span class="p">[</span><span class="n">c</span><span class="p">];</span> <span class="o">!</span><span class="n">ok</span> <span class="p">{</span>
+				<span class="n">courseSet</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="k">struct</span><span class="p">{}{}</span>
+				<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="n">students</span> <span class="o">:=</span> <span class="n">studentArr</span><span class="p">{</span>
+		<span class="p">{</span><span class="n">ID</span><span class="o">:</span> <span class="m">1</span><span class="p">,</span> <span class="n">Name</span><span class="o">:</span> <span class="s">"Nico"</span><span class="p">,</span> <span class="n">Courses</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"React MasterClass"</span><span class="p">,</span> <span class="s">"Kokoa Clone"</span><span class="p">}},</span>
+		<span class="p">{</span><span class="n">ID</span><span class="o">:</span> <span class="m">2</span><span class="p">,</span> <span class="n">Name</span><span class="o">:</span> <span class="s">"Lynn"</span><span class="p">,</span> <span class="n">Courses</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"Kokoa Clone"</span><span class="p">}},</span>
+		<span class="p">{</span><span class="n">ID</span><span class="o">:</span> <span class="m">3</span><span class="p">,</span> <span class="n">Name</span><span class="o">:</span> <span class="s">"Young"</span><span class="p">,</span> <span class="n">Courses</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"Youtube Clone"</span><span class="p">}},</span>
+	<span class="p">}</span>
+	<span class="n">students</span><span class="o">.</span><span class="n">PrintCourses</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>이렇게 추상화된 함수들은 나중에 이 배열이 다른 <code class="language-plaintext highlighter-rouge">struct</code>로 바뀐다고 할 지라도 실제 구현만 바꿔서 사용할 수 있고 이 추상화된 함수를 테스트하던 테스트 코드들도 그대로 활용할 수 있을 것이다. 모든 코드를 다 추상화해서 사용할 필요는 없지만 이처럼 반복된 기능을 수행하거나 다른 API나 시스템에서 호출될 기능들이라면 추상화해서 제공함으로써 다른 개발자들이 손쉽게 이 기능들을 사용할 수 있을 것 같다. 그리고 또 하나의 장점으로 <code class="language-plaintext highlighter-rouge">Receiver Function</code>은 내가 만든 <code class="language-plaintext highlighter-rouge">type</code>에 함수를 만드는 것이기 때문에 다른 코드에서 쉽게 자동 완성으로 불러낼 수 있다는 점이다. 이를 이용하면 다른 개발자들이 중복된 함수를 만드는 것을 방지할 수 있지 않을까라는 생각도 해보았다.</p>
+
+        </div>
+      
+        <a href="https://www.buymeacoffee.com/youngchoi"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=youngchoi&button_colour=FFDD00&font_colour=000000&font_family=Comic&outline_colour=000000&coffee_colour=ffffff"></a>
+
+        <script src="https://utteranc.es/client.js" repo="whyjun/whyjun.github.io" issue-term="title" label="💬 comment"
+          theme="github-light" crossorigin="anonymous" async>
+        </script>
+
+        <!-- 
+        <div class="page-share">
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwhyjun.github.io%2Fbooks%2FRead-Clean-Code-In-Go-01" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--facebook btn--small"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i> <span>Share</span></a>
+  <a href="https://twitter.com/intent/tweet?text=Go+%EC%96%B8%EC%96%B4%EB%A1%9C+%EC%9D%BD%EB%8A%94+%ED%81%B4%EB%A6%B0+%EC%BD%94%EB%93%9C+1%EC%9E%A5+-+%EA%B9%A8%EB%81%97%ED%95%9C+%EC%BD%94%EB%93%9C%20https%3A%2F%2Fwhyjun.github.io%2Fbooks%2FRead-Clean-Code-In-Go-01" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--twitter btn--small"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i> <span>Tweet</span></a>
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fwhyjun.github.io%2Fbooks%2FRead-Clean-Code-In-Go-01" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--linkedin btn--small"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i> <span>LinkedIn</span></a>
+  <a href="https://reddit.com/submit?title=Go+%EC%96%B8%EC%96%B4%EB%A1%9C+%EC%9D%BD%EB%8A%94+%ED%81%B4%EB%A6%B0+%EC%BD%94%EB%93%9C+1%EC%9E%A5+-+%EA%B9%A8%EB%81%97%ED%95%9C+%EC%BD%94%EB%93%9C&url=https%3A%2F%2Fwhyjun.github.io%2Fbooks%2FRead-Clean-Code-In-Go-01" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--reddit btn--small"><i class="fab fa-fw fa-reddit" aria-hidden="true"></i> <span>Reddit</span></a>
+</div>
+
+         -->
+
+        <nav class="page-pagination" role="navigation">
+  
+    <a class="page-previous" href="/books/Read-Clean-Code-In-Go-00">
+      <h4 class="page-pagination-label">Previous</h4>
+      <span class="page-pagination-title">
+        <i class="fas fa-arrow-left"></i> Go 언어로 읽는 클린 코드 0장 - 들어가면서
+
+      </span>
+    </a>
+  
+
+  
+    <a class="page-next" href="/books/Read-Clean-Code-In-Go-02">
+      <h4 class="page-pagination-label">Next</h4>
+      <span class="page-pagination-title">
+        Go 언어로 읽는 클린 코드 2장 - 의미 있는 이름
+ <i class="fas fa-arrow-right"></i>
+      </span>
+    </a>
+  
+</nav>
+
+      </div>
+    </div>
+  </article>
+</main>
+
+    <footer id="footer" class="site-footer">
+  <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+<div class="copyright">
+    
+      <p>&copy; 2024 개발 기록. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://github.com/mmistakes/so-simple-theme" rel="nofollow">So Simple</a>.</p>
+    
+  </div>
+</footer>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://use.fontawesome.com/releases/v5.0.12/js/all.js"></script>
+
+
+  </body>
+
+</html>

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<!--
+    So Simple Jekyll Theme 3.2.0
+    Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+    Free for personal and commercial use under the MIT license
+    https://github.com/mmistakes/so-simple-theme/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+
+  
+    
+    <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Using Interface for Controller Requests in Java Spring Framework | 개발 기록</title>
+<meta name="generator" content="Jekyll v3.9.5" />
+<meta property="og:title" content="Using Interface for Controller Requests in Java Spring Framework" />
+<meta name="author" content="Young Choi" />
+<meta property="og:locale" content="ko_KR" />
+<meta name="description" content="When building a REST API with Java Spring Framework, handling multiple types of requests efficiently can be challenging. One effective approach is to use interfaces for controller requests. In this blog post, we’ll walk through an example using a restaurant order system. We’ll handle different types of orders (like hamburger and pizza) with a single endpoint." />
+<meta property="og:description" content="When building a REST API with Java Spring Framework, handling multiple types of requests efficiently can be challenging. One effective approach is to use interfaces for controller requests. In this blog post, we’ll walk through an example using a restaurant order system. We’ll handle different types of orders (like hamburger and pizza) with a single endpoint." />
+<link rel="canonical" href="https://whyjun.github.io/blog/Using-Interface-for-Controller-Requests-in-Java%20Spring-Framework" />
+<meta property="og:url" content="https://whyjun.github.io/blog/Using-Interface-for-Controller-Requests-in-Java%20Spring-Framework" />
+<meta property="og:site_name" content="개발 기록" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2024-07-06T00:00:00-05:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Using Interface for Controller Requests in Java Spring Framework" />
+<meta name="twitter:site" content="@youngchoi_dev" />
+<meta name="twitter:creator" content="@https://x.com/youngchoi_dev" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Young Choi"},"dateModified":"2024-07-06T00:00:00-05:00","datePublished":"2024-07-06T00:00:00-05:00","description":"When building a REST API with Java Spring Framework, handling multiple types of requests efficiently can be challenging. One effective approach is to use interfaces for controller requests. In this blog post, we’ll walk through an example using a restaurant order system. We’ll handle different types of orders (like hamburger and pizza) with a single endpoint.","headline":"Using Interface for Controller Requests in Java Spring Framework","mainEntityOfPage":{"@type":"WebPage","@id":"https://whyjun.github.io/blog/Using-Interface-for-Controller-Requests-in-Java%20Spring-Framework"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://whyjun.github.io/assets/images/young-choi-gopher-image.png"},"name":"Young Choi"},"url":"https://whyjun.github.io/blog/Using-Interface-for-Controller-Requests-in-Java%20Spring-Framework"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  
+
+  <script>
+    /* Cut the mustard */
+    if ( 'querySelector' in document && 'addEventListener' in window ) {
+      document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + 'js';
+    }
+  </script>
+
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/skins/default.css">
+  
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,700,700i|Lora:400,400i,700,700i">
+  <link rel="alternate" type="application/atom+xml" title="개발 기록" href="/atom.xml">
+<!-- start custom head snippets -->
+
+<!-- insert favicons. use http://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+</head>
+
+
+  <body class="layout--post  using-interface-for-controller-requests-in-java-spring-framework">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#primary-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    
+  <div class="navigation-wrapper">
+    <a href="#menu-toggle" id="menu-toggle">Menu</a>
+    <nav id="primary-nav" class="site-nav animated drop">
+      <ul><li><a href="/posts/">Posts</a></li><li><a href="/categories/">Categories</a></li><li><a href="/tags/">Tags</a></li><li><a href="/search/">Search</a></li></ul>
+    </nav>
+  </div><!-- /.navigation-wrapper -->
+
+
+    <header class="masthead">
+  <div class="wrap">
+    
+      <a href="/" class="site-logo" rel="home" title="개발 기록">
+        <img src="/assets/images/young-choi-gopher-image.png" class="site-logo-img animated fadeInDown" alt="개발 기록">
+      </a>
+    
+    
+    
+      
+        <div class="site-title animated fadeIn"><a href="/">개발 기록</a></div>
+      
+      <p class="site-description animated fadeIn" itemprop="description">개발자 경험(DX)을 생각하는 개발자입니다.</p>
+    
+  </div>
+</header><!-- /.masthead -->
+
+
+    <main id="main" class="main-content" aria-label="Content">
+  <article class="h-entry">
+    
+
+    <div class="page-wrapper">
+      <header class="page-header">
+        
+        
+        <h1 id="page-title" class="page-title p-name">Using Interface for Controller Requests in Java Spring Framework
+</h1>
+        
+      </header>
+
+      <div class="page-sidebar">
+        <div class="page-author h-card p-author"><img src="/assets/images/young-choi-gopher-image.png" class="author-avatar u-photo" alt="Young Choi"><div class="author-info"><div class="author-name">
+        <span class="p-name">Young Choi</span>
+      </div><ul class="author-links"><li class="author-link">
+            <a class="u-url" rel="me" href="https://github.com/whyjun"><i class="fab fa-github-square fa-lg" title="GitHub"></i></a>
+          </li></ul><!-- 
+
+<span class="read-time">2 min read</span>
+ -->
+    <time class="page-date dt-published" datetime="2024-07-06T00:00:00-05:00"><a class="u-url" href="">July 6, 2024</a>
+</time>
+
+  </div>
+</div>
+
+        
+  <h3 class="page-taxonomies-title">Categories</h3>
+  
+  <ul class="page-taxonomies"><li class="page-taxonomy"><a class="p-category" href="/categories/#development" title="Pages filed under development">development</a></li>
+  </ul>
+
+
+        <!-- 
+  <h3 class="page-taxonomies-title">Tags</h3>
+  
+  <ul class="page-taxonomies"><li class="page-taxonomy"><a href="/tags/#java" title="Pages tagged java" rel="tag">java</a></li>
+  </ul>
+ -->
+
+      </div>
+
+      <div class="page-content">
+        <div class="e-content">
+          <p>When building a REST API with Java Spring Framework, handling multiple types of requests efficiently can be challenging. One effective approach is to use interfaces for controller requests. In this blog post, we’ll walk through an example using a restaurant order system. We’ll handle different types of orders (like hamburger and pizza) with a single endpoint.</p>
+
+<h2 id="scenario-restaurant-order-system">Scenario: Restaurant Order System</h2>
+
+<p>Imagine we have an endpoint /v1/orders that accepts different types of orders. Each order type has some common fields, but also unique fields. We’ll use an interface called Order and implement it with specific classes for each order type. Let’s dive in.</p>
+
+<h3 id="step-1-define-the-order-interface">Step 1: Define the Order Interface</h3>
+
+<p>First, we create an Order interface with common fields that all orders will have.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Order</span> <span class="o">{</span>
+    <span class="nc">String</span> <span class="nf">getOrderType</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="step-2-implement-order-types">Step 2: Implement Order Types</h3>
+
+<p>Next, we create classes for specific order types, like HamburgerOrder and PizzaOrder.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">lombok.Data</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">javax.validation.constraints.NotNull</span><span class="o">;</span>
+
+<span class="nd">@Data</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HamburgerOrder</span> <span class="kd">implements</span> <span class="nc">Order</span> <span class="o">{</span>
+    <span class="nd">@NotNull</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">orderType</span> <span class="o">=</span> <span class="s">"hamburger"</span><span class="o">;</span>
+    <span class="nd">@NotNull</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">bunType</span><span class="o">;</span>
+    <span class="nd">@NotNull</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">meatType</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">extraCheese</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">lombok.Data</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">javax.validation.constraints.NotNull</span><span class="o">;</span>
+
+<span class="nd">@Data</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">PizzaOrder</span> <span class="kd">implements</span> <span class="nc">Order</span> <span class="o">{</span>
+    <span class="nd">@NotNull</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">orderType</span> <span class="o">=</span> <span class="s">"pizza"</span><span class="o">;</span>
+    <span class="nd">@NotNull</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">crustType</span><span class="o">;</span>
+    <span class="nd">@NotNull</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">size</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">extraToppings</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="step-3-create-the-controller">Step 3: Create the Controller</h3>
+
+<p>Now, we create the controller to handle the /v1/orders POST request. We’ll use <code class="language-plaintext highlighter-rouge">@RequestBody</code> and <code class="language-plaintext highlighter-rouge">@Valid</code> annotations to ensure the request body is correctly validated.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">org.springframework.http.HttpStatus</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.http.ResponseEntity</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.validation.annotation.Validated</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.*</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">javax.validation.Valid</span><span class="o">;</span>
+
+<span class="nd">@RestController</span>
+<span class="nd">@RequestMapping</span><span class="o">(</span><span class="s">"/v1/orders"</span><span class="o">)</span>
+<span class="nd">@Validated</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">OrderController</span> <span class="o">{</span>
+
+    <span class="nd">@PostMapping</span>
+    <span class="kd">public</span> <span class="nc">ResponseEntity</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="nf">createOrder</span><span class="o">(</span><span class="nd">@Valid</span> <span class="nd">@RequestBody</span> <span class="nc">Order</span> <span class="n">order</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">order</span> <span class="k">instanceof</span> <span class="nc">HamburgerOrder</span><span class="o">)</span> <span class="o">{</span>
+            <span class="nc">HamburgerOrder</span> <span class="n">hamburgerOrder</span> <span class="o">=</span> <span class="o">(</span><span class="nc">HamburgerOrder</span><span class="o">)</span> <span class="n">order</span><span class="o">;</span>
+            <span class="c1">// Process hamburger order</span>
+            <span class="k">return</span> <span class="k">new</span> <span class="nc">ResponseEntity</span><span class="o">&lt;&gt;(</span><span class="s">"Hamburger order received"</span><span class="o">,</span> <span class="nc">HttpStatus</span><span class="o">.</span><span class="na">OK</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">order</span> <span class="k">instanceof</span> <span class="nc">PizzaOrder</span><span class="o">)</span> <span class="o">{</span>
+            <span class="nc">PizzaOrder</span> <span class="n">pizzaOrder</span> <span class="o">=</span> <span class="o">(</span><span class="nc">PizzaOrder</span><span class="o">)</span> <span class="n">order</span><span class="o">;</span>
+            <span class="c1">// Process pizza order</span>
+            <span class="k">return</span> <span class="k">new</span> <span class="nc">ResponseEntity</span><span class="o">&lt;&gt;(</span><span class="s">"Pizza order received"</span><span class="o">,</span> <span class="nc">HttpStatus</span><span class="o">.</span><span class="na">OK</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="k">new</span> <span class="nc">ResponseEntity</span><span class="o">&lt;&gt;(</span><span class="s">"Unknown order type"</span><span class="o">,</span> <span class="nc">HttpStatus</span><span class="o">.</span><span class="na">BAD_REQUEST</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="step-4-configure-jackson-for-polymorphic-deserialization">Step 4: Configure Jackson for Polymorphic Deserialization</h3>
+
+<p>To handle polymorphic deserialization, we need to configure Jackson. This allows us to deserialize JSON into the correct Order implementation.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">com.fasterxml.jackson.annotation.JsonSubTypes</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.fasterxml.jackson.annotation.JsonTypeInfo</span><span class="o">;</span>
+
+<span class="nd">@JsonTypeInfo</span><span class="o">(</span>
+        <span class="n">use</span> <span class="o">=</span> <span class="nc">JsonTypeInfo</span><span class="o">.</span><span class="na">Id</span><span class="o">.</span><span class="na">NAME</span><span class="o">,</span>
+        <span class="n">include</span> <span class="o">=</span> <span class="nc">JsonTypeInfo</span><span class="o">.</span><span class="na">As</span><span class="o">.</span><span class="na">PROPERTY</span><span class="o">,</span>
+        <span class="n">property</span> <span class="o">=</span> <span class="s">"orderType"</span>
+<span class="o">)</span>
+<span class="nd">@JsonSubTypes</span><span class="o">({</span>
+        <span class="nd">@JsonSubTypes</span><span class="o">.</span><span class="na">Type</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="nc">HamburgerOrder</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s">"hamburger"</span><span class="o">),</span>
+        <span class="nd">@JsonSubTypes</span><span class="o">.</span><span class="na">Type</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="nc">PizzaOrder</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s">"pizza"</span><span class="o">)</span>
+<span class="o">})</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Order</span> <span class="o">{</span>
+    <span class="nc">String</span> <span class="nf">getOrderType</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="step-5-add-global-validation-handling">Step 5: Add Global Validation Handling</h3>
+
+<p>Finally, add global exception handling to manage validation errors.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">org.springframework.http.HttpStatus</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.http.ResponseEntity</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.bind.MethodArgumentNotValidException</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.ControllerAdvice</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.ExceptionHandler</span><span class="o">;</span>
+
+<span class="nd">@ControllerAdvice</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">GlobalExceptionHandler</span> <span class="o">{</span>
+
+    <span class="nd">@ExceptionHandler</span><span class="o">(</span><span class="nc">MethodArgumentNotValidException</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="nc">ResponseEntity</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="nf">handleValidationExceptions</span><span class="o">(</span><span class="nc">MethodArgumentNotValidException</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nc">ResponseEntity</span><span class="o">&lt;&gt;(</span><span class="s">"Invalid order data"</span><span class="o">,</span> <span class="nc">HttpStatus</span><span class="o">.</span><span class="na">BAD_REQUEST</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Using interfaces for controller requests in Java Spring Framework allows you to handle multiple types of requests cleanly and efficiently. In this example, we created an Order interface and implemented specific order types, handled polymorphic deserialization with Jackson, and ensured validation with <code class="language-plaintext highlighter-rouge">@Valid</code> and <code class="language-plaintext highlighter-rouge">@RequestBody</code>. This approach makes your code more flexible and easier to maintain. Happy coding!</p>
+
+        </div>
+      
+        <a href="https://www.buymeacoffee.com/youngchoi"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=youngchoi&button_colour=FFDD00&font_colour=000000&font_family=Comic&outline_colour=000000&coffee_colour=ffffff"></a>
+
+        <script src="https://utteranc.es/client.js" repo="whyjun/whyjun.github.io" issue-term="title" label="💬 comment"
+          theme="github-light" crossorigin="anonymous" async>
+        </script>
+
+        <!-- 
+        <div class="page-share">
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwhyjun.github.io%2Fblog%2FUsing-Interface-for-Controller-Requests-in-Java%2520Spring-Framework" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--facebook btn--small"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i> <span>Share</span></a>
+  <a href="https://twitter.com/intent/tweet?text=Using+Interface+for+Controller+Requests+in+Java+Spring+Framework%20https%3A%2F%2Fwhyjun.github.io%2Fblog%2FUsing-Interface-for-Controller-Requests-in-Java%2520Spring-Framework" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--twitter btn--small"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i> <span>Tweet</span></a>
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fwhyjun.github.io%2Fblog%2FUsing-Interface-for-Controller-Requests-in-Java%2520Spring-Framework" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--linkedin btn--small"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i> <span>LinkedIn</span></a>
+  <a href="https://reddit.com/submit?title=Using+Interface+for+Controller+Requests+in+Java+Spring+Framework&url=https%3A%2F%2Fwhyjun.github.io%2Fblog%2FUsing-Interface-for-Controller-Requests-in-Java%2520Spring-Framework" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--reddit btn--small"><i class="fab fa-fw fa-reddit" aria-hidden="true"></i> <span>Reddit</span></a>
+</div>
+
+         -->
+
+        <nav class="page-pagination" role="navigation">
+  
+    <a class="page-previous" href="/blog/The-Importance-of-Signals-from-Test-Codes">
+      <h4 class="page-pagination-label">Previous</h4>
+      <span class="page-pagination-title">
+        <i class="fas fa-arrow-left"></i> The Importance of Signals from Test Codes
+
+      </span>
+    </a>
+  
+
+  
+</nav>
+
+      </div>
+    </div>
+  </article>
+</main>
+
+    <footer id="footer" class="site-footer">
+  <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+<div class="copyright">
+    
+      <p>&copy; 2024 개발 기록. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://github.com/mmistakes/so-simple-theme" rel="nofollow">So Simple</a>.</p>
+    
+  </div>
+</footer>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://use.fontawesome.com/releases/v5.0.12/js/all.js"></script>
+
+
+  </body>
+
+</html>

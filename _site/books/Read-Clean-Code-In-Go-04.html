@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<!--
+    So Simple Jekyll Theme 3.2.0
+    Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+    Free for personal and commercial use under the MIT license
+    https://github.com/mmistakes/so-simple-theme/blob/master/LICENSE
+-->
+<html lang="ko" class="no-js">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+
+  
+    
+    <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Go 언어로 읽는 클린 코드 4장 - 주석 | 개발 기록</title>
+<meta name="generator" content="Jekyll v3.9.5" />
+<meta property="og:title" content="Go 언어로 읽는 클린 코드 4장 - 주석" />
+<meta name="author" content="Young Choi" />
+<meta property="og:locale" content="ko_KR" />
+<meta name="description" content="클린 코드, 애자일 소프트웨어 장인 정신: Day 04 - 주석" />
+<meta property="og:description" content="클린 코드, 애자일 소프트웨어 장인 정신: Day 04 - 주석" />
+<link rel="canonical" href="https://whyjun.github.io/books/Read-Clean-Code-In-Go-04" />
+<meta property="og:url" content="https://whyjun.github.io/books/Read-Clean-Code-In-Go-04" />
+<meta property="og:site_name" content="개발 기록" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-02-24T00:00:00-06:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Go 언어로 읽는 클린 코드 4장 - 주석" />
+<meta name="twitter:site" content="@youngchoi_dev" />
+<meta name="twitter:creator" content="@https://x.com/youngchoi_dev" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Young Choi"},"dateModified":"2022-02-24T00:00:00-06:00","datePublished":"2022-02-24T00:00:00-06:00","description":"클린 코드, 애자일 소프트웨어 장인 정신: Day 04 - 주석","headline":"Go 언어로 읽는 클린 코드 4장 - 주석","mainEntityOfPage":{"@type":"WebPage","@id":"https://whyjun.github.io/books/Read-Clean-Code-In-Go-04"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://whyjun.github.io/assets/images/young-choi-gopher-image.png"},"name":"Young Choi"},"url":"https://whyjun.github.io/books/Read-Clean-Code-In-Go-04"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  
+
+  <script>
+    /* Cut the mustard */
+    if ( 'querySelector' in document && 'addEventListener' in window ) {
+      document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + 'js';
+    }
+  </script>
+
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/skins/default.css">
+  
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,700,700i|Lora:400,400i,700,700i">
+  <link rel="alternate" type="application/atom+xml" title="개발 기록" href="/atom.xml">
+<!-- start custom head snippets -->
+
+<!-- insert favicons. use http://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+</head>
+
+
+  <body class="layout--post  go-언어로-읽는-클린-코드-4장-주석">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#primary-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    
+  <div class="navigation-wrapper">
+    <a href="#menu-toggle" id="menu-toggle">Menu</a>
+    <nav id="primary-nav" class="site-nav animated drop">
+      <ul><li><a href="/posts/">Posts</a></li><li><a href="/categories/">Categories</a></li><li><a href="/tags/">Tags</a></li><li><a href="/search/">Search</a></li></ul>
+    </nav>
+  </div><!-- /.navigation-wrapper -->
+
+
+    <header class="masthead">
+  <div class="wrap">
+    
+      <a href="/" class="site-logo" rel="home" title="개발 기록">
+        <img src="/assets/images/young-choi-gopher-image.png" class="site-logo-img animated fadeInDown" alt="개발 기록">
+      </a>
+    
+    
+    
+      
+        <div class="site-title animated fadeIn"><a href="/">개발 기록</a></div>
+      
+      <p class="site-description animated fadeIn" itemprop="description">개발자 경험(DX)을 생각하는 개발자입니다.</p>
+    
+  </div>
+</header><!-- /.masthead -->
+
+
+    <main id="main" class="main-content" aria-label="Content">
+  <article class="h-entry">
+    
+
+    <div class="page-wrapper">
+      <header class="page-header">
+        
+        
+        <h1 id="page-title" class="page-title p-name">Go 언어로 읽는 클린 코드 4장 - 주석
+</h1>
+        
+      </header>
+
+      <div class="page-sidebar">
+        <div class="page-author h-card p-author"><img src="/assets/images/young-choi-gopher-image.png" class="author-avatar u-photo" alt="Young Choi"><div class="author-info"><div class="author-name">
+        <span class="p-name">Young Choi</span>
+      </div><ul class="author-links"><li class="author-link">
+            <a class="u-url" rel="me" href="https://github.com/whyjun"><i class="fab fa-github-square fa-lg" title="GitHub"></i></a>
+          </li></ul><!-- 
+
+<span class="read-time">2 min read</span>
+ -->
+    <time class="page-date dt-published" datetime="2022-02-24T00:00:00-06:00"><a class="u-url" href="">February 24, 2022</a>
+</time>
+
+  </div>
+</div>
+
+        
+  <h3 class="page-taxonomies-title">Categories</h3>
+  
+  <ul class="page-taxonomies"><li class="page-taxonomy"><a class="p-category" href="/categories/#books" title="Pages filed under Books">Books</a></li>
+  </ul>
+
+
+        <!-- 
+  <h3 class="page-taxonomies-title">Tags</h3>
+  
+  <ul class="page-taxonomies"><li class="page-taxonomy"><a href="/tags/#%EB%85%B8%EA%B0%9C%EB%B6%81" title="Pages tagged 노개북" rel="tag">노개북</a></li><li class="page-taxonomy"><a href="/tags/#%ED%81%B4%EB%A6%B0-%EC%BD%94%EB%93%9C" title="Pages tagged 클린 코드" rel="tag">클린 코드</a></li>
+  </ul>
+ -->
+
+      </div>
+
+      <div class="page-content">
+        <div class="e-content">
+          <p>클린 코드, 애자일 소프트웨어 장인 정신: Day 04 - 주석</p>
+
+<blockquote>
+  <p>Java 언어를 기반으로 쓰여진 이 책의 내용들을 어떻게 Go 언어에 적용할 수 있을까를 고민하며 읽었습니다.</p>
+</blockquote>
+
+<h2 id="-책에서-기억하고-싶은-내용을-써보세요">😀 책에서 기억하고 싶은 내용을 써보세요.</h2>
+
+<p>“이유는 단순하다. 프로그래머들이 주석을 유지하고 보수하기란 현실적으로 불가능하니까.” (p.68)</p>
+
+<p>“자신이 저지른 난장판을 주석으로 설명 하려 애쓰는 대신에 그 난장판을 깨끗이 치우는 데 시간을 보내라!” (p.69)</p>
+
+<p>“주기적으로 TODO 주석을 점검해 없애도 괜찮은 주석은 없애라고 권한다.” (p.75)</p>
+
+<p>“설명이 잘 된 공개 API는 참으로 유용하고 만족스럽다. 표준 자바 라이브러리에서 사용한 Javadocs가 좋은 예다. Javadocs가 없다면 자바 프로그램을 짜기가 아주 어려우리라. 공개 API를 구현한다면 반드시 훌륭한 Javadocs를 작성한다.” (p.75)</p>
+
+<p>“함수나 변수로 표현할 수 있다면 주석을 달지 마라” (p.84)</p>
+
+<p>“공개 API는 Javadocs가 유용하지만 공개하지 않을 코드라면 Javadocs는 쓸모가 없다. 시스템 내부에 속한 클래스와 함수에 Javadocs를 생성할 필요는 없다.” (p.90)</p>
+
+<h2 id="-오늘-읽은-소감은-떠오르는-생각을-가볍게-적어보세요">🤔 오늘 읽은 소감은? 떠오르는 생각을 가볍게 적어보세요.</h2>
+
+<p>예전 회사에서 주석에 속아서 코드를 잘못 이해했다가 골탕을 먹었던 게 기억이 났다. 왜 주석을 관리하지 않았는가보다 그것을 믿고 코드를 제대로 확인하지 않았던 부분에 대해서 지적하는지 이상하게 생각했었는데 개발자로 계속 일을 하다가 보니 정말 책에서 나온 것처럼 여러 군데에 파편적으로 나누어져있는 주석을 제대로 관리하는 것은 코드를 제대로 관리하는 것보다 훨씬 어렵다는 것을 알게 되었다. 그렇기 때문에 특별한 이유가 있지 않다면 주석은 정해진 위치에 모여 있어야 한다고 생각한다. 개인적으로 선호하는 방법은 public 함수 위 주석을 달고 그 주석들을 문서화 유틸리티들을 활용해서 문서로 만들어서 사용하는 것이다. 이러면 따로 문서를 만들 필요도 없다는 장점과 코드 리뷰 중에 문서도 같이 리뷰할 수 있다는 장점도 있다고 생각한다. 특히 웹 개발에서는 백엔드 API가 <code class="language-plaintext highlighter-rouge">Javascript</code>가 아닌 경우가 많아서 코드를 읽는데 어려움이 있을 수 있는데 이런 경우 어떤 http error response를 반환하는지가 미리 문서에 작성되어 있으면 다른 개발자들이 쉽게 코드를 작성할 수 있다.</p>
+
+<h2 id="-소감-3줄-요약">👀 소감 3줄 요약</h2>
+
+<ul>
+  <li>주석의 목적이 코드를 명확하게 하는 거라면 코드의 함수와 변수를 명확하게 해야 한다.</li>
+  <li>코드에 문서가 필요하다면 함수 주석을 문서화해주는 도구를 사용하자. Swagger나 각 언어 표준 라이브러리에 있는 문서화 도구들이 있을 것이다.</li>
+  <li>코드가 먼저다. 코드를 잘 관리하자.</li>
+</ul>
+
+<h2 id="godoc-주석을-문서로-만들기">godoc: 주석을 문서로 만들기</h2>
+
+<p><a href="https://go.dev/blog/godoc">Godoc: documenting Go code</a></p>
+
+<p>실제로 Go 언어는 기본적으로 godoc이 내장되어있다. 그리고 <code class="language-plaintext highlighter-rouge">godoc</code> 커맨드를 이용해서 웹 문서로 쉽게 변환할 수 있다. 우리가 사용하는 여러 패키지들의 문서들은 그렇게 만들어진 것이고 <a href="https://pkg.go.dev">Go Package</a>에서 쉽게 확인할 수 있다.</p>
+
+<p>예를 들면 실제 <code class="language-plaintext highlighter-rouge">fmt</code> 패키지 소스 코드를 확인해보면 아래와 같이 되어있고 실제 문서는 이렇게 자동으로 생성된다 <a href="https://pkg.go.dev/fmt#Fprint">(링크)</a>. 이 문서를 보면 예시 코드가 있는데 그 예시 코드는 <code class="language-plaintext highlighter-rouge">_test</code> 패키지에 예시를 작성하고 싶은 함수명앞에 <code class="language-plaintext highlighter-rouge">Example</code>을 추가해서 만들면 <code class="language-plaintext highlighter-rouge">godoc</code>에 추가할 수 있다 <a href="https://cs.opensource.google/go/go/+/refs/tags/go1.17.7:src/fmt/example_test.go;l=142">(링크)</a>.</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">// Fprint formats using the default formats for its operands and writes to w.</span>
+<span class="c">// Spaces are added between operands when neither is a string.</span>
+<span class="c">// It returns the number of bytes written and any write error encountered.</span>
+<span class="k">func</span> <span class="n">Fprint</span><span class="p">(</span><span class="n">w</span> <span class="n">io</span><span class="o">.</span><span class="n">Writer</span><span class="p">,</span> <span class="n">a</span> <span class="o">...</span><span class="k">interface</span><span class="p">{})</span> <span class="p">(</span><span class="n">n</span> <span class="kt">int</span><span class="p">,</span> <span class="n">err</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+
+<span class="p">}</span>
+</code></pre></div></div>
+
+        </div>
+      
+        <a href="https://www.buymeacoffee.com/youngchoi"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=youngchoi&button_colour=FFDD00&font_colour=000000&font_family=Comic&outline_colour=000000&coffee_colour=ffffff"></a>
+
+        <script src="https://utteranc.es/client.js" repo="whyjun/whyjun.github.io" issue-term="title" label="💬 comment"
+          theme="github-light" crossorigin="anonymous" async>
+        </script>
+
+        <!-- 
+        <div class="page-share">
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwhyjun.github.io%2Fbooks%2FRead-Clean-Code-In-Go-04" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--facebook btn--small"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i> <span>Share</span></a>
+  <a href="https://twitter.com/intent/tweet?text=Go+%EC%96%B8%EC%96%B4%EB%A1%9C+%EC%9D%BD%EB%8A%94+%ED%81%B4%EB%A6%B0+%EC%BD%94%EB%93%9C+4%EC%9E%A5+-+%EC%A3%BC%EC%84%9D%20https%3A%2F%2Fwhyjun.github.io%2Fbooks%2FRead-Clean-Code-In-Go-04" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--twitter btn--small"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i> <span>Tweet</span></a>
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fwhyjun.github.io%2Fbooks%2FRead-Clean-Code-In-Go-04" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--linkedin btn--small"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i> <span>LinkedIn</span></a>
+  <a href="https://reddit.com/submit?title=Go+%EC%96%B8%EC%96%B4%EB%A1%9C+%EC%9D%BD%EB%8A%94+%ED%81%B4%EB%A6%B0+%EC%BD%94%EB%93%9C+4%EC%9E%A5+-+%EC%A3%BC%EC%84%9D&url=https%3A%2F%2Fwhyjun.github.io%2Fbooks%2FRead-Clean-Code-In-Go-04" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--reddit btn--small"><i class="fab fa-fw fa-reddit" aria-hidden="true"></i> <span>Reddit</span></a>
+</div>
+
+         -->
+
+        <nav class="page-pagination" role="navigation">
+  
+    <a class="page-previous" href="/books/Read-Clean-Code-In-Go-03">
+      <h4 class="page-pagination-label">Previous</h4>
+      <span class="page-pagination-title">
+        <i class="fas fa-arrow-left"></i> Go 언어로 읽는 클린 코드 3장 - 함수
+
+      </span>
+    </a>
+  
+
+  
+    <a class="page-next" href="/books/Read-Clean-Code-In-Go-05">
+      <h4 class="page-pagination-label">Next</h4>
+      <span class="page-pagination-title">
+        Go 언어로 읽는 클린 코드 5장 - 형식 맞추기
+ <i class="fas fa-arrow-right"></i>
+      </span>
+    </a>
+  
+</nav>
+
+      </div>
+    </div>
+  </article>
+</main>
+
+    <footer id="footer" class="site-footer">
+  <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+<div class="copyright">
+    
+      <p>&copy; 2024 개발 기록. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://github.com/mmistakes/so-simple-theme" rel="nofollow">So Simple</a>.</p>
+    
+  </div>
+</footer>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://use.fontawesome.com/releases/v5.0.12/js/all.js"></script>
+
+
+  </body>
+
+</html>
