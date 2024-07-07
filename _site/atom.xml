@@ -1,442 +1,506 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.2">Jekyll</generator><link href="https://whyjun.github.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://whyjun.github.io/" rel="alternate" type="text/html" /><updated>2024-06-30T19:42:30-05:00</updated><id>https://whyjun.github.io/atom.xml</id><title type="html">개발 기록</title><subtitle>개발자 경험(DX)을 생각하는 개발자입니다.</subtitle><author><name>Young Choi</name></author><entry xml:lang="ko"><title type="html">Go에서 omitempty 태그 사용하기</title><link href="https://whyjun.github.io/golang/Golang-Omitempty-Tag" rel="alternate" type="text/html" title="Go에서 omitempty 태그 사용하기" /><published>2023-03-15T00:00:00-05:00</published><updated>2023-03-15T00:00:00-05:00</updated><id>https://whyjun.github.io/golang/Golang-Omitempty-Tag</id><content type="html" xml:base="https://whyjun.github.io/golang/Golang-Omitempty-Tag">&lt;p&gt;Go로 웹 서버를 개발하다 보면 JSON 데이터를 주고 받는 경우가 많이 있습니다. struct를 JSON으로 바꿀 때 값이 Zero Value(각 type별 기본 값)이거나 nil인 경우 그 값을 보내지 않아야할 때가 있습니다. 이런 경우, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;omitempty&lt;/code&gt; 태그를 활용하면 JSON에서 쉽게 생략할 수 있습니다.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.5">Jekyll</generator><link href="https://whyjun.github.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://whyjun.github.io/" rel="alternate" type="text/html" /><updated>2024-07-01T22:06:10-05:00</updated><id>https://whyjun.github.io/atom.xml</id><title type="html">개발 기록</title><subtitle>개발자 경험(DX)을 생각하는 개발자입니다.</subtitle><author><name>Young Choi</name></author><entry xml:lang="ko"><title type="html">The Importance of Signals from Test Codes</title><link href="https://whyjun.github.io/blog/The-Importance-of-Signals-from-Test-Codes" rel="alternate" type="text/html" title="The Importance of Signals from Test Codes" /><published>2024-06-30T00:00:00-05:00</published><updated>2024-06-30T00:00:00-05:00</updated><id>https://whyjun.github.io/blog/The%20Importance-of-Signals-from-Test-Codes</id><content type="html" xml:base="https://whyjun.github.io/blog/The-Importance-of-Signals-from-Test-Codes"><![CDATA[<p>When you write test code, it can tell you a lot about your main code. If you find it hard to write tests, it often means there are problems in your code design. Let’s explore why these signals are important and what they can teach you.</p>
 
-&lt;p&gt;struct 필드에 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;omitempty&lt;/code&gt; 태그가 있다면, Go 언어의 JSON 인코더는 그 필드의 값이 Zero Value거나 nil일 때 그 필드를 생략합니다. 이는 JSON으로 데이터를 보내고 받는 API를 개발할 때 유용하고 특히 JSON 메세지의 사이즈를 줄일 수 있다는 장점이 있습니다.&lt;/p&gt;
+<h2 id="why-test-codes-matter">Why Test Codes Matter</h2>
 
-&lt;h2 id=&quot;omitempty-태그&quot;&gt;omitempty 태그&lt;/h2&gt;
+<p>Test codes are like a mirror for your main code. They show you its strengths and weaknesses. Here are some key signals to watch for:</p>
 
-&lt;p&gt;struct의 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;omitempty&lt;/code&gt; 태그는 아래와 같이 필드 type 뒤에 Backtick(`)안에 작성해 추가할 수 있습니다.&lt;/p&gt;
+<ul>
+  <li>Difficulty Writing Tests: If you struggle to write tests, your code might be too complex or not modular.</li>
+  <li>Excessive Mocking: If you need to mock too many things, your code might be tightly coupled.</li>
+  <li>Long Setup Times: If setting up a test takes a long time, your code may have too many dependencies.</li>
+  <li>Hidden Dependencies: If certain dependencies are not obvious, your code might be hard to maintain or extend.</li>
+</ul>
 
-&lt;div class=&quot;language-go highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Person&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;Name&lt;/span&gt;      &lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;`json:&quot;name,omitempty&quot;`&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;Age&lt;/span&gt;       &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;    &lt;span class=&quot;s&quot;&gt;`json:&quot;age,omitempty&quot;`&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;Address&lt;/span&gt;   &lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;`json:&quot;address,omitempty&quot;`&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;Telephone&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;`json:&quot;telephone,omitempty&quot;`&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<h2 id="key-signals-and-what-they-mean">Key Signals and What They Mean</h2>
 
-&lt;p&gt;위의 예시를 보면 모든 필드에 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;omitempty&lt;/code&gt; 태그가 있는 것을 볼 수 있습니다. 이는 필드의 값이 Zero Value라면 JSON 형식으로 데이터를 변경할 때 필드가 사라짐을 의미합니다. 예를 들어 아래의 값을 가진 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Person&lt;/code&gt; 인스턴스가 있다고 합시다.&lt;/p&gt;
+<h3 id="excessive-mocking">Excessive Mocking</h3>
 
-&lt;div class=&quot;language-go highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Person&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;Name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;      &lt;span class=&quot;s&quot;&gt;&quot;John&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;Age&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;       &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;Address&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;   &lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;Telephone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;123-456-7890&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<ul>
+  <li><strong>What It Is</strong>: Mocking means creating fake objects that mimic real ones.</li>
+  <li><strong>The Signal</strong>: Needing too many mocks usually means your classes are too dependent on each other.</li>
+  <li><strong>The Solution</strong>: Improve your code design. Break down large classes into smaller, independent ones.</li>
+</ul>
 
-&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Person&lt;/code&gt;을 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;json.Marshal&lt;/code&gt; 함수를 사용해서 JSON으로 바꾼다면 결과값은 아래와 같이 나옵니다.&lt;/p&gt;
+<h3 id="long-setup-times">Long Setup Times</h3>
 
-&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;John&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;telephone&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;123-456-7890&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<ul>
+  <li><strong>What It Is</strong>: Setting up tests should be quick and easy.</li>
+  <li><strong>The Signal</strong>: Long setup times can mean your code has too many dependencies or lacks modularity.</li>
+  <li><strong>The Solution</strong>: Simplify your code. Use dependency injection to reduce setup complexity.</li>
+</ul>
 
-&lt;p&gt;위에서 볼 수 있듯이, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Age&lt;/code&gt;와 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Address&lt;/code&gt; 필드가 사라진 것을 확인할 수 있습니다.&lt;/p&gt;</content><author><name>Young Choi</name></author><category term="Golang" /><category term="golang" /><summary type="html">Go로 웹 서버를 개발하다 보면 JSON 데이터를 주고 받는 경우가 많이 있습니다. struct를 JSON으로 바꿀 때 값이 Zero Value(각 type별 기본 값)이거나 nil인 경우 그 값을 보내지 않아야할 때가 있습니다. 이런 경우, omitempty 태그를 활용하면 JSON에서 쉽게 생략할 수 있습니다.</summary></entry><entry xml:lang="ko"><title type="html">golangcli-lint로 Go 코드 규칙 적용하기</title><link href="https://whyjun.github.io/golang/Use-GolangCI-Lint" rel="alternate" type="text/html" title="golangcli-lint로 Go 코드 규칙 적용하기" /><published>2023-03-08T00:00:00-06:00</published><updated>2023-03-08T00:00:00-06:00</updated><id>https://whyjun.github.io/golang/Use-GolangCI-Lint</id><content type="html" xml:base="https://whyjun.github.io/golang/Use-GolangCI-Lint">&lt;p&gt;개발팀 사이즈가 커지면서 관리해야 하는 리포지토리의 개수가 늘어났고 각각의 프로젝트가 팀을 리드하는 개발자에 따라 자유분방한 모습으로 진화했습니다. 특히 Go 언어를 처음으로 사용하는 개발자들이 늘어나면서 코드 리뷰 과정에서 Idiomatic Go에 대해서 설명하고 작성하는데 시간을 꽤 소모하게 되었습니다. 그러다보니 실제로 리뷰가 되어야 하는 부분보다 더 많은 시간을 쏟게 되는 경우가 늘어났고 이를 방지하기 위해 자동화된 도구가 필요하다라는 피드백이 나오기 시작했습니다.&lt;/p&gt;
+<h3 id="difficulty-isolating-tests">Difficulty Isolating Tests</h3>
 
-&lt;p&gt;다행히도 Go 커뮤니티에는 다양한 Lint 도구들이 이미 개발되어 있었는데 대표적으로 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;govet&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gofmt&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;golint&lt;/code&gt; 등이 있습니다. 이러한 도구들은 좋은 Go 코드를 작성하기 위해 필요한 부분들을 다 체크하지만 각각 따로 돌려야 한다는 단점이 있습니다. 이러한 단점을 극복하기 위해 저희 팀은 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;golangci-lint&lt;/code&gt;를 사용하기로 했습니다.&lt;/p&gt;
+<ul>
+  <li><strong>What It Is</strong>: Each test should run independently.</li>
+  <li><strong>The Signal</strong>: If tests affect each other, your code might have hidden dependencies.</li>
+  <li><strong>The Solution</strong>: Make your code more modular. Ensure each part of your code does one thing well.</li>
+</ul>
 
-&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;golangci-lint&lt;/code&gt;는 Lint 도구는 아니지만 다양한 Lint 도구들을 한번에 돌릴 수 있게 도와줍니다. 단순히 도구들을 순서대로 돌리는 것이 아니라 병렬적으로 돌리는 동시에 분석 결과값을 캐싱함으로써 정적 분석을 매우 빠르게 끝낼 수 있습니다. 그리고 회사에 많은 개발자들이 사용하고 있는 Visual Studio Code를 지원하고 이 점을 활용해 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;settings.json&lt;/code&gt;에 설정 몇 가지를 추가하는 것으로 코드 규칙을 지키지 않을 경우 Warning 메세지를 바로 띄워주어 개발자들이 빠르게 고칠 수 있게 도와줍니다.&lt;/p&gt;
+<h3 id="hidden-dependencies">Hidden Dependencies</h3>
 
-&lt;p&gt;&lt;img src=&quot;https://repository-images.githubusercontent.com/132145189/05239680-dfaf-11e9-9646-2c3ef2f5f8d4&quot; alt=&quot;golangci-lint log&quot; class=&quot;align-center&quot; /&gt;&lt;/p&gt;
+<ul>
+  <li><strong>What It Is</strong>: Hidden dependencies are those that are not immediately obvious, such as using Instant.now directly within a method.</li>
+  <li><strong>The Signal</strong>: If you find that certain parts of your code rely on hidden dependencies, it’s hard to write unit tests without mocks.</li>
+  <li><strong>The Solution</strong>: Use dependency inversion. For example, instead of setting the current timestamp using Instant.now directly, inject a clock interface and use it to get the current time. This decouples your code from the specific implementation and makes it easier to test.</li>
+</ul>
 
-&lt;h2 id=&quot;설치하기&quot;&gt;설치하기&lt;/h2&gt;
+<h4 id="implementing-dependency-inversion">Implementing Dependency Inversion</h4>
 
-&lt;p&gt;Mac과 Windows가 아닌 다른 환경에서 설치하는 방법은 &lt;a href=&quot;https://golangci-lint.run/usage/install/&quot;&gt;공식 문서&lt;/a&gt;에 자세히 나와있습니다.&lt;/p&gt;
+<p>Here’s a practical example to illustrate how to handle hidden dependencies using dependency inversion:</p>
 
-&lt;h3 id=&quot;mac&quot;&gt;Mac&lt;/h3&gt;
+<p>Before:</p>
 
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;brew &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;golangci-lint
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Event</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="nc">Instant</span> <span class="n">timestamp</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">Event</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">timestamp</span> <span class="o">=</span> <span class="nc">Instant</span><span class="o">.</span><span class="na">now</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>After:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Clock</span> <span class="o">{</span>
+    <span class="nc">Instant</span> <span class="nf">now</span><span class="o">();</span>
+<span class="o">}</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SystemClock</span> <span class="kd">implements</span> <span class="nc">Clock</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="nc">Instant</span> <span class="nf">now</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="nc">Instant</span><span class="o">.</span><span class="na">now</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">FakeClock</span> <span class="kd">implements</span> <span class="nc">Clock</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="nc">Instant</span> <span class="nf">now</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="nc">Instant</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="s">"2007-12-03T10:15:30.00Z"</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Event</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="nc">Instant</span> <span class="n">timestamp</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">Event</span><span class="o">(</span><span class="nc">Clock</span> <span class="n">clock</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">timestamp</span> <span class="o">=</span> <span class="n">clock</span><span class="o">.</span><span class="na">now</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h2 id="benefits-of-listening-to-these-signals">Benefits of Listening to These Signals</h2>
+
+<p>By paying attention to these signals, you can improve your code design. This makes your code:</p>
+
+<ul>
+  <li>Easier to Understand: Clear, modular code is easier to read and maintain.</li>
+  <li>More Reliable: Well-designed code has fewer bugs and is easier to test.</li>
+  <li>More Flexible: Good design makes it easier to add new features.</li>
+</ul>
+
+<h2 id="practical-steps-to-improve-your-code">Practical Steps to Improve Your Code</h2>
+
+<ul>
+  <li>Refactor Regularly: Don’t wait until your code is a mess. Refactor as you go to keep your code clean.</li>
+  <li>Use Dependency Injection: This reduces the need for mocks and makes your code more modular.</li>
+  <li>Write Small, Focused Functions: Each function should do one thing and do it well. This makes them easier to test.</li>
+  <li>Identify and Eliminate Hidden Dependencies: Use patterns like port-adapter and dependency inversion to decouple your code.</li>
+</ul>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Test codes are valuable tools. They don’t just check if your code works; they also show you where it needs improvement. By paying attention to the signals from your test codes, you can make your code more robust, easier to maintain, and more enjoyable to work with. Keep your tests simple, listen to what they’re telling you, and your code will thank you.</p>]]></content><author><name>Young Choi</name></author><category term="development" /><category term="test" /><summary type="html"><![CDATA[When you write test code, it can tell you a lot about your main code. If you find it hard to write tests, it often means there are problems in your code design. Let’s explore why these signals are important and what they can teach you.]]></summary></entry><entry xml:lang="ko"><title type="html">Go에서 omitempty 태그 사용하기</title><link href="https://whyjun.github.io/golang/Golang-Omitempty-Tag" rel="alternate" type="text/html" title="Go에서 omitempty 태그 사용하기" /><published>2023-03-15T00:00:00-05:00</published><updated>2023-03-15T00:00:00-05:00</updated><id>https://whyjun.github.io/golang/Golang-Omitempty-Tag</id><content type="html" xml:base="https://whyjun.github.io/golang/Golang-Omitempty-Tag"><![CDATA[<p>Go로 웹 서버를 개발하다 보면 JSON 데이터를 주고 받는 경우가 많이 있습니다. struct를 JSON으로 바꿀 때 값이 Zero Value(각 type별 기본 값)이거나 nil인 경우 그 값을 보내지 않아야할 때가 있습니다. 이런 경우, <code class="language-plaintext highlighter-rouge">omitempty</code> 태그를 활용하면 JSON에서 쉽게 생략할 수 있습니다.</p>
+
+<p>struct 필드에 <code class="language-plaintext highlighter-rouge">omitempty</code> 태그가 있다면, Go 언어의 JSON 인코더는 그 필드의 값이 Zero Value거나 nil일 때 그 필드를 생략합니다. 이는 JSON으로 데이터를 보내고 받는 API를 개발할 때 유용하고 특히 JSON 메세지의 사이즈를 줄일 수 있다는 장점이 있습니다.</p>
+
+<h2 id="omitempty-태그">omitempty 태그</h2>
+
+<p>struct의 <code class="language-plaintext highlighter-rouge">omitempty</code> 태그는 아래와 같이 필드 type 뒤에 Backtick(`)안에 작성해 추가할 수 있습니다.</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">type</span> <span class="n">Person</span> <span class="k">struct</span> <span class="p">{</span>
+    <span class="n">Name</span>      <span class="kt">string</span> <span class="s">`json:"name,omitempty"`</span>
+    <span class="n">Age</span>       <span class="kt">int</span>    <span class="s">`json:"age,omitempty"`</span>
+    <span class="n">Address</span>   <span class="kt">string</span> <span class="s">`json:"address,omitempty"`</span>
+    <span class="n">Telephone</span> <span class="kt">string</span> <span class="s">`json:"telephone,omitempty"`</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>위의 예시를 보면 모든 필드에 <code class="language-plaintext highlighter-rouge">omitempty</code> 태그가 있는 것을 볼 수 있습니다. 이는 필드의 값이 Zero Value라면 JSON 형식으로 데이터를 변경할 때 필드가 사라짐을 의미합니다. 예를 들어 아래의 값을 가진 <code class="language-plaintext highlighter-rouge">Person</code> 인스턴스가 있다고 합시다.</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">p</span> <span class="o">:=</span> <span class="n">Person</span><span class="p">{</span>
+    <span class="n">Name</span><span class="o">:</span>      <span class="s">"John"</span><span class="p">,</span>
+    <span class="n">Age</span><span class="o">:</span>       <span class="m">0</span><span class="p">,</span>
+    <span class="n">Address</span><span class="o">:</span>   <span class="s">""</span><span class="p">,</span>
+    <span class="n">Telephone</span><span class="o">:</span> <span class="s">"123-456-7890"</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">Person</code>을 <code class="language-plaintext highlighter-rouge">json.Marshal</code> 함수를 사용해서 JSON으로 바꾼다면 결과값은 아래와 같이 나옵니다.</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"John"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"telephone"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123-456-7890"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>위에서 볼 수 있듯이, <code class="language-plaintext highlighter-rouge">Age</code>와 <code class="language-plaintext highlighter-rouge">Address</code> 필드가 사라진 것을 확인할 수 있습니다.</p>]]></content><author><name>Young Choi</name></author><category term="Golang" /><category term="golang" /><summary type="html"><![CDATA[Go로 웹 서버를 개발하다 보면 JSON 데이터를 주고 받는 경우가 많이 있습니다. struct를 JSON으로 바꿀 때 값이 Zero Value(각 type별 기본 값)이거나 nil인 경우 그 값을 보내지 않아야할 때가 있습니다. 이런 경우, omitempty 태그를 활용하면 JSON에서 쉽게 생략할 수 있습니다.]]></summary></entry><entry xml:lang="ko"><title type="html">golangcli-lint로 Go 코드 규칙 적용하기</title><link href="https://whyjun.github.io/golang/Use-GolangCI-Lint" rel="alternate" type="text/html" title="golangcli-lint로 Go 코드 규칙 적용하기" /><published>2023-03-08T00:00:00-06:00</published><updated>2023-03-08T00:00:00-06:00</updated><id>https://whyjun.github.io/golang/Use-GolangCI-Lint</id><content type="html" xml:base="https://whyjun.github.io/golang/Use-GolangCI-Lint"><![CDATA[<p>개발팀 사이즈가 커지면서 관리해야 하는 리포지토리의 개수가 늘어났고 각각의 프로젝트가 팀을 리드하는 개발자에 따라 자유분방한 모습으로 진화했습니다. 특히 Go 언어를 처음으로 사용하는 개발자들이 늘어나면서 코드 리뷰 과정에서 Idiomatic Go에 대해서 설명하고 작성하는데 시간을 꽤 소모하게 되었습니다. 그러다보니 실제로 리뷰가 되어야 하는 부분보다 더 많은 시간을 쏟게 되는 경우가 늘어났고 이를 방지하기 위해 자동화된 도구가 필요하다라는 피드백이 나오기 시작했습니다.</p>
+
+<p>다행히도 Go 커뮤니티에는 다양한 Lint 도구들이 이미 개발되어 있었는데 대표적으로 <code class="language-plaintext highlighter-rouge">govet</code>, <code class="language-plaintext highlighter-rouge">gofmt</code>, <code class="language-plaintext highlighter-rouge">golint</code> 등이 있습니다. 이러한 도구들은 좋은 Go 코드를 작성하기 위해 필요한 부분들을 다 체크하지만 각각 따로 돌려야 한다는 단점이 있습니다. 이러한 단점을 극복하기 위해 저희 팀은 <code class="language-plaintext highlighter-rouge">golangci-lint</code>를 사용하기로 했습니다.</p>
+
+<p><code class="language-plaintext highlighter-rouge">golangci-lint</code>는 Lint 도구는 아니지만 다양한 Lint 도구들을 한번에 돌릴 수 있게 도와줍니다. 단순히 도구들을 순서대로 돌리는 것이 아니라 병렬적으로 돌리는 동시에 분석 결과값을 캐싱함으로써 정적 분석을 매우 빠르게 끝낼 수 있습니다. 그리고 회사에 많은 개발자들이 사용하고 있는 Visual Studio Code를 지원하고 이 점을 활용해 <code class="language-plaintext highlighter-rouge">settings.json</code>에 설정 몇 가지를 추가하는 것으로 코드 규칙을 지키지 않을 경우 Warning 메세지를 바로 띄워주어 개발자들이 빠르게 고칠 수 있게 도와줍니다.</p>
+
+<p><img src="https://repository-images.githubusercontent.com/132145189/05239680-dfaf-11e9-9646-2c3ef2f5f8d4" alt="golangci-lint log" class="align-center" /></p>
+
+<h2 id="설치하기">설치하기</h2>
+
+<p>Mac과 Windows가 아닌 다른 환경에서 설치하는 방법은 <a href="https://golangci-lint.run/usage/install/">공식 문서</a>에 자세히 나와있습니다.</p>
+
+<h3 id="mac">Mac</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>brew <span class="nb">install </span>golangci-lint
 brew upgrade golangci-lint
 
 golangci-lint version
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+</code></pre></div></div>
 
-&lt;h3 id=&quot;windows&quot;&gt;Windows&lt;/h3&gt;
+<h3 id="windows">Windows</h3>
 
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# Git for Windows를 설치할 때 같이 설치되는 Git Bash에 아래 명령어를 입력하시면 설치됩니다.&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# 실제 binary는 $(go env GOPATH)/bin/golangci-lint에 있습니다&lt;/span&gt;
-curl &lt;span class=&quot;nt&quot;&gt;-sSfL&lt;/span&gt; https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-b&lt;/span&gt; &lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;go &lt;span class=&quot;nb&quot;&gt;env &lt;/span&gt;GOPATH&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;/bin 
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Git for Windows를 설치할 때 같이 설치되는 Git Bash에 아래 명령어를 입력하시면 설치됩니다.</span>
+<span class="c"># 실제 binary는 $(go env GOPATH)/bin/golangci-lint에 있습니다</span>
+curl <span class="nt">-sSfL</span> https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh <span class="nt">-s</span> <span class="nt">--</span> <span class="nt">-b</span> <span class="si">$(</span>go <span class="nb">env </span>GOPATH<span class="si">)</span>/bin 
 
-golangci-lint &lt;span class=&quot;nt&quot;&gt;--version&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+golangci-lint <span class="nt">--version</span>
+</code></pre></div></div>
 
-&lt;h2 id=&quot;사용하기&quot;&gt;사용하기&lt;/h2&gt;
+<h2 id="사용하기">사용하기</h2>
 
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;golangci-lint run
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>golangci-lint run
+</code></pre></div></div>
 
-&lt;p&gt;위 명령어를 입력하면 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;golangci-lint&lt;/code&gt; 기본으로 설정되어 있는 Lint 도구들로 코드를 분석합니다. 어떠한 도구들을 사용하는지 확인하고 싶으면 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;golangci-lint help linters&lt;/code&gt;로 확인할 수 있습니다. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;golangci-lint&lt;/code&gt;를 직접 설정하고 싶다면 &lt;a href=&quot;https://golangci-lint.run/usage/configuration/&quot;&gt;공식 문서&lt;/a&gt;를 참고해서 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.golangci.yml&lt;/code&gt; 파일을 작성하시면 됩니다.&lt;/p&gt;
+<p>위 명령어를 입력하면 <code class="language-plaintext highlighter-rouge">golangci-lint</code> 기본으로 설정되어 있는 Lint 도구들로 코드를 분석합니다. 어떠한 도구들을 사용하는지 확인하고 싶으면 <code class="language-plaintext highlighter-rouge">golangci-lint help linters</code>로 확인할 수 있습니다. <code class="language-plaintext highlighter-rouge">golangci-lint</code>를 직접 설정하고 싶다면 <a href="https://golangci-lint.run/usage/configuration/">공식 문서</a>를 참고해서 <code class="language-plaintext highlighter-rouge">.golangci.yml</code> 파일을 작성하시면 됩니다.</p>
 
-&lt;h2 id=&quot;visual-studio-code에-추가하기&quot;&gt;Visual Studio Code에 추가하기&lt;/h2&gt;
+<h2 id="visual-studio-code에-추가하기">Visual Studio Code에 추가하기</h2>
 
-&lt;p&gt;Visual Studio Code 설정에 들어가서 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;settings.json&lt;/code&gt;을 연 다음, 아래 설정을 추가하면 Visual Studio Code에서 Warning 메세지를 확인할 수 있습니다.&lt;/p&gt;
+<p>Visual Studio Code 설정에 들어가서 <code class="language-plaintext highlighter-rouge">settings.json</code>을 연 다음, 아래 설정을 추가하면 Visual Studio Code에서 Warning 메세지를 확인할 수 있습니다.</p>
 
-&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nl&quot;&gt;&quot;go.lintTool&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;golangci-lint&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;go.lintFlags&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-    &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;--fast&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">"go.lintTool"</span><span class="p">:</span><span class="w"> </span><span class="s2">"golangci-lint"</span><span class="w">
+</span><span class="nl">"go.lintFlags"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="s2">"--fast"</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
 
-&lt;h2 id=&quot;사용-후기&quot;&gt;사용 후기&lt;/h2&gt;
+<h2 id="사용-후기">사용 후기</h2>
 
-&lt;p&gt;실제로 적용해보니 코드 리뷰로 잡아내지 못한 이슈들이 꽤 있었습니다. 대표적으로 error를 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;fmt.Errorf&lt;/code&gt;로 래핑할 때, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;%w&lt;/code&gt;를 사용하지 않았던 부분입니다. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;errors&lt;/code&gt; 패키지를 잘 활용하지 않았다보니 알아차리지 못했지만 프로젝트의 사이즈가 커지면서 어떤 error인지를 확인해야 하는 경우가 빈번하게 발생했는데 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;%w&lt;/code&gt;가 아닌 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;%s&lt;/code&gt;나 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;%v&lt;/code&gt;를 사용했을 때는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;errors.UnWrap()&lt;/code&gt; 함수를 사용할 수 없고 그 때문에 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;errors.Is&lt;/code&gt;와 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;errors.As&lt;/code&gt;도 활용할 수 없다는 것을 알게 되었습니다. 이처럼 Linter는 하나의 정해진 코드 규칙을 모든 개발자가 지킬 수 있게 해준다는 점을 넘어서 코드에 있는 버그들을 개발자들이 일찍 알아차릴 수 있게 해줍니다.&lt;/p&gt;</content><author><name>Young Choi</name></author><category term="Golang" /><category term="golang" /><summary type="html">개발팀 사이즈가 커지면서 관리해야 하는 리포지토리의 개수가 늘어났고 각각의 프로젝트가 팀을 리드하는 개발자에 따라 자유분방한 모습으로 진화했습니다. 특히 Go 언어를 처음으로 사용하는 개발자들이 늘어나면서 코드 리뷰 과정에서 Idiomatic Go에 대해서 설명하고 작성하는데 시간을 꽤 소모하게 되었습니다. 그러다보니 실제로 리뷰가 되어야 하는 부분보다 더 많은 시간을 쏟게 되는 경우가 늘어났고 이를 방지하기 위해 자동화된 도구가 필요하다라는 피드백이 나오기 시작했습니다.</summary></entry><entry xml:lang="ko"><title type="html">알고리즘 공부 - Go에서 배열 역순으로 정렬하기 (reverse)</title><link href="https://whyjun.github.io/algorithm/Reverse-Array" rel="alternate" type="text/html" title="알고리즘 공부 - Go에서 배열 역순으로 정렬하기 (reverse)" /><published>2022-05-19T00:00:00-05:00</published><updated>2022-05-19T00:00:00-05:00</updated><id>https://whyjun.github.io/algorithm/Reverse-Array</id><content type="html" xml:base="https://whyjun.github.io/algorithm/Reverse-Array">&lt;p&gt;알고리즘 문제를 풀다 보면, 배열을 거꾸로 뒤집어야 하는 경우가 종종 있다. 아쉽게도 Go Standard Library는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;reverse&lt;/code&gt; 함수가 없기 때문에 직접 구현해야 한다. 시간도 아끼고 필요할 때마다 쓰기 위해서 까먹기 전에 정리하기로 했다. 나중에 시간 날 때 나만의 알고리즘 라이브러리처럼 만들어두면 좋을 것 같다.&lt;/p&gt;
+<p>실제로 적용해보니 코드 리뷰로 잡아내지 못한 이슈들이 꽤 있었습니다. 대표적으로 error를 <code class="language-plaintext highlighter-rouge">fmt.Errorf</code>로 래핑할 때, <code class="language-plaintext highlighter-rouge">%w</code>를 사용하지 않았던 부분입니다. <code class="language-plaintext highlighter-rouge">errors</code> 패키지를 잘 활용하지 않았다보니 알아차리지 못했지만 프로젝트의 사이즈가 커지면서 어떤 error인지를 확인해야 하는 경우가 빈번하게 발생했는데 <code class="language-plaintext highlighter-rouge">%w</code>가 아닌 <code class="language-plaintext highlighter-rouge">%s</code>나 <code class="language-plaintext highlighter-rouge">%v</code>를 사용했을 때는 <code class="language-plaintext highlighter-rouge">errors.UnWrap()</code> 함수를 사용할 수 없고 그 때문에 <code class="language-plaintext highlighter-rouge">errors.Is</code>와 <code class="language-plaintext highlighter-rouge">errors.As</code>도 활용할 수 없다는 것을 알게 되었습니다. 이처럼 Linter는 하나의 정해진 코드 규칙을 모든 개발자가 지킬 수 있게 해준다는 점을 넘어서 코드에 있는 버그들을 개발자들이 일찍 알아차릴 수 있게 해줍니다.</p>]]></content><author><name>Young Choi</name></author><category term="Golang" /><category term="golang" /><summary type="html"><![CDATA[개발팀 사이즈가 커지면서 관리해야 하는 리포지토리의 개수가 늘어났고 각각의 프로젝트가 팀을 리드하는 개발자에 따라 자유분방한 모습으로 진화했습니다. 특히 Go 언어를 처음으로 사용하는 개발자들이 늘어나면서 코드 리뷰 과정에서 Idiomatic Go에 대해서 설명하고 작성하는데 시간을 꽤 소모하게 되었습니다. 그러다보니 실제로 리뷰가 되어야 하는 부분보다 더 많은 시간을 쏟게 되는 경우가 늘어났고 이를 방지하기 위해 자동화된 도구가 필요하다라는 피드백이 나오기 시작했습니다.]]></summary></entry><entry xml:lang="ko"><title type="html">알고리즘 공부 - Go에서 배열 역순으로 정렬하기 (reverse)</title><link href="https://whyjun.github.io/algorithm/Reverse-Array" rel="alternate" type="text/html" title="알고리즘 공부 - Go에서 배열 역순으로 정렬하기 (reverse)" /><published>2022-05-19T00:00:00-05:00</published><updated>2022-05-19T00:00:00-05:00</updated><id>https://whyjun.github.io/algorithm/Reverse-Array</id><content type="html" xml:base="https://whyjun.github.io/algorithm/Reverse-Array"><![CDATA[<p>알고리즘 문제를 풀다 보면, 배열을 거꾸로 뒤집어야 하는 경우가 종종 있다. 아쉽게도 Go Standard Library는 <code class="language-plaintext highlighter-rouge">reverse</code> 함수가 없기 때문에 직접 구현해야 한다. 시간도 아끼고 필요할 때마다 쓰기 위해서 까먹기 전에 정리하기로 했다. 나중에 시간 날 때 나만의 알고리즘 라이브러리처럼 만들어두면 좋을 것 같다.</p>
 
-&lt;div class=&quot;language-go highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;reverse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;arrs&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;interface&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{},&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;l&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;r&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;l&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;l&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;r&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;l&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;r&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;arrs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;l&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;arrs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;arrs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;arrs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;l&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>Young Choi</name></author><category term="Algorithm" /><category term="algorithm" /><summary type="html">알고리즘 문제를 풀다 보면, 배열을 거꾸로 뒤집어야 하는 경우가 종종 있다. 아쉽게도 Go Standard Library는 reverse 함수가 없기 때문에 직접 구현해야 한다. 시간도 아끼고 필요할 때마다 쓰기 위해서 까먹기 전에 정리하기로 했다. 나중에 시간 날 때 나만의 알고리즘 라이브러리처럼 만들어두면 좋을 것 같다.</summary></entry><entry xml:lang="ko"><title type="html">알고리즘 공부 - Red-Black Tree</title><link href="https://whyjun.github.io/algorithm/Red-Black-Tree" rel="alternate" type="text/html" title="알고리즘 공부 - Red-Black Tree" /><published>2022-05-15T00:00:00-05:00</published><updated>2022-05-15T00:00:00-05:00</updated><id>https://whyjun.github.io/algorithm/Red-Black-Tree</id><content type="html" xml:base="https://whyjun.github.io/algorithm/Red-Black-Tree">&lt;p&gt;오랜만에 인터뷰 문제를 풀어볼 겸 LeetCode에 들어갔는데 인터뷰 가이드에 있는 문제들을 풀어보면 금방 풀겠지 하다가 한 문제에 잘못 걸렸다. 어찌저찌 구현은 했지만 다른 사람들이 풀은 방식 중에 듣기만 해보고 제대로 공부하지는 않았던 자료구조가 있어서 이렇게 따로 정리해보기로 했다. 고생시켰던 문제가 무엇인지 궁금하신 분은 이 &lt;a href=&quot;https://leetcode.com/problems/odd-even-jump/&quot;&gt;링크&lt;/a&gt;로 가면 확인해볼 수 있다. 사실 Hard 난이도인 걸 가이드 페이지에 안 나와있어서 풀었지 실제로 알았다면 풀려고 하지 않았을 것 같다.&lt;/p&gt;
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">func</span> <span class="n">reverse</span><span class="p">(</span><span class="n">arrs</span> <span class="o">*</span><span class="p">[]</span><span class="k">interface</span><span class="p">{},</span> <span class="n">l</span><span class="p">,</span> <span class="n">r</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">;</span> <span class="n">l</span> <span class="o">&lt;</span> <span class="n">r</span><span class="p">;</span> <span class="n">l</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">l</span> <span class="o">+</span> <span class="m">1</span><span class="p">,</span> <span class="n">r</span> <span class="o">-</span> <span class="m">1</span> <span class="p">{</span>
+        <span class="p">(</span><span class="o">*</span><span class="n">arrs</span><span class="p">)[</span><span class="n">l</span><span class="p">],</span> <span class="p">(</span><span class="o">*</span><span class="n">arrs</span><span class="p">)[</span><span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">arrs</span><span class="p">)[</span><span class="n">r</span><span class="p">],</span> <span class="p">(</span><span class="o">*</span><span class="n">arrs</span><span class="p">)[</span><span class="n">l</span><span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>]]></content><author><name>Young Choi</name></author><category term="Algorithm" /><category term="algorithm" /><summary type="html"><![CDATA[알고리즘 문제를 풀다 보면, 배열을 거꾸로 뒤집어야 하는 경우가 종종 있다. 아쉽게도 Go Standard Library는 reverse 함수가 없기 때문에 직접 구현해야 한다. 시간도 아끼고 필요할 때마다 쓰기 위해서 까먹기 전에 정리하기로 했다. 나중에 시간 날 때 나만의 알고리즘 라이브러리처럼 만들어두면 좋을 것 같다.]]></summary></entry><entry xml:lang="ko"><title type="html">알고리즘 공부 - Red-Black Tree</title><link href="https://whyjun.github.io/algorithm/Red-Black-Tree" rel="alternate" type="text/html" title="알고리즘 공부 - Red-Black Tree" /><published>2022-05-15T00:00:00-05:00</published><updated>2022-05-15T00:00:00-05:00</updated><id>https://whyjun.github.io/algorithm/Red-Black-Tree</id><content type="html" xml:base="https://whyjun.github.io/algorithm/Red-Black-Tree"><![CDATA[<p>오랜만에 인터뷰 문제를 풀어볼 겸 LeetCode에 들어갔는데 인터뷰 가이드에 있는 문제들을 풀어보면 금방 풀겠지 하다가 한 문제에 잘못 걸렸다. 어찌저찌 구현은 했지만 다른 사람들이 풀은 방식 중에 듣기만 해보고 제대로 공부하지는 않았던 자료구조가 있어서 이렇게 따로 정리해보기로 했다. 고생시켰던 문제가 무엇인지 궁금하신 분은 이 <a href="https://leetcode.com/problems/odd-even-jump/">링크</a>로 가면 확인해볼 수 있다. 사실 Hard 난이도인 걸 가이드 페이지에 안 나와있어서 풀었지 실제로 알았다면 풀려고 하지 않았을 것 같다.</p>
 
-&lt;h2 id=&quot;red-black-tree는&quot;&gt;Red-Black Tree는?&lt;/h2&gt;
+<h2 id="red-black-tree는">Red-Black Tree는?</h2>
 
-&lt;p&gt;위키피디아에 나온 정의로 설명하면, Red-Black Tree는 “Self-Balancing Binary Search Tree (스스로 균형을 맞추는 이진 탐색 트리)”입니다. 이는 Binary Search Tree의 특징을 그대로 가지고 있다는 뜻인데요. 새로운 Node가 이 자료구조에 들어오면 현재 Node보다 Key값이 작은 경우 그 Node의 왼쪽으로, 큰 경우에는 오른쪽으로 삽입하게 됩니다. 이러한 특징때문에 어떠한 값을 찾아야 하는 인터뷰 문제에서 자주 사용하게 되는 자료구조입니다. 여기에 더해 Red-Black Tree는 Node의 색깔이라는 개념을 추가해서 스스로 균형을 맞출 수 있도록 (어느 한 쪽으로 Node가 너무 많이 들어가지 않도록) 했습니다.&lt;/p&gt;
+<p>위키피디아에 나온 정의로 설명하면, Red-Black Tree는 “Self-Balancing Binary Search Tree (스스로 균형을 맞추는 이진 탐색 트리)”입니다. 이는 Binary Search Tree의 특징을 그대로 가지고 있다는 뜻인데요. 새로운 Node가 이 자료구조에 들어오면 현재 Node보다 Key값이 작은 경우 그 Node의 왼쪽으로, 큰 경우에는 오른쪽으로 삽입하게 됩니다. 이러한 특징때문에 어떠한 값을 찾아야 하는 인터뷰 문제에서 자주 사용하게 되는 자료구조입니다. 여기에 더해 Red-Black Tree는 Node의 색깔이라는 개념을 추가해서 스스로 균형을 맞출 수 있도록 (어느 한 쪽으로 Node가 너무 많이 들어가지 않도록) 했습니다.</p>
 
-&lt;p align=&quot;center&quot;&gt; 
-  &lt;img src=&quot;https://upload.wikimedia.org/wikipedia/commons/4/41/Red-black_tree_example_with_NIL.svg&quot; alt=&quot;figure 1: red-black-tree&quot; /&gt;
-  &lt;p align=&quot;center&quot;&gt;이미지 출처: Wikipedia(https://en.wikipedia.org/wiki/Red%E2%80%93black_tree)&lt;/p&gt;
-&lt;/p&gt;
+<p align="center"> 
+  <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Red-black_tree_example_with_NIL.svg" alt="figure 1: red-black-tree" />
+  <p align="center">이미지 출처: Wikipedia(https://en.wikipedia.org/wiki/Red%E2%80%93black_tree)</p>
+</p>
 
-&lt;p&gt;위 이미지에서 볼 수 있듯이, Red-Black Tree는 아래와 같은 특징을 가지고 있습니다.&lt;/p&gt;
+<p>위 이미지에서 볼 수 있듯이, Red-Black Tree는 아래와 같은 특징을 가지고 있습니다.</p>
 
-&lt;ul&gt;
-  &lt;li&gt;Root Node의 색깔은 항상 검정이다.&lt;/li&gt;
-  &lt;li&gt;모든 Nil Node의 색깔은 검정이라고 생각한다.&lt;/li&gt;
-  &lt;li&gt;빨간 Node는 자신의 자식으로 빨간 Node를 가지지 않는다.&lt;/li&gt;
-  &lt;li&gt;어느 Leaf Node에서 시작해도 Root Node까지 가는 길에 만나는 검정 Node의 개수는 같아야 한다.&lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li>Root Node의 색깔은 항상 검정이다.</li>
+  <li>모든 Nil Node의 색깔은 검정이라고 생각한다.</li>
+  <li>빨간 Node는 자신의 자식으로 빨간 Node를 가지지 않는다.</li>
+  <li>어느 Leaf Node에서 시작해도 Root Node까지 가는 길에 만나는 검정 Node의 개수는 같아야 한다.</li>
+</ul>
 
-&lt;p&gt;이러한 조건들에 맞게 새로운 Node가 삽입이 될 때마다 Red-Black Tree는 스스로 균형을 맞출 수 있다. 그리고 이렇게 맞춰진 균형이 완벽하지 않더라도 어떠한 Node를 찾는데 걸리는 시간 복잡도는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;O(logN)&lt;/code&gt;이고 삽입과 제거 또한 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;O(logN)&lt;/code&gt; 시간 복잡도로 수행할 수 있다.&lt;/p&gt;
+<p>이러한 조건들에 맞게 새로운 Node가 삽입이 될 때마다 Red-Black Tree는 스스로 균형을 맞출 수 있다. 그리고 이렇게 맞춰진 균형이 완벽하지 않더라도 어떠한 Node를 찾는데 걸리는 시간 복잡도는 <code class="language-plaintext highlighter-rouge">O(logN)</code>이고 삽입과 제거 또한 <code class="language-plaintext highlighter-rouge">O(logN)</code> 시간 복잡도로 수행할 수 있다.</p>
 
-&lt;h2 id=&quot;이-문제에서-red-black-tree가-필요한-이유는&quot;&gt;이 문제에서 Red-Black Tree가 필요한 이유는?&lt;/h2&gt;
+<h2 id="이-문제에서-red-black-tree가-필요한-이유는">이 문제에서 Red-Black Tree가 필요한 이유는?</h2>
 
-&lt;p&gt;이 문제에서 가장 시간을 많이 잡았던 부분은 배열을 역순으로 값을 확인하면서 그 값보다 크지만 가장 작거나 아니면 그 값보다 작지만 가장 큰 값을 그 값보다 우측에 있는 값들 중 찾아야 하는 부분이었다. 배열에 있는 값들을 하나하나 확인할 때마다 비교군에 새로운 값들이 추가되기 때문에 이를 자동으로 정렬해줄 수 있는 자료구조가 필요했고 어떤 자료구조를 사용하면 쉽고 빠르게 구현할 수 있을지에 대해서 생각하지 못했었다. 다행히 Discussion에서 treemap(Red-Black Tree를 기반으로 한 자료구조)을 사용하는 답변을 보아서 문제를 풀 수는 있었지만 지금 정리를 해놓지 않으면 나중에 이런 문제를 보게 되었을 때 Binary Search Tree를 생각해내지 못할 것 같았다.&lt;/p&gt;
+<p>이 문제에서 가장 시간을 많이 잡았던 부분은 배열을 역순으로 값을 확인하면서 그 값보다 크지만 가장 작거나 아니면 그 값보다 작지만 가장 큰 값을 그 값보다 우측에 있는 값들 중 찾아야 하는 부분이었다. 배열에 있는 값들을 하나하나 확인할 때마다 비교군에 새로운 값들이 추가되기 때문에 이를 자동으로 정렬해줄 수 있는 자료구조가 필요했고 어떤 자료구조를 사용하면 쉽고 빠르게 구현할 수 있을지에 대해서 생각하지 못했었다. 다행히 Discussion에서 treemap(Red-Black Tree를 기반으로 한 자료구조)을 사용하는 답변을 보아서 문제를 풀 수는 있었지만 지금 정리를 해놓지 않으면 나중에 이런 문제를 보게 되었을 때 Binary Search Tree를 생각해내지 못할 것 같았다.</p>
 
-&lt;h2 id=&quot;어떤-경우에-또-사용할-수-있을까&quot;&gt;어떤 경우에 또 사용할 수 있을까?&lt;/h2&gt;
+<h2 id="어떤-경우에-또-사용할-수-있을까">어떤 경우에 또 사용할 수 있을까?</h2>
 
-&lt;p&gt;새로운 값을 계속해서 비교해야 하는 문제에서 특히 유용할 것 같다. 이 문제를 풀 때 Go 오픈소스 모듈 중 하나인 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gods&lt;/code&gt;에서 제공하는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;treemap&lt;/code&gt;을 사용했는데 이 모듈에서 제공하는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Ceiling&lt;/code&gt;하고 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Floor&lt;/code&gt;함수는 내가 비교하려는 값에 제일 가까운 크거나 작은 값을 반환해준다. 이와 같은 기능이 필요한 문제라면 사용해야 할 자료구조라고 생각한다.&lt;/p&gt;
+<p>새로운 값을 계속해서 비교해야 하는 문제에서 특히 유용할 것 같다. 이 문제를 풀 때 Go 오픈소스 모듈 중 하나인 <code class="language-plaintext highlighter-rouge">gods</code>에서 제공하는 <code class="language-plaintext highlighter-rouge">treemap</code>을 사용했는데 이 모듈에서 제공하는 <code class="language-plaintext highlighter-rouge">Ceiling</code>하고 <code class="language-plaintext highlighter-rouge">Floor</code>함수는 내가 비교하려는 값에 제일 가까운 크거나 작은 값을 반환해준다. 이와 같은 기능이 필요한 문제라면 사용해야 할 자료구조라고 생각한다.</p>
 
-&lt;div class=&quot;language-go highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;main&lt;/span&gt;
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">main</span>
 
-&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;github.com/emirpasic/gods/maps/treemap&quot;&lt;/span&gt;
+<span class="k">import</span> <span class="s">"github.com/emirpasic/gods/maps/treemap"</span>
 
-&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;m&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;treemap&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NewWithIntComparator&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;// empty (keys are of type int)&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Put&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;x&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;                       &lt;span class=&quot;c&quot;&gt;// 1-&amp;gt;x&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Put&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;b&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;                       &lt;span class=&quot;c&quot;&gt;// 1-&amp;gt;x, 2-&amp;gt;b (in order)&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Put&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;a&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;                       &lt;span class=&quot;c&quot;&gt;// 1-&amp;gt;a, 2-&amp;gt;b (in order)&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;                     &lt;span class=&quot;c&quot;&gt;// b, true&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;                     &lt;span class=&quot;c&quot;&gt;// nil, false&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Values&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;                      &lt;span class=&quot;c&quot;&gt;// []interface {}{&quot;a&quot;, &quot;b&quot;} (in order)&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Keys&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;                        &lt;span class=&quot;c&quot;&gt;// []interface {}{1, 2} (in order)&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Remove&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;                         &lt;span class=&quot;c&quot;&gt;// 2-&amp;gt;b&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Clear&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;                           &lt;span class=&quot;c&quot;&gt;// empty&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;                           &lt;span class=&quot;c&quot;&gt;// true&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;                            &lt;span class=&quot;c&quot;&gt;// 0&lt;/span&gt;
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">m</span> <span class="o">:=</span> <span class="n">treemap</span><span class="o">.</span><span class="n">NewWithIntComparator</span><span class="p">()</span> <span class="c">// empty (keys are of type int)</span>
+	<span class="n">m</span><span class="o">.</span><span class="n">Put</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="s">"x"</span><span class="p">)</span>                       <span class="c">// 1-&gt;x</span>
+	<span class="n">m</span><span class="o">.</span><span class="n">Put</span><span class="p">(</span><span class="m">2</span><span class="p">,</span> <span class="s">"b"</span><span class="p">)</span>                       <span class="c">// 1-&gt;x, 2-&gt;b (in order)</span>
+	<span class="n">m</span><span class="o">.</span><span class="n">Put</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="s">"a"</span><span class="p">)</span>                       <span class="c">// 1-&gt;a, 2-&gt;b (in order)</span>
+	<span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">Get</span><span class="p">(</span><span class="m">2</span><span class="p">)</span>                     <span class="c">// b, true</span>
+	<span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">Get</span><span class="p">(</span><span class="m">3</span><span class="p">)</span>                     <span class="c">// nil, false</span>
+	<span class="n">_</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">Values</span><span class="p">()</span>                      <span class="c">// []interface {}{"a", "b"} (in order)</span>
+	<span class="n">_</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">Keys</span><span class="p">()</span>                        <span class="c">// []interface {}{1, 2} (in order)</span>
+	<span class="n">m</span><span class="o">.</span><span class="n">Remove</span><span class="p">(</span><span class="m">1</span><span class="p">)</span>                         <span class="c">// 2-&gt;b</span>
+	<span class="n">m</span><span class="o">.</span><span class="n">Clear</span><span class="p">()</span>                           <span class="c">// empty</span>
+	<span class="n">m</span><span class="o">.</span><span class="n">Empty</span><span class="p">()</span>                           <span class="c">// true</span>
+	<span class="n">m</span><span class="o">.</span><span class="n">Size</span><span class="p">()</span>                            <span class="c">// 0</span>
 
-	&lt;span class=&quot;c&quot;&gt;// Other:&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Min&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;// Returns the minimum key and its value from map.&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;// Returns the maximum key and its value from map.&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Ceiling&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;// Returns the smallest key that is larger than or equal to the given key&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Floor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;// Returns the largest key that is smaller than or equal to the given key&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>Young Choi</name></author><category term="Algorithm" /><category term="algorithm" /><summary type="html">오랜만에 인터뷰 문제를 풀어볼 겸 LeetCode에 들어갔는데 인터뷰 가이드에 있는 문제들을 풀어보면 금방 풀겠지 하다가 한 문제에 잘못 걸렸다. 어찌저찌 구현은 했지만 다른 사람들이 풀은 방식 중에 듣기만 해보고 제대로 공부하지는 않았던 자료구조가 있어서 이렇게 따로 정리해보기로 했다. 고생시켰던 문제가 무엇인지 궁금하신 분은 이 링크로 가면 확인해볼 수 있다. 사실 Hard 난이도인 걸 가이드 페이지에 안 나와있어서 풀었지 실제로 알았다면 풀려고 하지 않았을 것 같다.</summary></entry><entry xml:lang="ko"><title type="html">Go 언어로 읽는 클린 코드 10장 - 클래스</title><link href="https://whyjun.github.io/books/Read-Clean-Code-In-Go-09" rel="alternate" type="text/html" title="Go 언어로 읽는 클린 코드 10장 - 클래스" /><published>2022-03-08T00:00:00-06:00</published><updated>2022-03-08T00:00:00-06:00</updated><id>https://whyjun.github.io/books/Read-Clean-Code-in-Go-09</id><content type="html" xml:base="https://whyjun.github.io/books/Read-Clean-Code-In-Go-09">&lt;p&gt;클린 코드, 애자일 소프트웨어 장인 정신: Day 09 - 클래스&lt;/p&gt;
+	<span class="c">// Other:</span>
+	<span class="n">m</span><span class="o">.</span><span class="n">Min</span><span class="p">()</span> <span class="c">// Returns the minimum key and its value from map.</span>
+	<span class="n">m</span><span class="o">.</span><span class="n">Max</span><span class="p">()</span> <span class="c">// Returns the maximum key and its value from map.</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">Ceiling</span><span class="p">()</span> <span class="c">// Returns the smallest key that is larger than or equal to the given key</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">Floor</span><span class="p">()</span> <span class="c">// Returns the largest key that is smaller than or equal to the given key</span>
+<span class="p">}</span>
+</code></pre></div></div>]]></content><author><name>Young Choi</name></author><category term="Algorithm" /><category term="algorithm" /><summary type="html"><![CDATA[오랜만에 인터뷰 문제를 풀어볼 겸 LeetCode에 들어갔는데 인터뷰 가이드에 있는 문제들을 풀어보면 금방 풀겠지 하다가 한 문제에 잘못 걸렸다. 어찌저찌 구현은 했지만 다른 사람들이 풀은 방식 중에 듣기만 해보고 제대로 공부하지는 않았던 자료구조가 있어서 이렇게 따로 정리해보기로 했다. 고생시켰던 문제가 무엇인지 궁금하신 분은 이 링크로 가면 확인해볼 수 있다. 사실 Hard 난이도인 걸 가이드 페이지에 안 나와있어서 풀었지 실제로 알았다면 풀려고 하지 않았을 것 같다.]]></summary></entry><entry xml:lang="ko"><title type="html">Go 언어로 읽는 클린 코드 10장 - 클래스</title><link href="https://whyjun.github.io/books/Read-Clean-Code-In-Go-09" rel="alternate" type="text/html" title="Go 언어로 읽는 클린 코드 10장 - 클래스" /><published>2022-03-08T00:00:00-06:00</published><updated>2022-03-08T00:00:00-06:00</updated><id>https://whyjun.github.io/books/Read-Clean-Code-in-Go-09</id><content type="html" xml:base="https://whyjun.github.io/books/Read-Clean-Code-In-Go-09"><![CDATA[<p>클린 코드, 애자일 소프트웨어 장인 정신: Day 09 - 클래스</p>
 
-&lt;blockquote&gt;
-  &lt;p&gt;Java 언어를 기반으로 쓰여진 이 책의 내용들을 어떻게 Go 언어에 적용할 수 있을까를 고민하며 읽었습니다.&lt;/p&gt;
-&lt;/blockquote&gt;
+<blockquote>
+  <p>Java 언어를 기반으로 쓰여진 이 책의 내용들을 어떻게 Go 언어에 적용할 수 있을까를 고민하며 읽었습니다.</p>
+</blockquote>
 
-&lt;h2 id=&quot;-책에서-기억하고-싶은-내용을-써보세요&quot;&gt;😀 책에서 기억하고 싶은 내용을 써보세요.&lt;/h2&gt;
+<h2 id="-책에서-기억하고-싶은-내용을-써보세요">😀 책에서 기억하고 싶은 내용을 써보세요.</h2>
 
-&lt;p&gt;“클래스는 작아야 한다. (중략) 함수와 마찬가지로, ‘작게’가 기본 규칙이라는 의미다. 그렇다면 가장 먼저 떠오르는 의문은, 함수와 마찬가지로, “얼마나 작아야 하는가?”겠다. (중략) 클래스가 맡은 책임을 센다.” (p.172-173)&lt;/p&gt;
+<p>“클래스는 작아야 한다. (중략) 함수와 마찬가지로, ‘작게’가 기본 규칙이라는 의미다. 그렇다면 가장 먼저 떠오르는 의문은, 함수와 마찬가지로, “얼마나 작아야 하는가?”겠다. (중략) 클래스가 맡은 책임을 센다.” (p.172-173)</p>
 
-&lt;p&gt;“클래스 설명은 만일(“if”), 그리고(“and”), -(하)며(“or”), 하지만(“but”)을 사용하지 않고서 25단어 내외로 가능해야 한다.” (p.175)&lt;/p&gt;
+<p>“클래스 설명은 만일(“if”), 그리고(“and”), -(하)며(“or”), 하지만(“but”)을 사용하지 않고서 25단어 내외로 가능해야 한다.” (p.175)</p>
 
-&lt;p&gt;“단일 책임 원칙은 클래스나 모듈을 변경할 이유가하나, 단 하나뿐이어야 한다는 원칙이다. SRP는 ‘책임’이라는 개념을 정의하며 적절한 클래스 크기를 제시한다. 클래스는 책임, 즉 변경할 이유가 하나여야 한다는 의미다.” (p.175)&lt;/p&gt;
+<p>“단일 책임 원칙은 클래스나 모듈을 변경할 이유가하나, 단 하나뿐이어야 한다는 원칙이다. SRP는 ‘책임’이라는 개념을 정의하며 적절한 클래스 크기를 제시한다. 클래스는 책임, 즉 변경할 이유가 하나여야 한다는 의미다.” (p.175)</p>
 
-&lt;p&gt;“책임, 즉 변경할 이유를 파악하려 애쓰다 보면 코드를 추상화하기도 쉬워진다. 더 좋은 추상화가 더 쉽게 떠오른다.” (p.176)&lt;/p&gt;
+<p>“책임, 즉 변경할 이유를 파악하려 애쓰다 보면 코드를 추상화하기도 쉬워진다. 더 좋은 추상화가 더 쉽게 떠오른다.” (p.176)</p>
 
-&lt;p&gt;“문제는 우리들 대다수가 프로그램이 돌아가면 일이 끝났다고 여기는 데 있다. ‘깨끗하고 체계적인 소프트웨어’라는 다음 관심사로 전환하지 않는다. 프로그램으로 되돌아가 만능 클래스를 단일 책임 클래스 여럿으로 분리하는 대신 다음 문제로 넘어가버린다.” (p.176)&lt;/p&gt;
+<p>“문제는 우리들 대다수가 프로그램이 돌아가면 일이 끝났다고 여기는 데 있다. ‘깨끗하고 체계적인 소프트웨어’라는 다음 관심사로 전환하지 않는다. 프로그램으로 되돌아가 만능 클래스를 단일 책임 클래스 여럿으로 분리하는 대신 다음 문제로 넘어가버린다.” (p.176)</p>
 
-&lt;p&gt;“‘함수를 작게, 매개변수 목록을 짧게’라는 전략을 따르다 보면 때때로 몇몇 메서드만이 사용하는 인스턴스 변수가 아주 많아진다. 이는 십중팔구 새로운 클래스 로 쪼개야 한다는 신호다. 응집도가 높아지도록 변수와 메서드를 적절히 분리해 새로운 클래스 두세 개로 쪼개준다.” (p.178)&lt;/p&gt;
+<p>“‘함수를 작게, 매개변수 목록을 짧게’라는 전략을 따르다 보면 때때로 몇몇 메서드만이 사용하는 인스턴스 변수가 아주 많아진다. 이는 십중팔구 새로운 클래스 로 쪼개야 한다는 신호다. 응집도가 높아지도록 변수와 메서드를 적절히 분리해 새로운 클래스 두세 개로 쪼개준다.” (p.178)</p>
 
-&lt;p&gt;“가장 먼저, 원래 프로그램의 정확한 동작을 검증하는 테스트 슈트를 작성했다. 그런 다음, 한 번에 하나씩 수 차례에 걸쳐 조금씩 코드를 변경했다. 코드를 변경할 때마다 테스트를 수행해 원래 프로그램과 동일하게 동작하는지 확인했다. 조금씩 원래 프로그램을 정리한 결과 최종 프로그램이 얻어졌다.” (p.185)&lt;/p&gt;
+<p>“가장 먼저, 원래 프로그램의 정확한 동작을 검증하는 테스트 슈트를 작성했다. 그런 다음, 한 번에 하나씩 수 차례에 걸쳐 조금씩 코드를 변경했다. 코드를 변경할 때마다 테스트를 수행해 원래 프로그램과 동일하게 동작하는지 확인했다. 조금씩 원래 프로그램을 정리한 결과 최종 프로그램이 얻어졌다.” (p.185)</p>
 
-&lt;p&gt;“대다수 시스템은 지속적인 변경이 가해진다. 그리고 뭔가 변경할 때마다 시스템 이 의도대로 동작하지 않을 위험이 따른다. 깨끗한 시스템은 클래스를 체계적으로 정리해 변경에 수반하는 위험을 낮춘다.” (p.185)&lt;/p&gt;
+<p>“대다수 시스템은 지속적인 변경이 가해진다. 그리고 뭔가 변경할 때마다 시스템 이 의도대로 동작하지 않을 위험이 따른다. 깨끗한 시스템은 클래스를 체계적으로 정리해 변경에 수반하는 위험을 낮춘다.” (p.185)</p>
 
-&lt;p&gt;“가까운 장래에 update 문이 필요하지 않다면 Sql 클래스를 내버려두는 편이 좋다. 하지만 클래스에 손대는 순간 설계를 개선하려는 고민과 시도가 필요하다.” (p.185)&lt;/p&gt;
+<p>“가까운 장래에 update 문이 필요하지 않다면 Sql 클래스를 내버려두는 편이 좋다. 하지만 클래스에 손대는 순간 설계를 개선하려는 고민과 시도가 필요하다.” (p.185)</p>
 
-&lt;p&gt;“테스트 관점에서 모든 논리를 구석구석 증명하기도 쉬워졌다. 클래스가 서로 분리되었기 때문이다. (중략) 새 기능을 수정하거나 기존 기능을 변경할 때 건드릴 코드가 최소인 시스템 구조가 바람직하다. 이상적인 시스템이라면 새 기능을 추가할 때 시스템을 확장 할 뿐 기존 코드를 변경하지는 않는다.” (p.188)&lt;/p&gt;
+<p>“테스트 관점에서 모든 논리를 구석구석 증명하기도 쉬워졌다. 클래스가 서로 분리되었기 때문이다. (중략) 새 기능을 수정하거나 기존 기능을 변경할 때 건드릴 코드가 최소인 시스템 구조가 바람직하다. 이상적인 시스템이라면 새 기능을 추가할 때 시스템을 확장 할 뿐 기존 코드를 변경하지는 않는다.” (p.188)</p>
 
-&lt;p&gt;“상세한 구현에 의존하는 코드는 테스트가 어렵다.” (p.189)&lt;/p&gt;
+<p>“상세한 구현에 의존하는 코드는 테스트가 어렵다.” (p.189)</p>
 
-&lt;h2 id=&quot;-오늘-읽은-소감은-떠오르는-생각을-가볍게-적어보세요&quot;&gt;🤔 오늘 읽은 소감은? 떠오르는 생각을 가볍게 적어보세요.&lt;/h2&gt;
+<h2 id="-오늘-읽은-소감은-떠오르는-생각을-가볍게-적어보세요">🤔 오늘 읽은 소감은? 떠오르는 생각을 가볍게 적어보세요.</h2>
 
-&lt;p&gt;모든 챕터를 통틀어서 계속 반복되는 부분은 코드를 작성한 후 돌아가는 것만 체크하고 끝내서는 안된다는 점이다. 내가 많은 일을 하는 것처럼 보이려고 코드를 빨리 작성해서 배포하는 것에만 신경을 쓰게 된다. 하지만 작성했던 코드를 바꾸는 것은 매우 빈번하게 일어난다. 그리고 바꿀 때마다 새로운 버그가 생길 확률은 기하급수적으로 늘어난다. 이러한 점을 볼 때 생산성을 점진적으로 계속해서 늘리려면 결국 깔끔한 코드가 필요하다는 것을 느낀다.&lt;/p&gt;
+<p>모든 챕터를 통틀어서 계속 반복되는 부분은 코드를 작성한 후 돌아가는 것만 체크하고 끝내서는 안된다는 점이다. 내가 많은 일을 하는 것처럼 보이려고 코드를 빨리 작성해서 배포하는 것에만 신경을 쓰게 된다. 하지만 작성했던 코드를 바꾸는 것은 매우 빈번하게 일어난다. 그리고 바꿀 때마다 새로운 버그가 생길 확률은 기하급수적으로 늘어난다. 이러한 점을 볼 때 생산성을 점진적으로 계속해서 늘리려면 결국 깔끔한 코드가 필요하다는 것을 느낀다.</p>
 
-&lt;p&gt;이번 챕터에서는 클래스를 위주로 설명을 한다. Go 언어에는 클래스가 존재하지 않기 때문에 적용하기 어려울 것이라고 생각했지만 인터페이스는 존재하기 때문에 인터페이스를 활용해서 어떻게 하면 코드를 상세한 구현에서 격리시킬 수 있는지를 생각해보게 되었다. 특히 현재 리팩토링하고 있는 시스템에서 단순히 구조체로 구현되어 있는 데이터들이 있는데 이것을 어떻게 하면 인터페이스를 활용해서 격리시키고 테스트 가능하게 만들 수 있는지 고민해봐야겠다.&lt;/p&gt;
+<p>이번 챕터에서는 클래스를 위주로 설명을 한다. Go 언어에는 클래스가 존재하지 않기 때문에 적용하기 어려울 것이라고 생각했지만 인터페이스는 존재하기 때문에 인터페이스를 활용해서 어떻게 하면 코드를 상세한 구현에서 격리시킬 수 있는지를 생각해보게 되었다. 특히 현재 리팩토링하고 있는 시스템에서 단순히 구조체로 구현되어 있는 데이터들이 있는데 이것을 어떻게 하면 인터페이스를 활용해서 격리시키고 테스트 가능하게 만들 수 있는지 고민해봐야겠다.</p>
 
-&lt;h2 id=&quot;-소감-3줄-요약&quot;&gt;👀 소감 3줄 요약&lt;/h2&gt;
+<h2 id="-소감-3줄-요약">👀 소감 3줄 요약</h2>
 
-&lt;ul&gt;
-  &lt;li&gt;깔끔한 코드는 바로 나오지 않는다. 그렇기 때문에 작성한 코드를 계속해서 돌아봐야 하고 테스트들을 추가해야 한다.&lt;/li&gt;
-  &lt;li&gt;클래스는 단순히 재사용을 위해서만 존재하지 않는다. 코드에 의미를 부여하고 하나하나의 책임 단위로 분리하는 행위다.&lt;/li&gt;
-  &lt;li&gt;인터페이스를 잘 활용해서 테스트에 사용하자.&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Young Choi</name></author><category term="Books" /><category term="노개북" /><category term="클린 코드" /><summary type="html">클린 코드, 애자일 소프트웨어 장인 정신: Day 09 - 클래스</summary></entry><entry xml:lang="ko"><title type="html">Go 언어로 읽는 클린 코드 9장 - 단위 테스트</title><link href="https://whyjun.github.io/books/Read-Clean-Code-In-Go-08" rel="alternate" type="text/html" title="Go 언어로 읽는 클린 코드 9장 - 단위 테스트" /><published>2022-03-05T00:00:00-06:00</published><updated>2022-03-05T00:00:00-06:00</updated><id>https://whyjun.github.io/books/Read-Clean-Code-in-Go-08</id><content type="html" xml:base="https://whyjun.github.io/books/Read-Clean-Code-In-Go-08">&lt;p&gt;클린 코드, 애자일 소프트웨어 장인 정신: Day 08 - 단위 테스트&lt;/p&gt;
+<ul>
+  <li>깔끔한 코드는 바로 나오지 않는다. 그렇기 때문에 작성한 코드를 계속해서 돌아봐야 하고 테스트들을 추가해야 한다.</li>
+  <li>클래스는 단순히 재사용을 위해서만 존재하지 않는다. 코드에 의미를 부여하고 하나하나의 책임 단위로 분리하는 행위다.</li>
+  <li>인터페이스를 잘 활용해서 테스트에 사용하자.</li>
+</ul>]]></content><author><name>Young Choi</name></author><category term="Books" /><category term="노개북" /><category term="클린 코드" /><summary type="html"><![CDATA[클린 코드, 애자일 소프트웨어 장인 정신: Day 09 - 클래스]]></summary></entry><entry xml:lang="ko"><title type="html">Go 언어로 읽는 클린 코드 9장 - 단위 테스트</title><link href="https://whyjun.github.io/books/Read-Clean-Code-In-Go-08" rel="alternate" type="text/html" title="Go 언어로 읽는 클린 코드 9장 - 단위 테스트" /><published>2022-03-05T00:00:00-06:00</published><updated>2022-03-05T00:00:00-06:00</updated><id>https://whyjun.github.io/books/Read-Clean-Code-in-Go-08</id><content type="html" xml:base="https://whyjun.github.io/books/Read-Clean-Code-In-Go-08"><![CDATA[<p>클린 코드, 애자일 소프트웨어 장인 정신: Day 08 - 단위 테스트</p>
 
-&lt;blockquote&gt;
-  &lt;p&gt;Java 언어를 기반으로 쓰여진 이 책의 내용들을 어떻게 Go 언어에 적용할 수 있을까를 고민하며 읽었습니다.&lt;/p&gt;
-&lt;/blockquote&gt;
+<blockquote>
+  <p>Java 언어를 기반으로 쓰여진 이 책의 내용들을 어떻게 Go 언어에 적용할 수 있을까를 고민하며 읽었습니다.</p>
+</blockquote>
 
-&lt;h2 id=&quot;-책에서-기억하고-싶은-내용을-써보세요&quot;&gt;😀 책에서 기억하고 싶은 내용을 써보세요.&lt;/h2&gt;
+<h2 id="-책에서-기억하고-싶은-내용을-써보세요">😀 책에서 기억하고 싶은 내용을 써보세요.</h2>
 
-&lt;p&gt;“TDD 법칙 세 가지 - 첫째 법칙: 실패하는 단위 테스트를 작성할 때까지 실제 코드를 작성하지 않는다. 둘째 법칙: 컴파일은 실패하지 않으면서 실행이 실패하는 정도로만 단위 테스트를 작성한다. 셋째 법칙: 현재 실패하는 테스트를 통과할 정도로만 실제 코드를 작성한다.” (p.155)&lt;/p&gt;
+<p>“TDD 법칙 세 가지 - 첫째 법칙: 실패하는 단위 테스트를 작성할 때까지 실제 코드를 작성하지 않는다. 둘째 법칙: 컴파일은 실패하지 않으면서 실행이 실패하는 정도로만 단위 테스트를 작성한다. 셋째 법칙: 현재 실패하는 테스트를 통과할 정도로만 실제 코드를 작성한다.” (p.155)</p>
 
-&lt;p&gt;“하지만 실제 코드와 맞먹을 정도로 방대한 테스트 코드는 심각한 관리 문제를 유발하기도 한다.” (p.155)&lt;/p&gt;
+<p>“하지만 실제 코드와 맞먹을 정도로 방대한 테스트 코드는 심각한 관리 문제를 유발하기도 한다.” (p.155)</p>
 
-&lt;p&gt;“하지만 팀은 지저분한 테스트 코드를 내놓으나 테스트를 안 하나 오십보 백 보라는, 아니 오히려 더 못하다는 사실을 깨닫지 못했다. 문제는 실제 코드가 진화하면 테스트 코드도 변해야 한다는 데 있다. 그런데 테스트 코드가 지저분할 수록 변경하기 어려워진다. 테스트 코드가 복잡할수록 실제 코드를 짜는 시간보다 테스트 케이스를 추가하는 시간이 더 걸리기 십상이다.” (p.156)&lt;/p&gt;
+<p>“하지만 팀은 지저분한 테스트 코드를 내놓으나 테스트를 안 하나 오십보 백 보라는, 아니 오히려 더 못하다는 사실을 깨닫지 못했다. 문제는 실제 코드가 진화하면 테스트 코드도 변해야 한다는 데 있다. 그런데 테스트 코드가 지저분할 수록 변경하기 어려워진다. 테스트 코드가 복잡할수록 실제 코드를 짜는 시간보다 테스트 케이스를 추가하는 시간이 더 걸리기 십상이다.” (p.156)</p>
 
-&lt;p&gt;“테스트 코드는 실제 코드 못지 않게 중요하다. 테스트 코드는 이류 시민이 아니다. 테스트 코드는 사고와 설계와 주의가 필요하다.” (p.157)&lt;/p&gt;
+<p>“테스트 코드는 실제 코드 못지 않게 중요하다. 테스트 코드는 이류 시민이 아니다. 테스트 코드는 사고와 설계와 주의가 필요하다.” (p.157)</p>
 
-&lt;p&gt;“코드에 유연성, 유지보수성, 재사용성을 제공하는 버팀목이 바로 단위 테스트다. 이유는 단순하다. 테스트 케이스가 있으면 변경이 두렵지 않으니까! 테스트 케이스가 없다면 모든 변경이 잠정적인 버그다. 아키텍처가 아무리 유연하더라도, 설계를 아무리 잘 나눴더라도, 테스트 케이스가 없으면 개발자는 변경을 주저한다. 버그가 숨어들까 두렵기 때문이다. 하지만 테스트 케이스가 있다면 공포는 사실상 사라진다. 테스트 커버리지가 높을수록 공포는 줄어든다. 아키텍처가 부실한 코드나 설계가 모호하고 엉망인 코드라도 별다른 우려 없이 변경할 수 있다. 아니, 오히려 안심하고 아키텍처와 설계를 개선할 수 있다.” (p.157)&lt;/p&gt;
+<p>“코드에 유연성, 유지보수성, 재사용성을 제공하는 버팀목이 바로 단위 테스트다. 이유는 단순하다. 테스트 케이스가 있으면 변경이 두렵지 않으니까! 테스트 케이스가 없다면 모든 변경이 잠정적인 버그다. 아키텍처가 아무리 유연하더라도, 설계를 아무리 잘 나눴더라도, 테스트 케이스가 없으면 개발자는 변경을 주저한다. 버그가 숨어들까 두렵기 때문이다. 하지만 테스트 케이스가 있다면 공포는 사실상 사라진다. 테스트 커버리지가 높을수록 공포는 줄어든다. 아키텍처가 부실한 코드나 설계가 모호하고 엉망인 코드라도 별다른 우려 없이 변경할 수 있다. 아니, 오히려 안심하고 아키텍처와 설계를 개선할 수 있다.” (p.157)</p>
 
-&lt;p&gt;“깨끗한 테스트 코드를 만들려면? 세 가지가 필요하다. 가독성, 가독성, 가독성. 어쩌면 가독성은 실제 코드보다 테스트 코드에 더더욱 중요하다.” (p.158)&lt;/p&gt;
+<p>“깨끗한 테스트 코드를 만들려면? 세 가지가 필요하다. 가독성, 가독성, 가독성. 어쩌면 가독성은 실제 코드보다 테스트 코드에 더더욱 중요하다.” (p.158)</p>
 
-&lt;p&gt;“BUILD-OPERATE-CHECK 패턴2이 위와 같은 테스트 구조에 적합하다. 각 테스트는 명확히 세 부분으로 나눠진다. 첫 부분은 테스트 자료를 만든다. 두 번째 부분은 테스트 자료를 조작하며, 세 번째 부분은 조작한 결과가 올바른지 확인 한다. 잡다하고 세세한 코드를 거의 다 없앴다는 사실에 주목한다. 테스트 코드는 본론에 돌입해 진짜 필요한 자료 유형과 함수만 사용한다. 그러므로 코드를 읽는 사람은 온갖 잡다하고 세세한 코드에 주눅들고 헷갈릴 필요 없이 코드가 수행하는 기능을 재빨리 이해한다.” (p.161)&lt;/p&gt;
+<p>“BUILD-OPERATE-CHECK 패턴2이 위와 같은 테스트 구조에 적합하다. 각 테스트는 명확히 세 부분으로 나눠진다. 첫 부분은 테스트 자료를 만든다. 두 번째 부분은 테스트 자료를 조작하며, 세 번째 부분은 조작한 결과가 올바른지 확인 한다. 잡다하고 세세한 코드를 거의 다 없앴다는 사실에 주목한다. 테스트 코드는 본론에 돌입해 진짜 필요한 자료 유형과 함수만 사용한다. 그러므로 코드를 읽는 사람은 온갖 잡다하고 세세한 코드에 주눅들고 헷갈릴 필요 없이 코드가 수행하는 기능을 재빨리 이해한다.” (p.161)</p>
 
-&lt;p&gt;“도메인에 특화된 언어(DSL)로 테스트 코드를 구현하는 기법을 보여준다. 흔히 쓰는 시스템 조작 API를 사용하는 대신 API 위에다 함수와 유틸리티를 구현한 후 그 함수와 유틸리티를 사용하므로 테스트 코드를 짜기도 읽기도 쉬워진다.” (p.161)&lt;/p&gt;
+<p>“도메인에 특화된 언어(DSL)로 테스트 코드를 구현하는 기법을 보여준다. 흔히 쓰는 시스템 조작 API를 사용하는 대신 API 위에다 함수와 유틸리티를 구현한 후 그 함수와 유틸리티를 사용하므로 테스트 코드를 짜기도 읽기도 쉬워진다.” (p.161)</p>
 
-&lt;p&gt;“테스트 API 코드에 적용하는 표준은 실제 코드에 적용하는 표준과 확실히 다르다. 단순하고, 간결하고, 표현력이 풍부해야 하지만, 실제 코드만큼 효율적일 필요는 없다. (p.161-162)&lt;/p&gt;
+<p>“테스트 API 코드에 적용하는 표준은 실제 코드에 적용하는 표준과 확실히 다르다. 단순하고, 간결하고, 표현력이 풍부해야 하지만, 실제 코드만큼 효율적일 필요는 없다. (p.161-162)</p>
 
-&lt;p&gt;“각 절에 assert 문이 여럿이라는 사실이 문제가 아니다. 한 테스트 함수에서 여러 개념을 테스트한다는 사실이 문제다. 그러므로 가장 좋은 규칙은 “개념 당 assert 문 수를 최소로 줄여라”와 “테스트 함수 하나는 개념 하나만 테스트하라”라 하겠다.” (p.167)&lt;/p&gt;
+<p>“각 절에 assert 문이 여럿이라는 사실이 문제가 아니다. 한 테스트 함수에서 여러 개념을 테스트한다는 사실이 문제다. 그러므로 가장 좋은 규칙은 “개념 당 assert 문 수를 최소로 줄여라”와 “테스트 함수 하나는 개념 하나만 테스트하라”라 하겠다.” (p.167)</p>
 
-&lt;p&gt;“FIRST: 빠르게, 독립적으로, 반복가능하게, 자가검증하는, 적시에” (p.167-168)&lt;/p&gt;
+<p>“FIRST: 빠르게, 독립적으로, 반복가능하게, 자가검증하는, 적시에” (p.167-168)</p>
 
-&lt;p&gt;“테스트 코드는 실제 코드의 유연성, 유지보수성, 재사용성을 보존하고 강화하기 때문이다. 그러므로 테스트 코드는 지속적으로 깨끗하게 관리하자. 표현력을 높이고 간결하게 정리하자. 테스트 API를 구현해 도메인 특화 언어(Domain Specific Language, DSL)를 만들자. 그러면 그만큼 테스트 코드를 짜기가 쉬워진다. 테스트 코드가 방치되어 망가지면 실제 코드도 망가진다. 테스트 코드를 깨끗하게 유지하자.” (p.168)&lt;/p&gt;
+<p>“테스트 코드는 실제 코드의 유연성, 유지보수성, 재사용성을 보존하고 강화하기 때문이다. 그러므로 테스트 코드는 지속적으로 깨끗하게 관리하자. 표현력을 높이고 간결하게 정리하자. 테스트 API를 구현해 도메인 특화 언어(Domain Specific Language, DSL)를 만들자. 그러면 그만큼 테스트 코드를 짜기가 쉬워진다. 테스트 코드가 방치되어 망가지면 실제 코드도 망가진다. 테스트 코드를 깨끗하게 유지하자.” (p.168)</p>
 
-&lt;h2 id=&quot;-오늘-읽은-소감은-떠오르는-생각을-가볍게-적어보세요&quot;&gt;🤔 오늘 읽은 소감은? 떠오르는 생각을 가볍게 적어보세요.&lt;/h2&gt;
+<h2 id="-오늘-읽은-소감은-떠오르는-생각을-가볍게-적어보세요">🤔 오늘 읽은 소감은? 떠오르는 생각을 가볍게 적어보세요.</h2>
 
-&lt;p&gt;최근 회사에서 마이그레이션을 진행하고 있는데 레거시 코드에 테스트가 거의 없다 보니 모든 부분을 정확하게 옮기고 있는지를 알기가 어려워서 고생을 하고 있다. 매 단계 진행할 때마다 새로운 버그가 나오고 그 버그들을 고치느라 프로젝트에 진행이 더뎌지고 있다. 이 와중에 이 챕터를 읽으니 새로운 마이그레이션 코드에 어떻게 단위 테스트를 만들지 고민해볼 수 있었다. 아직 초반부이기 때문에 코드가 시시각각 바뀌었기 때문에 테스트 코드를 제대로 작성하지 못했었는데 슬슬 안정화단계에 들어선 코드가 생겼으니 오늘 배운 내용을 가지고 단위 테스트와 데이터베이스와의 연결도 테스트하는 통합테스트에 대한 계획을 제대로 세워봐야겠다.&lt;/p&gt;
+<p>최근 회사에서 마이그레이션을 진행하고 있는데 레거시 코드에 테스트가 거의 없다 보니 모든 부분을 정확하게 옮기고 있는지를 알기가 어려워서 고생을 하고 있다. 매 단계 진행할 때마다 새로운 버그가 나오고 그 버그들을 고치느라 프로젝트에 진행이 더뎌지고 있다. 이 와중에 이 챕터를 읽으니 새로운 마이그레이션 코드에 어떻게 단위 테스트를 만들지 고민해볼 수 있었다. 아직 초반부이기 때문에 코드가 시시각각 바뀌었기 때문에 테스트 코드를 제대로 작성하지 못했었는데 슬슬 안정화단계에 들어선 코드가 생겼으니 오늘 배운 내용을 가지고 단위 테스트와 데이터베이스와의 연결도 테스트하는 통합테스트에 대한 계획을 제대로 세워봐야겠다.</p>
 
-&lt;h2 id=&quot;-소감-3줄-요약&quot;&gt;👀 소감 3줄 요약&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;제대로 작성하지 않은 테스트 코드는 오히려 테스트 코드에서 문제가 없었으니 괜찮다는 방심을 불러일으킬 수 있어 오히려 더 위험하다.&lt;/li&gt;
-  &lt;li&gt;일단 테스트가 있는게 낫지라고 단순하게 생각했었는데 회사 테스트 코드들을 다시 한 번 돌아볼 기회를 가질 수 있게 되었다.&lt;/li&gt;
-  &lt;li&gt;함수와 추상화와 같이 테스트도 하나의 테스트에는 하나의 의미만!&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Young Choi</name></author><category term="Books" /><category term="노개북" /><category term="클린 코드" /><summary type="html">클린 코드, 애자일 소프트웨어 장인 정신: Day 08 - 단위 테스트</summary></entry><entry xml:lang="ko"><title type="html">Go 언어로 읽는 클린 코드 7장 - 오류처리</title><link href="https://whyjun.github.io/books/Read-Clean-Code-In-Go-07" rel="alternate" type="text/html" title="Go 언어로 읽는 클린 코드 7장 - 오류처리" /><published>2022-03-03T00:00:00-06:00</published><updated>2022-03-03T00:00:00-06:00</updated><id>https://whyjun.github.io/books/Read-Clean-Code-in-Go-07</id><content type="html" xml:base="https://whyjun.github.io/books/Read-Clean-Code-In-Go-07">&lt;p&gt;클린 코드, 애자일 소프트웨어 장인 정신: Day 07 - 객체와 자료 구조&lt;/p&gt;
+<h2 id="-소감-3줄-요약">👀 소감 3줄 요약</h2>
+<ul>
+  <li>제대로 작성하지 않은 테스트 코드는 오히려 테스트 코드에서 문제가 없었으니 괜찮다는 방심을 불러일으킬 수 있어 오히려 더 위험하다.</li>
+  <li>일단 테스트가 있는게 낫지라고 단순하게 생각했었는데 회사 테스트 코드들을 다시 한 번 돌아볼 기회를 가질 수 있게 되었다.</li>
+  <li>함수와 추상화와 같이 테스트도 하나의 테스트에는 하나의 의미만!</li>
+</ul>]]></content><author><name>Young Choi</name></author><category term="Books" /><category term="노개북" /><category term="클린 코드" /><summary type="html"><![CDATA[클린 코드, 애자일 소프트웨어 장인 정신: Day 08 - 단위 테스트]]></summary></entry><entry xml:lang="ko"><title type="html">Go 언어로 읽는 클린 코드 7장 - 오류처리</title><link href="https://whyjun.github.io/books/Read-Clean-Code-In-Go-07" rel="alternate" type="text/html" title="Go 언어로 읽는 클린 코드 7장 - 오류처리" /><published>2022-03-03T00:00:00-06:00</published><updated>2022-03-03T00:00:00-06:00</updated><id>https://whyjun.github.io/books/Read-Clean-Code-in-Go-07</id><content type="html" xml:base="https://whyjun.github.io/books/Read-Clean-Code-In-Go-07"><![CDATA[<p>클린 코드, 애자일 소프트웨어 장인 정신: Day 07 - 객체와 자료 구조</p>
 
-&lt;blockquote&gt;
-  &lt;p&gt;Java 언어를 기반으로 쓰여진 이 책의 내용들을 어떻게 Go 언어에 적용할 수 있을까를 고민하며 읽었습니다.&lt;/p&gt;
-&lt;/blockquote&gt;
+<blockquote>
+  <p>Java 언어를 기반으로 쓰여진 이 책의 내용들을 어떻게 Go 언어에 적용할 수 있을까를 고민하며 읽었습니다.</p>
+</blockquote>
 
-&lt;h2 id=&quot;-책에서-기억하고-싶은-내용을-써보세요&quot;&gt;😀 책에서 기억하고 싶은 내용을 써보세요.&lt;/h2&gt;
+<h2 id="-책에서-기억하고-싶은-내용을-써보세요">😀 책에서 기억하고 싶은 내용을 써보세요.</h2>
 
-&lt;p&gt;“간단히 말해, 뭔가 잘못될 가능성은 늘 존재한다. 뭔가 잘못되면 바로 잡을 책임은 바로 우리 프로그 래머에게 있다.” (p.130)&lt;/p&gt;
+<p>“간단히 말해, 뭔가 잘못될 가능성은 늘 존재한다. 뭔가 잘못되면 바로 잡을 책임은 바로 우리 프로그 래머에게 있다.” (p.130)</p>
 
-&lt;p&gt;“함수를 호출한 즉시 오류를 확인해야 하기 때문이다. 불행히도 이 단계는 잊어버리기 쉽다.” (p.131)&lt;/p&gt;
+<p>“함수를 호출한 즉시 오류를 확인해야 하기 때문이다. 불행히도 이 단계는 잊어버리기 쉽다.” (p.131)</p>
 
-&lt;p&gt;“예외를 던질 때는 전후 상황을 충분히 덧붙인다. 그러면 오류가 발생한 원인과 위치를 찾기가 쉬워진다.” (p.135)&lt;/p&gt;
+<p>“예외를 던질 때는 전후 상황을 충분히 덧붙인다. 그러면 오류가 발생한 원인과 위치를 찾기가 쉬워진다.” (p.135)</p>
 
-&lt;p&gt;“하지만 애플리케이션에서 오류를 정의할 때 프로그래머에게 가장 중요한 관심사는 오류를 잡아내는 방법이 되어야 한다.” (p.135)&lt;/p&gt;
+<p>“하지만 애플리케이션에서 오류를 정의할 때 프로그래머에게 가장 중요한 관심사는 오류를 잡아내는 방법이 되어야 한다.” (p.135)</p>
 
-&lt;p&gt;“대다수 상황에서 우리가 오류를 처리하는 방식은 (오류를 일으킨 원인과 무관하게) 비교적 일정하다. 1) 오류를 기록한다. 2) 프로그램을 계속 수행해도 좋은지 확인한다.” (p.136)&lt;/p&gt;
+<p>“대다수 상황에서 우리가 오류를 처리하는 방식은 (오류를 일으킨 원인과 무관하게) 비교적 일정하다. 1) 오류를 기록한다. 2) 프로그램을 계속 수행해도 좋은지 확인한다.” (p.136)</p>
 
-&lt;p&gt;“null을 반환하지 마라” (p.138)&lt;/p&gt;
+<p>“null을 반환하지 마라” (p.138)</p>
 
-&lt;p&gt;“실상은 null 확인이 너무 많아 문제다. 메서드에서 null을 반환하고픈 유혹이 든다면 그 대신 예외를 던지거나 특수 사례 객체를 반환한다. 사용하려는 외부 API가 null을 반환 한다면 감싸기 메서드를 구현해 예외를 던지거나 특수 사례 객체를 반환하는 방식을 고려한다.” (p.139)&lt;/p&gt;
+<p>“실상은 null 확인이 너무 많아 문제다. 메서드에서 null을 반환하고픈 유혹이 든다면 그 대신 예외를 던지거나 특수 사례 객체를 반환한다. 사용하려는 외부 API가 null을 반환 한다면 감싸기 메서드를 구현해 예외를 던지거나 특수 사례 객체를 반환하는 방식을 고려한다.” (p.139)</p>
 
-&lt;p&gt;“null을 전달하지 마라. 메서드에서 null을 반환하는 방식도 나쁘지만 메서드로 null을 전달하는 방식은 더 나쁘다. 정상적인 인수로 null을 기대하는 API가 아니라면 메서드로 null을 전달하는 코드는 최대한 피한다.” (p.140)&lt;/p&gt;
+<p>“null을 전달하지 마라. 메서드에서 null을 반환하는 방식도 나쁘지만 메서드로 null을 전달하는 방식은 더 나쁘다. 정상적인 인수로 null을 기대하는 API가 아니라면 메서드로 null을 전달하는 코드는 최대한 피한다.” (p.140)</p>
 
-&lt;p&gt;“대다수 프로그래밍 언어는 호출자가 실수로 넘기는 null을 적절히 처리하는 방법이 없다. 그렇다면 애초에 null을 넘기지 못하도록 금지하는 정책이 합리적이다. 즉, 인수로 null이 넘어오면 코드에 문제가 있다는 말이다. 이런 정책을 따르면 그만큼 부주의한 실수를 저지를 확률도 작아진다.” (p.142)&lt;/p&gt;
+<p>“대다수 프로그래밍 언어는 호출자가 실수로 넘기는 null을 적절히 처리하는 방법이 없다. 그렇다면 애초에 null을 넘기지 못하도록 금지하는 정책이 합리적이다. 즉, 인수로 null이 넘어오면 코드에 문제가 있다는 말이다. 이런 정책을 따르면 그만큼 부주의한 실수를 저지를 확률도 작아진다.” (p.142)</p>
 
-&lt;p&gt;“깨끗한 코드는 읽기도 좋아야 하지만 안정성도 높아야 한다. 이 둘은 상충하는 목표가 아니다. 오류 처리를 프로그램 논리와 분리해 독자적인 사안으로 고려하면 튼튼하고 깨끗한 코드를 작성할 수 있다. 오류 처리를 프로그램 논리와 분리하면 독립적인 추론이 가능해지며 코드 유지보수성도 크게 높아진다.” (p.142)&lt;/p&gt;
+<p>“깨끗한 코드는 읽기도 좋아야 하지만 안정성도 높아야 한다. 이 둘은 상충하는 목표가 아니다. 오류 처리를 프로그램 논리와 분리해 독자적인 사안으로 고려하면 튼튼하고 깨끗한 코드를 작성할 수 있다. 오류 처리를 프로그램 논리와 분리하면 독립적인 추론이 가능해지며 코드 유지보수성도 크게 높아진다.” (p.142)</p>
 
-&lt;h2 id=&quot;go-언어에서는&quot;&gt;Go 언어에서는?&lt;/h2&gt;
+<h2 id="go-언어에서는">Go 언어에서는?</h2>
 
-&lt;h3 id=&quot;exception이-없는-go-언어&quot;&gt;Exception이 없는 Go 언어&lt;/h3&gt;
+<h3 id="exception이-없는-go-언어">Exception이 없는 Go 언어</h3>
 
-&lt;p&gt;이 책이 처음 출간된 다음 해인 2009년에 탄생한 Go 언어는 exception(예외)를 지원하지 않는다. 책에서는 exception을 지원하는 언어가 많아졌기 때문에 가장 첫 조언으로 에러 코드 대신 exception을 사용하라고 한다. 그럼 왜 Go 언어는 exception을 지원하지 않을까? 이 질문에 Go 언어 공식 사이트는 “여러 값을 반환할 수 있는 특징을 활용해서 다른 언어와 다른 방식으로 쉽게 에러를 반환하고 처리할 수 있다”고 답한다 &lt;a href=&quot;https://go.dev/doc/faq#exceptions&quot;&gt;(Why does Go not have exceptions?)&lt;/a&gt;. 그렇기 때문에 Go 코드들을 읽다보면 아래와 같이 error 타입을 함께 반환하는 코드들을 많이 볼 수 있다.&lt;/p&gt;
+<p>이 책이 처음 출간된 다음 해인 2009년에 탄생한 Go 언어는 exception(예외)를 지원하지 않는다. 책에서는 exception을 지원하는 언어가 많아졌기 때문에 가장 첫 조언으로 에러 코드 대신 exception을 사용하라고 한다. 그럼 왜 Go 언어는 exception을 지원하지 않을까? 이 질문에 Go 언어 공식 사이트는 “여러 값을 반환할 수 있는 특징을 활용해서 다른 언어와 다른 방식으로 쉽게 에러를 반환하고 처리할 수 있다”고 답한다 <a href="https://go.dev/doc/faq#exceptions">(Why does Go not have exceptions?)</a>. 그렇기 때문에 Go 코드들을 읽다보면 아래와 같이 error 타입을 함께 반환하는 코드들을 많이 볼 수 있다.</p>
 
-&lt;div class=&quot;language-go highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;err&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;doSomething&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;err&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;nil&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;fmt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Println&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;fail to get result: &quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;err&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">result</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">doSomething</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"fail to get result: "</span><span class="p">,</span> <span class="n">err</span><span class="o">.</span><span class="n">Error</span><span class="p">())</span>
+<span class="p">}</span>
+</code></pre></div></div>
 
-&lt;p&gt;위의 예시에서는 어떤 함수가 실행되고 result라는 결과값이 err라는 에러와 같이 반환되었다. 만약 err가 nil이 아니라면 (null 값이 아니라면), err 안에 있는 메세지를 감싸서 출력하는 식으로 에러를 처리한다. 함수에서 error 값을 같이 반환하는 것이 하나의 규칙이다 보니 개발자들이 함수를 호출한 이후에 즉시 오류를 확인하게 한다. 그렇다고 할 지라도 잊어버리고 버그를 만들어내는 경우도 종종 볼 수 있다.&lt;/p&gt;
+<p>위의 예시에서는 어떤 함수가 실행되고 result라는 결과값이 err라는 에러와 같이 반환되었다. 만약 err가 nil이 아니라면 (null 값이 아니라면), err 안에 있는 메세지를 감싸서 출력하는 식으로 에러를 처리한다. 함수에서 error 값을 같이 반환하는 것이 하나의 규칙이다 보니 개발자들이 함수를 호출한 이후에 즉시 오류를 확인하게 한다. 그렇다고 할 지라도 잊어버리고 버그를 만들어내는 경우도 종종 볼 수 있다.</p>
 
-&lt;p&gt;exception 대신 에러만 있기 때문에 Go 언어 개발자들은 어떤 경우에 exception으로 따로 만들어서 처리해줘야 하는가를 고민할 필요가 없다. 결국 exception으로 처리해줘야 할 것도 본질은 에러에서부터 왔다. 그러므로 어떤 exception으로 잡을지가 아니라 어떻게 처리해야 할 지에 개발자들이 더 고민할 수 있게 해준다.&lt;/p&gt;
+<p>exception 대신 에러만 있기 때문에 Go 언어 개발자들은 어떤 경우에 exception으로 따로 만들어서 처리해줘야 하는가를 고민할 필요가 없다. 결국 exception으로 처리해줘야 할 것도 본질은 에러에서부터 왔다. 그러므로 어떤 exception으로 잡을지가 아니라 어떻게 처리해야 할 지에 개발자들이 더 고민할 수 있게 해준다.</p>
 
-&lt;h3 id=&quot;error-type&quot;&gt;error type&lt;/h3&gt;
+<h3 id="error-type">error type</h3>
 
-&lt;p&gt;Go 언어는 C 언어에서 에러 코드를 -1과 같은 형식으로 반환하는 문제를 해결하기 위해서 error라는 에러 타입을 다음과 같이 만들었다.&lt;/p&gt;
+<p>Go 언어는 C 언어에서 에러 코드를 -1과 같은 형식으로 반환하는 문제를 해결하기 위해서 error라는 에러 타입을 다음과 같이 만들었다.</p>
 
-&lt;div class=&quot;language-go highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;error&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;interface&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;Error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">type</span> <span class="kt">error</span> <span class="k">interface</span> <span class="p">{</span>
+    <span class="n">Error</span><span class="p">()</span> <span class="kt">string</span>
+<span class="p">}</span>
+</code></pre></div></div>
 
-&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Error()&lt;/code&gt;라는 메소드 한 개만을 가지고 있는 interface이기 때문에 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Error()&lt;/code&gt; 메소드만 구현한다면 매우 쉽게 커스텀 에러 타입들을 만들어낼 수 있다. 아래와 같이 에러를 처리할 때 추가적인 정보를 제공한다거나 C 언어처럼 integer 값으로 관리하고 있던 에러 코드들을 에러 타입으로 쉽게 만들어줄 수 있다.&lt;/p&gt;
+<p><code class="language-plaintext highlighter-rouge">Error()</code>라는 메소드 한 개만을 가지고 있는 interface이기 때문에 <code class="language-plaintext highlighter-rouge">Error()</code> 메소드만 구현한다면 매우 쉽게 커스텀 에러 타입들을 만들어낼 수 있다. 아래와 같이 에러를 처리할 때 추가적인 정보를 제공한다거나 C 언어처럼 integer 값으로 관리하고 있던 에러 코드들을 에러 타입으로 쉽게 만들어줄 수 있다.</p>
 
-&lt;div class=&quot;language-go highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ChallengeSignUpError&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;ChallengeName&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;Err&lt;/span&gt;         &lt;span class=&quot;kt&quot;&gt;error&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">type</span> <span class="n">ChallengeSignUpError</span> <span class="k">struct</span> <span class="p">{</span>
+    <span class="n">ChallengeName</span> <span class="kt">string</span>
+    <span class="n">Err</span>         <span class="kt">error</span>
+<span class="p">}</span>
 
-&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ChallengeSignUpError&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fmt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Sprintf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;failed to sign up %s: %s&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ChallengeName&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Err&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+<span class="k">func</span> <span class="p">(</span><span class="n">e</span> <span class="o">*</span><span class="n">ChallengeSignUpError</span><span class="p">)</span> <span class="n">Error</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">fmt</span><span class="o">.</span><span class="n">Sprintf</span><span class="p">(</span><span class="s">"failed to sign up %s: %s"</span><span class="p">,</span> <span class="n">ChallengeName</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">Err</span><span class="o">.</span><span class="n">Error</span><span class="p">())</span>
+<span class="p">}</span>
 
-&lt;span class=&quot;k&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;intAsError&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;
+<span class="k">type</span> <span class="n">intAsError</span> <span class="kt">int</span>
 
-&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;intAsError&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;c&quot;&gt;// 각 에러 코드에 대한 설명을 추가할 수 있다. &lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fmt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Sprintf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;%d&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<span class="k">func</span> <span class="p">(</span><span class="n">e</span> <span class="o">*</span><span class="n">intAsError</span><span class="p">)</span> <span class="n">Error</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
+    <span class="c">// 각 에러 코드에 대한 설명을 추가할 수 있다. </span>
+    <span class="k">return</span> <span class="n">fmt</span><span class="o">.</span><span class="n">Sprintf</span><span class="p">(</span><span class="s">"%d"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
 
-&lt;p&gt;이러한 커스텀 타입이 아니라 그냥 단순한 error 타입으로 충분하다면 아래 세 가지 방법으로 error를 구현할 수 있다.&lt;/p&gt;
+<p>이러한 커스텀 타입이 아니라 그냥 단순한 error 타입으로 충분하다면 아래 세 가지 방법으로 error를 구현할 수 있다.</p>
 
-&lt;ul&gt;
-  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;fmt.Errorf&lt;/code&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;errors.New&lt;/code&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;errChallengeNotFound := &amp;amp;ChallengeSignUpError{ChallengeName: &quot;Clean Code Book Club&quot;, Err: fmt.Errof(&quot;challenge not found&quot;)}&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">fmt.Errorf</code></li>
+  <li><code class="language-plaintext highlighter-rouge">errors.New</code></li>
+  <li><code class="language-plaintext highlighter-rouge">errChallengeNotFound := &amp;ChallengeSignUpError{ChallengeName: "Clean Code Book Club", Err: fmt.Errof("challenge not found")}</code></li>
+</ul>
 
-&lt;p&gt;그리고 이러한 error들은 다른 언어에서 사용되는 exception들과 같이 throw할 수도 있고 아니면 catch해서 throw하지 않은 채로 처리할 수도 있다. 이처럼 Go 언어에서도 exception이라는 타입이 없을 뿐이지 발생한 에러를 기록하고 프로그램이 계속 작동하는지 확인하는 점은 바뀌지 않는다.&lt;/p&gt;
+<p>그리고 이러한 error들은 다른 언어에서 사용되는 exception들과 같이 throw할 수도 있고 아니면 catch해서 throw하지 않은 채로 처리할 수도 있다. 이처럼 Go 언어에서도 exception이라는 타입이 없을 뿐이지 발생한 에러를 기록하고 프로그램이 계속 작동하는지 확인하는 점은 바뀌지 않는다.</p>
 
-&lt;h2 id=&quot;-소감-3줄-요약&quot;&gt;👀 소감 3줄 요약&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;에러가 없을 수 없다는 것을 인정하면서 에러를 처리하는 코드가 얼마나 중요한지 깨닫게 되었다.&lt;/li&gt;
-  &lt;li&gt;integer로 된 에러 코드나 null을 반환하지 않기 위해서 언어는 다양한 발전을 거쳤다. 대부분의 언어는 exception을 채용했고, Go 언어는 error 값을 같이 반환하는 방식을 택했다.&lt;/li&gt;
-  &lt;li&gt;Go 언어는 그래도 여전히 개발자들에게 많은 자유를 주었다. 이러한 자유에는 큰 책임이 따른다. 에러를 제대로 처리하고 있는지 항상 확인해야 한다. 이러한 부분들을 강제하기 위해 Rust는 아예 Null을 없애고 Option이란 개념을 추가했다 &lt;a href=&quot;&amp;quot;https://blog.knoldus.com/rust-can-never-be-null/&amp;quot;&quot;&gt;(Rust can never be null)&lt;/a&gt;.&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Young Choi</name></author><category term="Books" /><category term="노개북" /><category term="클린 코드" /><summary type="html">클린 코드, 애자일 소프트웨어 장인 정신: Day 07 - 객체와 자료 구조</summary></entry><entry xml:lang="ko"><title type="html">Go 언어로 읽는 클린 코드 6장 - 객체와 자료 구조</title><link href="https://whyjun.github.io/books/Read-Clean-Code-In-Go-06" rel="alternate" type="text/html" title="Go 언어로 읽는 클린 코드 6장 - 객체와 자료 구조" /><published>2022-03-01T00:00:00-06:00</published><updated>2022-03-01T00:00:00-06:00</updated><id>https://whyjun.github.io/books/Read-Clean-Code-in-Go-06</id><content type="html" xml:base="https://whyjun.github.io/books/Read-Clean-Code-In-Go-06">&lt;p&gt;클린 코드, 애자일 소프트웨어 장인 정신: Day 06 - 객체와 자료 구조&lt;/p&gt;
+<h2 id="-소감-3줄-요약">👀 소감 3줄 요약</h2>
+<ul>
+  <li>에러가 없을 수 없다는 것을 인정하면서 에러를 처리하는 코드가 얼마나 중요한지 깨닫게 되었다.</li>
+  <li>integer로 된 에러 코드나 null을 반환하지 않기 위해서 언어는 다양한 발전을 거쳤다. 대부분의 언어는 exception을 채용했고, Go 언어는 error 값을 같이 반환하는 방식을 택했다.</li>
+  <li>Go 언어는 그래도 여전히 개발자들에게 많은 자유를 주었다. 이러한 자유에는 큰 책임이 따른다. 에러를 제대로 처리하고 있는지 항상 확인해야 한다. 이러한 부분들을 강제하기 위해 Rust는 아예 Null을 없애고 Option이란 개념을 추가했다 <a href="&quot;https://blog.knoldus.com/rust-can-never-be-null/&quot;">(Rust can never be null)</a>.</li>
+</ul>]]></content><author><name>Young Choi</name></author><category term="Books" /><category term="노개북" /><category term="클린 코드" /><summary type="html"><![CDATA[클린 코드, 애자일 소프트웨어 장인 정신: Day 07 - 객체와 자료 구조]]></summary></entry><entry xml:lang="ko"><title type="html">Go 언어로 읽는 클린 코드 6장 - 객체와 자료 구조</title><link href="https://whyjun.github.io/books/Read-Clean-Code-In-Go-06" rel="alternate" type="text/html" title="Go 언어로 읽는 클린 코드 6장 - 객체와 자료 구조" /><published>2022-03-01T00:00:00-06:00</published><updated>2022-03-01T00:00:00-06:00</updated><id>https://whyjun.github.io/books/Read-Clean-Code-in-Go-06</id><content type="html" xml:base="https://whyjun.github.io/books/Read-Clean-Code-In-Go-06"><![CDATA[<p>클린 코드, 애자일 소프트웨어 장인 정신: Day 06 - 객체와 자료 구조</p>
 
-&lt;blockquote&gt;
-  &lt;p&gt;Java 언어를 기반으로 쓰여진 이 책의 내용들을 어떻게 Go 언어에 적용할 수 있을까를 고민하며 읽었습니다.&lt;/p&gt;
-&lt;/blockquote&gt;
+<blockquote>
+  <p>Java 언어를 기반으로 쓰여진 이 책의 내용들을 어떻게 Go 언어에 적용할 수 있을까를 고민하며 읽었습니다.</p>
+</blockquote>
 
-&lt;h2 id=&quot;-책에서-기억하고-싶은-내용을-써보세요&quot;&gt;😀 책에서 기억하고 싶은 내용을 써보세요.&lt;/h2&gt;
+<h2 id="-책에서-기억하고-싶은-내용을-써보세요">😀 책에서 기억하고 싶은 내용을 써보세요.</h2>
 
-&lt;p&gt;“변수 사이에 함수라는 계층을 넣는다고 구현이 저절로 감춰지지는 않는다. 구현을 감추려면 추상화가 필요하다! 그저 (형식 논리에 치우쳐) 조회 함수와 설정 함수로 변수를 다룬다고 클래스가 되지는 않는다. 그보다는 추상 인터페이스를 제공해 사용자가 구현을 모른 채 자료의 핵심을 조작할 수 있어야 진정한 의미의 클래스다.” (p.119)&lt;/p&gt;
+<p>“변수 사이에 함수라는 계층을 넣는다고 구현이 저절로 감춰지지는 않는다. 구현을 감추려면 추상화가 필요하다! 그저 (형식 논리에 치우쳐) 조회 함수와 설정 함수로 변수를 다룬다고 클래스가 되지는 않는다. 그보다는 추상 인터페이스를 제공해 사용자가 구현을 모른 채 자료의 핵심을 조작할 수 있어야 진정한 의미의 클래스다.” (p.119)</p>
 
-&lt;p&gt;“개발자는 객체가 포함하는 자료를 표현할 가장 좋은 방법을 심각하게 고민해야 한다.” (p.119)&lt;/p&gt;
+<p>“개발자는 객체가 포함하는 자료를 표현할 가장 좋은 방법을 심각하게 고민해야 한다.” (p.119)</p>
 
-&lt;p&gt;“분별 있는 프로그래머는 모든 것이 객체라는 생각이 미신임을 잘 안다. 때로 는 단순한 자료 구조와 절차적인 코드가 가장 적합한 상황도 있다.” (p.122)&lt;/p&gt;
+<p>“분별 있는 프로그래머는 모든 것이 객체라는 생각이 미신임을 잘 안다. 때로 는 단순한 자료 구조와 절차적인 코드가 가장 적합한 상황도 있다.” (p.122)</p>
 
-&lt;p&gt;“ctxt가 객체라면 뭔가를 하라고 말해야지 속을 드러내라고 말하면 안 된다. 임시 디렉터리의 절대 경로가 왜 필요할까? 절대 경로를 얻어 어디에 쓸려고? (중략) 어찌 되었거나, 위 코드를 살펴 보면, 임시 디렉터리의 절대 경로를 얻으려는 이유가 임시 파일을 생성하기 위 한 목적이라는 사실이 드러난다. 그렇다면 ctxt 객체에 임시 파일을 생성하라고 시키면 어떨까?” (p.125)&lt;/p&gt;
+<p>“ctxt가 객체라면 뭔가를 하라고 말해야지 속을 드러내라고 말하면 안 된다. 임시 디렉터리의 절대 경로가 왜 필요할까? 절대 경로를 얻어 어디에 쓸려고? (중략) 어찌 되었거나, 위 코드를 살펴 보면, 임시 디렉터리의 절대 경로를 얻으려는 이유가 임시 파일을 생성하기 위 한 목적이라는 사실이 드러난다. 그렇다면 ctxt 객체에 임시 파일을 생성하라고 시키면 어떨까?” (p.125)</p>
 
-&lt;p&gt;“흔히 DTO는 데이터베이스에 저장된 가공되지 않은 정보를 애플리케이션 코드에서 사용할 객체로 변환하는 일련의 단계에서 가장 처음으로 사용하는 구조체다.” (p.126)&lt;/p&gt;
+<p>“흔히 DTO는 데이터베이스에 저장된 가공되지 않은 정보를 애플리케이션 코드에서 사용할 객체로 변환하는 일련의 단계에서 가장 처음으로 사용하는 구조체다.” (p.126)</p>
 
-&lt;p&gt;“시스템을 구현할 때, 새로운 자료 타입을 추가하는 유연성이 필요하면 객체가 더 적합하다. 다른 경우로 새로운 동작을 추가하는 유연성이 필요하면 자료 구조와 절차적인 코드가 더 적합하다. 우수한 소프트웨어 개발자는 편견 없이 이 사실을 이해해 직면한 문제에 최적인 해결책을 선택한다.” (p.128)&lt;/p&gt;
+<p>“시스템을 구현할 때, 새로운 자료 타입을 추가하는 유연성이 필요하면 객체가 더 적합하다. 다른 경우로 새로운 동작을 추가하는 유연성이 필요하면 자료 구조와 절차적인 코드가 더 적합하다. 우수한 소프트웨어 개발자는 편견 없이 이 사실을 이해해 직면한 문제에 최적인 해결책을 선택한다.” (p.128)</p>
 
-&lt;h2 id=&quot;-오늘-읽은-소감은-떠오르는-생각을-가볍게-적어보세요&quot;&gt;🤔 오늘 읽은 소감은? 떠오르는 생각을 가볍게 적어보세요.&lt;/h2&gt;
+<h2 id="-오늘-읽은-소감은-떠오르는-생각을-가볍게-적어보세요">🤔 오늘 읽은 소감은? 떠오르는 생각을 가볍게 적어보세요.</h2>
 
-&lt;p&gt;이번 챕터를 읽으면서 지금까지 기계적으로 조회 함수를 만들어왔다는 사실을 깨달았다. 객체를 추상화했던 것이 아니라 객체를 만들고 사용하는 것에 급급하지 않았나 싶다. 125쪽에 나와 있듯이 객체 안에 있는 정보를 그냥 단순히 제공하는 함수가 아니라 이 객체를 통해서 우리가 결국 무엇을 하고 싶었는지를 제대로 파악해서 무언가를 하는 함수를 만드는 게 중요하다. 그러한 고민이 없다면 제대로 된 추상화가 아니고 코드를 읽는 다른 개발자들이 단순한 정보 조회의 나열 속에서 코드의 의미를 찾아야 한다. 그리고 이것이 어렵기 때문에 우리는 주석을 너무 많이 달 유혹에 빠지게 되는 것 같다.&lt;/p&gt;
+<p>이번 챕터를 읽으면서 지금까지 기계적으로 조회 함수를 만들어왔다는 사실을 깨달았다. 객체를 추상화했던 것이 아니라 객체를 만들고 사용하는 것에 급급하지 않았나 싶다. 125쪽에 나와 있듯이 객체 안에 있는 정보를 그냥 단순히 제공하는 함수가 아니라 이 객체를 통해서 우리가 결국 무엇을 하고 싶었는지를 제대로 파악해서 무언가를 하는 함수를 만드는 게 중요하다. 그러한 고민이 없다면 제대로 된 추상화가 아니고 코드를 읽는 다른 개발자들이 단순한 정보 조회의 나열 속에서 코드의 의미를 찾아야 한다. 그리고 이것이 어렵기 때문에 우리는 주석을 너무 많이 달 유혹에 빠지게 되는 것 같다.</p>
 
-&lt;h2 id=&quot;-소감-3줄-요약&quot;&gt;👀 소감 3줄 요약&lt;/h2&gt;
+<h2 id="-소감-3줄-요약">👀 소감 3줄 요약</h2>
 
-&lt;ul&gt;
-  &lt;li&gt;기계적으로 함수를 만드는 것은 추상화가 아니다.&lt;/li&gt;
-  &lt;li&gt;개발은 기능을 단순히 구현하는 것이 아니라 코드에 의미를 부여하는 것이다.&lt;/li&gt;
-  &lt;li&gt;객체와 자료구조 중 무엇이 더 도움이 될까 계속 고민하자.&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Young Choi</name></author><category term="Books" /><category term="노개북" /><category term="클린 코드" /><summary type="html">클린 코드, 애자일 소프트웨어 장인 정신: Day 06 - 객체와 자료 구조</summary></entry><entry xml:lang="ko"><title type="html">Go 언어로 읽는 클린 코드 5장 - 형식 맞추기</title><link href="https://whyjun.github.io/books/Read-Clean-Code-In-Go-05" rel="alternate" type="text/html" title="Go 언어로 읽는 클린 코드 5장 - 형식 맞추기" /><published>2022-02-28T00:00:00-06:00</published><updated>2022-02-28T00:00:00-06:00</updated><id>https://whyjun.github.io/books/Read-Clean-Code-in-Go-05</id><content type="html" xml:base="https://whyjun.github.io/books/Read-Clean-Code-In-Go-05">&lt;p&gt;클린 코드, 애자일 소프트웨어 장인 정신: Day 05 - 형식&lt;/p&gt;
+<ul>
+  <li>기계적으로 함수를 만드는 것은 추상화가 아니다.</li>
+  <li>개발은 기능을 단순히 구현하는 것이 아니라 코드에 의미를 부여하는 것이다.</li>
+  <li>객체와 자료구조 중 무엇이 더 도움이 될까 계속 고민하자.</li>
+</ul>]]></content><author><name>Young Choi</name></author><category term="Books" /><category term="노개북" /><category term="클린 코드" /><summary type="html"><![CDATA[클린 코드, 애자일 소프트웨어 장인 정신: Day 06 - 객체와 자료 구조]]></summary></entry><entry xml:lang="ko"><title type="html">Go 언어로 읽는 클린 코드 5장 - 형식 맞추기</title><link href="https://whyjun.github.io/books/Read-Clean-Code-In-Go-05" rel="alternate" type="text/html" title="Go 언어로 읽는 클린 코드 5장 - 형식 맞추기" /><published>2022-02-28T00:00:00-06:00</published><updated>2022-02-28T00:00:00-06:00</updated><id>https://whyjun.github.io/books/Read-Clean-Code-in-Go-05</id><content type="html" xml:base="https://whyjun.github.io/books/Read-Clean-Code-In-Go-05"><![CDATA[<p>클린 코드, 애자일 소프트웨어 장인 정신: Day 05 - 형식</p>
 
-&lt;blockquote&gt;
-  &lt;p&gt;Java 언어를 기반으로 쓰여진 이 책의 내용들을 어떻게 Go 언어에 적용할 수 있을까를 고민하며 읽었습니다.&lt;/p&gt;
-&lt;/blockquote&gt;
+<blockquote>
+  <p>Java 언어를 기반으로 쓰여진 이 책의 내용들을 어떻게 Go 언어에 적용할 수 있을까를 고민하며 읽었습니다.</p>
+</blockquote>
 
-&lt;h2 id=&quot;-책에서-기억하고-싶은-내용을-써보세요&quot;&gt;😀 책에서 기억하고 싶은 내용을 써보세요.&lt;/h2&gt;
+<h2 id="-책에서-기억하고-싶은-내용을-써보세요">😀 책에서 기억하고 싶은 내용을 써보세요.</h2>
 
-&lt;p&gt;“프로그래머라면 형식을 깔끔하게 맞춰 코드를 짜야 한다. 코드 형식을 맞추기 위한 간단한 규칙을 정하고 그 규칙을 착실히 따라야 한다. 팀으로 일한다면 팀이 합의해 규칙을 정하고 모두가 그 규칙을 따라야 한다. 필요하다면 규칙을 자동으로 적용하는 도구를 활용한다.” (p.96)&lt;/p&gt;
+<p>“프로그래머라면 형식을 깔끔하게 맞춰 코드를 짜야 한다. 코드 형식을 맞추기 위한 간단한 규칙을 정하고 그 규칙을 착실히 따라야 한다. 팀으로 일한다면 팀이 합의해 규칙을 정하고 모두가 그 규칙을 따라야 한다. 필요하다면 규칙을 자동으로 적용하는 도구를 활용한다.” (p.96)</p>
 
-&lt;p&gt;“코드 형식은 의사소통의 일환이다. 의사소통은 전문 개발자의 일차적인 의무다.” (p.96)&lt;/p&gt;
+<p>“코드 형식은 의사소통의 일환이다. 의사소통은 전문 개발자의 일차적인 의무다.” (p.96)</p>
 
-&lt;p&gt;“소스 파일 첫 부분은 고차원 개념과 알고리즘을 설명한다. 아래로 내려갈수록 의도를 세세하게 묘사한다. 마지막에는 가장 저차원 함수와 세부 내역이 나온다.” (p.98)&lt;/p&gt;
+<p>“소스 파일 첫 부분은 고차원 개념과 알고리즘을 설명한다. 아래로 내려갈수록 의도를 세세하게 묘사한다. 마지막에는 가장 저차원 함수와 세부 내역이 나온다.” (p.98)</p>
 
-&lt;p&gt;“생각 사이는 빈 행을 넣어 분리해야 마땅하다.” (p.98)&lt;/p&gt;
+<p>“생각 사이는 빈 행을 넣어 분리해야 마땅하다.” (p.98)</p>
 
-&lt;p&gt;“서로 밀접한 코드 행은 세로로 가까이 놓여야 한다는 뜻이다. (중략) 연관성이란 한 개념을 이해하는데 다른 개념이 중요한 정도다. 연관성이 깊은 두 개념이 멀리 떨어져 있으면 코드를 읽는 사람이 소스 파일과 클래스를 여기저기 뒤지게 된다.” (p.100)&lt;/p&gt;
+<p>“서로 밀접한 코드 행은 세로로 가까이 놓여야 한다는 뜻이다. (중략) 연관성이란 한 개념을 이해하는데 다른 개념이 중요한 정도다. 연관성이 깊은 두 개념이 멀리 떨어져 있으면 코드를 읽는 사람이 소스 파일과 클래스를 여기저기 뒤지게 된다.” (p.100)</p>
 
-&lt;p&gt;“변수는 사용하는 위치에 최대한 가까이 선언한다. 우리가 만든 함수는 매우 짧으므로 지역 변수는 각 함수 맨 처음에 선언한다.” (p.101)&lt;/p&gt;
+<p>“변수는 사용하는 위치에 최대한 가까이 선언한다. 우리가 만든 함수는 매우 짧으므로 지역 변수는 각 함수 맨 처음에 선언한다.” (p.101)</p>
 
-&lt;p&gt;“잘 알려진 위치에 인스턴스 변수를 모은다는 사실이 중요하다. 변수 선언을 어디서 찾을지 모두가 알고 있어야 한다.” (p.103)&lt;/p&gt;
+<p>“잘 알려진 위치에 인스턴스 변수를 모은다는 사실이 중요하다. 변수 선언을 어디서 찾을지 모두가 알고 있어야 한다.” (p.103)</p>
 
-&lt;p&gt;“한 함수가 다른 함수를 호출한다면 두 함수는 세로로 가까이 배치한다. 또한 가능하다면 호출하는 함수를 호출되는 함수보다 먼저 배치한다. 그러면 프로그램이 자연스럽게 읽힌다. 규칙을 일관적으로 적용한다면 독자는 방금 호출한 함수가 잠시 후에 정의되리라는 사실을 예측한다.” (p.104)&lt;/p&gt;
+<p>“한 함수가 다른 함수를 호출한다면 두 함수는 세로로 가까이 배치한다. 또한 가능하다면 호출하는 함수를 호출되는 함수보다 먼저 배치한다. 그러면 프로그램이 자연스럽게 읽힌다. 규칙을 일관적으로 적용한다면 독자는 방금 호출한 함수가 잠시 후에 정의되리라는 사실을 예측한다.” (p.104)</p>
 
-&lt;p&gt;“상수를 알아야 마땅한 함수에서 실제로 사용하는 함수로 상수를 넘겨주는 방법이 더 좋다.” (p.105)&lt;/p&gt;
+<p>“상수를 알아야 마땅한 함수에서 실제로 사용하는 함수로 상수를 넘겨주는 방법이 더 좋다.” (p.105)</p>
 
-&lt;p&gt;“어떤 코드는 서로 끌어당긴다. 개념적인 친화도가 높기 때문이다. 친화도가 높을수록 코드를 가까이 배치한다.” (p.106)&lt;/p&gt;
+<p>“어떤 코드는 서로 끌어당긴다. 개념적인 친화도가 높기 때문이다. 친화도가 높을수록 코드를 가까이 배치한다.” (p.106)</p>
 
-&lt;p&gt;“범위(scope)로 이뤄진 계층을 표현하기 위해 우리는 코드를 들여쓴다. 들여쓰는 정도는 계층에서 코드가 자리잡은 수준에 비례한다.” (p.111)&lt;/p&gt;
+<p>“범위(scope)로 이뤄진 계층을 표현하기 위해 우리는 코드를 들여쓴다. 들여쓰는 정도는 계층에서 코드가 자리잡은 수준에 비례한다.” (p.111)</p>
 
-&lt;p&gt;“때로는 간단한 if 문, 짧은 while 문, 짧은 함수에서 들여쓰기 규칙을 무시하고픈 유혹이 생긴다. 이런 유혹에 빠질 때마다 나는 항상 원점으로 돌아가 들여쓰기를 넣는다.” (p.112)&lt;/p&gt;
+<p>“때로는 간단한 if 문, 짧은 while 문, 짧은 함수에서 들여쓰기 규칙을 무시하고픈 유혹이 생긴다. 이런 유혹에 빠질 때마다 나는 항상 원점으로 돌아가 들여쓰기를 넣는다.” (p.112)</p>
 
-&lt;p&gt;“하지만 팀에 속한다면 자신 이 선호해야 할 규칙은 바로 팀 규칙 이다. 팀은 한 가지 규칙에 합의해야 한다. 그리고 모든 팀원은 그 규칙을 따라야 한다. 그래야 소프트웨어가 일관적인 스타일을 보인다. 개개인이 따로국밥처럼 맘대로 짜대는 코드는 피해야 한다.” (p.113)&lt;/p&gt;
+<p>“하지만 팀에 속한다면 자신 이 선호해야 할 규칙은 바로 팀 규칙 이다. 팀은 한 가지 규칙에 합의해야 한다. 그리고 모든 팀원은 그 규칙을 따라야 한다. 그래야 소프트웨어가 일관적인 스타일을 보인다. 개개인이 따로국밥처럼 맘대로 짜대는 코드는 피해야 한다.” (p.113)</p>
 
-&lt;h2 id=&quot;-오늘-읽은-소감은-떠오르는-생각을-가볍게-적어보세요&quot;&gt;🤔 오늘 읽은 소감은? 떠오르는 생각을 가볍게 적어보세요.&lt;/h2&gt;
+<h2 id="-오늘-읽은-소감은-떠오르는-생각을-가볍게-적어보세요">🤔 오늘 읽은 소감은? 떠오르는 생각을 가볍게 적어보세요.</h2>
 
-&lt;p&gt;오늘 챕터에서는 정해진 형식을 통해 코드를 얼마나 쉽고 빠르게 읽을 수 있는지 알게 되었다. 이전 챕터들에서도 나왔듯이 우리는 대부분의 개발 시간을 코드를 읽고 이해하는데 사용한다. 그렇기 때문에 저자도 코드를 쉽게 읽고 쉽게 찾을 수 있는지에 대해서 이 책은 많은 부분을 할애했다. 지금까지 우리는 의미 있는 이름과 함수 챕터에서 파편적인 코드를 어떻게 하면 쉽게 찾을 수 있게 의미를 부여하고 추상화하는 방법에 대해 배웠다면, 이번 챕터에서는 하나의 정해진 형식을 팀이 사용하면서 처음 보는 파일일지라도 그 정해진 형식에 따라 쉽게 필요한 정보를 가져오고 이해할 수 있게 되는지를 설명하고 있다. 처음 보는 파일에 아무리 의미가 명확한 변수와 함수들이 있다고 해도 이름을 알지 못해서 찾을 수 없기 때문에 형식을 따르는 것은 매우 중요하다. 특히 이전 챕터까지 나온 책의 내용을 잘 따랐다면, 변수와 함수의 수가 늘었을 텐데 이것들이 여러 파일에 쪼개져서 숨겨져 있다면 결국 이 파일, 저 파일 열어봐야하기 때문에 좋은 코드라고 볼 수 없다. 어떤 형식이 무조건 옳고 좋다고는 할 수 없지만 팀에서 정해진 형식이 있다면 나와 생각이 다르더라도 최대한 따라야 하고 만약 그 형식들이 내 생산성을 침해한다면 내가 선호하는 대로 우선 코드를 작성하고 자동으로 적용하는 도구를 사용해서 정해진 형식을 맞출 수 있도록 해야 한다.&lt;/p&gt;
+<p>오늘 챕터에서는 정해진 형식을 통해 코드를 얼마나 쉽고 빠르게 읽을 수 있는지 알게 되었다. 이전 챕터들에서도 나왔듯이 우리는 대부분의 개발 시간을 코드를 읽고 이해하는데 사용한다. 그렇기 때문에 저자도 코드를 쉽게 읽고 쉽게 찾을 수 있는지에 대해서 이 책은 많은 부분을 할애했다. 지금까지 우리는 의미 있는 이름과 함수 챕터에서 파편적인 코드를 어떻게 하면 쉽게 찾을 수 있게 의미를 부여하고 추상화하는 방법에 대해 배웠다면, 이번 챕터에서는 하나의 정해진 형식을 팀이 사용하면서 처음 보는 파일일지라도 그 정해진 형식에 따라 쉽게 필요한 정보를 가져오고 이해할 수 있게 되는지를 설명하고 있다. 처음 보는 파일에 아무리 의미가 명확한 변수와 함수들이 있다고 해도 이름을 알지 못해서 찾을 수 없기 때문에 형식을 따르는 것은 매우 중요하다. 특히 이전 챕터까지 나온 책의 내용을 잘 따랐다면, 변수와 함수의 수가 늘었을 텐데 이것들이 여러 파일에 쪼개져서 숨겨져 있다면 결국 이 파일, 저 파일 열어봐야하기 때문에 좋은 코드라고 볼 수 없다. 어떤 형식이 무조건 옳고 좋다고는 할 수 없지만 팀에서 정해진 형식이 있다면 나와 생각이 다르더라도 최대한 따라야 하고 만약 그 형식들이 내 생산성을 침해한다면 내가 선호하는 대로 우선 코드를 작성하고 자동으로 적용하는 도구를 사용해서 정해진 형식을 맞출 수 있도록 해야 한다.</p>
 
-&lt;p&gt;나아가 그 형식들을 그냥 맹목적으로 따르는 것보다 그렇게 정해진 이유들을 찾아봐야 한다. 예를 들면, Go 언어로 코드를 작성할 때는 상수라고 할 지라도 대문자로 이름을 짓지 않는다. 이는 각 변수와 함수의 이름이 대문자로 시작할 경우 외부에서 사용할 수 있기 때문이다. 이러한 규칙들은 그 언어의 특징을 설명해주고 만약 팀에서 이러한 규칙을 지키지 않는다면 팀 차원에서 이 규칙에 대해 토의해보고 고쳐야 할 것이다.&lt;/p&gt;
+<p>나아가 그 형식들을 그냥 맹목적으로 따르는 것보다 그렇게 정해진 이유들을 찾아봐야 한다. 예를 들면, Go 언어로 코드를 작성할 때는 상수라고 할 지라도 대문자로 이름을 짓지 않는다. 이는 각 변수와 함수의 이름이 대문자로 시작할 경우 외부에서 사용할 수 있기 때문이다. 이러한 규칙들은 그 언어의 특징을 설명해주고 만약 팀에서 이러한 규칙을 지키지 않는다면 팀 차원에서 이 규칙에 대해 토의해보고 고쳐야 할 것이다.</p>
 
-&lt;h2 id=&quot;-소감-3줄-요약&quot;&gt;👀 소감 3줄 요약&lt;/h2&gt;
+<h2 id="-소감-3줄-요약">👀 소감 3줄 요약</h2>
 
-&lt;ul&gt;
-  &lt;li&gt;형식을 자동으로 맞춰주는 툴(lint, prettier, editorconfig)들을 활용하자.&lt;/li&gt;
-  &lt;li&gt;두괄식으로 코드를 작성하자. 이 파일을 열어볼 미래의 개발자들이 가장 궁금해할 내용이 무엇일지 생각해보면 어느 것이 상단에 위치해야 하는지 정하기 쉬울 것이다.&lt;/li&gt;
-  &lt;li&gt;각 언어마다 따라야 하는 형식들이 있다. 그렇게 정해진 이유가 분명 있을 것이다. 그 이유들을 찾아보고 알게 된다면 그 언어를 이해하는데 더 도움이 되지 않을까?&lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li>형식을 자동으로 맞춰주는 툴(lint, prettier, editorconfig)들을 활용하자.</li>
+  <li>두괄식으로 코드를 작성하자. 이 파일을 열어볼 미래의 개발자들이 가장 궁금해할 내용이 무엇일지 생각해보면 어느 것이 상단에 위치해야 하는지 정하기 쉬울 것이다.</li>
+  <li>각 언어마다 따라야 하는 형식들이 있다. 그렇게 정해진 이유가 분명 있을 것이다. 그 이유들을 찾아보고 알게 된다면 그 언어를 이해하는데 더 도움이 되지 않을까?</li>
+</ul>
 
-&lt;h2 id=&quot;gofmt&quot;&gt;gofmt&lt;/h2&gt;
+<h2 id="gofmt">gofmt</h2>
 
-&lt;p&gt;&lt;a href=&quot;https://go.dev/doc/effective_go#formatting&quot;&gt;Effective Go: Formatting&lt;/a&gt;&lt;/p&gt;
+<p><a href="https://go.dev/doc/effective_go#formatting">Effective Go: Formatting</a></p>
 
-&lt;p&gt;다양한 스타일의 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;eslint&lt;/code&gt;가 있는 Javascript와 달리, Go는 언어를 설치할 때 형식을 자동화하는 툴이 같이 설치한다. 이는 대부분의 형식을 개발자들 대신 자동으로 맞춰주고 팀의 형식을 정하기 위해 시간을 낭비하지 않도록 도와준다. 형식을 정하는게 얼마나 큰 대수냐라고 할 수 있지만, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;tab&lt;/code&gt;과 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;space&lt;/code&gt;를 가지고는 많은 개발자들의 논쟁이 있었고 Python에서는 들여쓰기가 둘 중 하나로 통일되지 않으면 파일이 실행되지 않기도 한다.&lt;/p&gt;</content><author><name>Young Choi</name></author><category term="Books" /><category term="노개북" /><category term="클린 코드" /><summary type="html">클린 코드, 애자일 소프트웨어 장인 정신: Day 05 - 형식</summary></entry><entry xml:lang="ko"><title type="html">Go 언어로 읽는 클린 코드 4장 - 주석</title><link href="https://whyjun.github.io/books/Read-Clean-Code-In-Go-04" rel="alternate" type="text/html" title="Go 언어로 읽는 클린 코드 4장 - 주석" /><published>2022-02-24T00:00:00-06:00</published><updated>2022-02-24T00:00:00-06:00</updated><id>https://whyjun.github.io/books/Read-Clean-Code-in-Go-04</id><content type="html" xml:base="https://whyjun.github.io/books/Read-Clean-Code-In-Go-04">&lt;p&gt;클린 코드, 애자일 소프트웨어 장인 정신: Day 04 - 주석&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;Java 언어를 기반으로 쓰여진 이 책의 내용들을 어떻게 Go 언어에 적용할 수 있을까를 고민하며 읽었습니다.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h2 id=&quot;-책에서-기억하고-싶은-내용을-써보세요&quot;&gt;😀 책에서 기억하고 싶은 내용을 써보세요.&lt;/h2&gt;
-
-&lt;p&gt;“이유는 단순하다. 프로그래머들이 주석을 유지하고 보수하기란 현실적으로 불가능하니까.” (p.68)&lt;/p&gt;
-
-&lt;p&gt;“자신이 저지른 난장판을 주석으로 설명 하려 애쓰는 대신에 그 난장판을 깨끗이 치우는 데 시간을 보내라!” (p.69)&lt;/p&gt;
-
-&lt;p&gt;“주기적으로 TODO 주석을 점검해 없애도 괜찮은 주석은 없애라고 권한다.” (p.75)&lt;/p&gt;
-
-&lt;p&gt;“설명이 잘 된 공개 API는 참으로 유용하고 만족스럽다. 표준 자바 라이브러리에서 사용한 Javadocs가 좋은 예다. Javadocs가 없다면 자바 프로그램을 짜기가 아주 어려우리라. 공개 API를 구현한다면 반드시 훌륭한 Javadocs를 작성한다.” (p.75)&lt;/p&gt;
-
-&lt;p&gt;“함수나 변수로 표현할 수 있다면 주석을 달지 마라” (p.84)&lt;/p&gt;
-
-&lt;p&gt;“공개 API는 Javadocs가 유용하지만 공개하지 않을 코드라면 Javadocs는 쓸모가 없다. 시스템 내부에 속한 클래스와 함수에 Javadocs를 생성할 필요는 없다.” (p.90)&lt;/p&gt;
-
-&lt;h2 id=&quot;-오늘-읽은-소감은-떠오르는-생각을-가볍게-적어보세요&quot;&gt;🤔 오늘 읽은 소감은? 떠오르는 생각을 가볍게 적어보세요.&lt;/h2&gt;
-
-&lt;p&gt;예전 회사에서 주석에 속아서 코드를 잘못 이해했다가 골탕을 먹었던 게 기억이 났다. 왜 주석을 관리하지 않았는가보다 그것을 믿고 코드를 제대로 확인하지 않았던 부분에 대해서 지적하는지 이상하게 생각했었는데 개발자로 계속 일을 하다가 보니 정말 책에서 나온 것처럼 여러 군데에 파편적으로 나누어져있는 주석을 제대로 관리하는 것은 코드를 제대로 관리하는 것보다 훨씬 어렵다는 것을 알게 되었다. 그렇기 때문에 특별한 이유가 있지 않다면 주석은 정해진 위치에 모여 있어야 한다고 생각한다. 개인적으로 선호하는 방법은 public 함수 위 주석을 달고 그 주석들을 문서화 유틸리티들을 활용해서 문서로 만들어서 사용하는 것이다. 이러면 따로 문서를 만들 필요도 없다는 장점과 코드 리뷰 중에 문서도 같이 리뷰할 수 있다는 장점도 있다고 생각한다. 특히 웹 개발에서는 백엔드 API가 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Javascript&lt;/code&gt;가 아닌 경우가 많아서 코드를 읽는데 어려움이 있을 수 있는데 이런 경우 어떤 http error response를 반환하는지가 미리 문서에 작성되어 있으면 다른 개발자들이 쉽게 코드를 작성할 수 있다.&lt;/p&gt;
-
-&lt;h2 id=&quot;-소감-3줄-요약&quot;&gt;👀 소감 3줄 요약&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;주석의 목적이 코드를 명확하게 하는 거라면 코드의 함수와 변수를 명확하게 해야 한다.&lt;/li&gt;
-  &lt;li&gt;코드에 문서가 필요하다면 함수 주석을 문서화해주는 도구를 사용하자. Swagger나 각 언어 표준 라이브러리에 있는 문서화 도구들이 있을 것이다.&lt;/li&gt;
-  &lt;li&gt;코드가 먼저다. 코드를 잘 관리하자.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;godoc-주석을-문서로-만들기&quot;&gt;godoc: 주석을 문서로 만들기&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://go.dev/blog/godoc&quot;&gt;Godoc: documenting Go code&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;실제로 Go 언어는 기본적으로 godoc이 내장되어있다. 그리고 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;godoc&lt;/code&gt; 커맨드를 이용해서 웹 문서로 쉽게 변환할 수 있다. 우리가 사용하는 여러 패키지들의 문서들은 그렇게 만들어진 것이고 &lt;a href=&quot;https://pkg.go.dev&quot;&gt;Go Package&lt;/a&gt;에서 쉽게 확인할 수 있다.&lt;/p&gt;
-
-&lt;p&gt;예를 들면 실제 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;fmt&lt;/code&gt; 패키지 소스 코드를 확인해보면 아래와 같이 되어있고 실제 문서는 이렇게 자동으로 생성된다 &lt;a href=&quot;https://pkg.go.dev/fmt#Fprint&quot;&gt;(링크)&lt;/a&gt;. 이 문서를 보면 예시 코드가 있는데 그 예시 코드는 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;_test&lt;/code&gt; 패키지에 예시를 작성하고 싶은 함수명앞에 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Example&lt;/code&gt;을 추가해서 만들면 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;godoc&lt;/code&gt;에 추가할 수 있다 &lt;a href=&quot;https://cs.opensource.google/go/go/+/refs/tags/go1.17.7:src/fmt/example_test.go;l=142&quot;&gt;(링크)&lt;/a&gt;.&lt;/p&gt;
-
-&lt;div class=&quot;language-go highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;// Fprint formats using the default formats for its operands and writes to w.&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;// Spaces are added between operands when neither is a string.&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;// It returns the number of bytes written and any write error encountered.&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Fprint&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;io&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Writer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;interface&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{})&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;err&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>Young Choi</name></author><category term="Books" /><category term="노개북" /><category term="클린 코드" /><summary type="html">클린 코드, 애자일 소프트웨어 장인 정신: Day 04 - 주석</summary></entry></feed>
+<p>다양한 스타일의 <code class="language-plaintext highlighter-rouge">eslint</code>가 있는 Javascript와 달리, Go는 언어를 설치할 때 형식을 자동화하는 툴이 같이 설치한다. 이는 대부분의 형식을 개발자들 대신 자동으로 맞춰주고 팀의 형식을 정하기 위해 시간을 낭비하지 않도록 도와준다. 형식을 정하는게 얼마나 큰 대수냐라고 할 수 있지만, <code class="language-plaintext highlighter-rouge">tab</code>과 <code class="language-plaintext highlighter-rouge">space</code>를 가지고는 많은 개발자들의 논쟁이 있었고 Python에서는 들여쓰기가 둘 중 하나로 통일되지 않으면 파일이 실행되지 않기도 한다.</p>]]></content><author><name>Young Choi</name></author><category term="Books" /><category term="노개북" /><category term="클린 코드" /><summary type="html"><![CDATA[클린 코드, 애자일 소프트웨어 장인 정신: Day 05 - 형식]]></summary></entry></feed>

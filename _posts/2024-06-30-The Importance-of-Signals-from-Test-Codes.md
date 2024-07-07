@@ -1,10 +1,10 @@
 ---
 layout: post
-lang: en
-permalink: dev/The-Importance-of-Signals-from-Test-Codes
+lang: ko
+permalink: blog/The-Importance-of-Signals-from-Test-Codes
 title: The Importance of Signals from Test Codes
 categories:
-  - dev
+  - development
 tags:
   - test
 sharing:
