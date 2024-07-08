@@ -5,8 +5,8 @@
     <description>개발자 경험(DX)을 생각하는 개발자입니다.</description>
     <link>https://whyjun.github.io/</link>
     <atom:link href="https://whyjun.github.io/twitter.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Mon, 08 Jul 2024 10:32:35 -0500</pubDate>
-    <lastBuildDate>Mon, 08 Jul 2024 10:32:35 -0500</lastBuildDate>
+    <pubDate>Mon, 08 Jul 2024 11:55:27 -0500</pubDate>
+    <lastBuildDate>Mon, 08 Jul 2024 11:55:27 -0500</lastBuildDate>
     <generator>Jekyll v3.9.5</generator>
     
     
@@ -39,10 +39,10 @@
       </item>
     
       <item>
-        <title>알고리즘 공부 - Go에서 배열 역순으로 정렬하기 (reverse)</title>
-        <pubDate>Thu, 19 May 2022 00:00:00 -0500</pubDate>
-        <link>https://whyjun.github.io/algorithm/Reverse-Array</link>
-        <guid isPermaLink="true">https://whyjun.github.io/algorithm/Reverse-Array</guid>
+        <title>Go에서 Enum 사용하기 그리고 주의할 점</title>
+        <pubDate>Sun, 09 Jan 2022 00:00:00 -0600</pubDate>
+        <link>https://whyjun.github.io/golang/Enum-in-Golang</link>
+        <guid isPermaLink="true">https://whyjun.github.io/golang/Enum-in-Golang</guid>
       </item>
     
   </channel>
