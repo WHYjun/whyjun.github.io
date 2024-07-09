@@ -10,7 +10,7 @@
         
 
         
-        <changefreq>daily</changefreq>
+        <changefreq>weekly</changefreq>
         
 
         
@@ -26,7 +26,7 @@
         
 
         
-        <changefreq>daily</changefreq>
+        <changefreq>weekly</changefreq>
         
 
         
@@ -42,7 +42,7 @@
         
 
         
-        <changefreq>daily</changefreq>
+        <changefreq>weekly</changefreq>
         
 
         
@@ -58,199 +58,7 @@
         
 
         
-        <changefreq>daily</changefreq>
-        
-
-        
-        <priority>0.7</priority>
-        
-
-    </url>
-    
-    <url>
-        <loc>https://whyjun.github.io/algorithm/Reverse-Array</loc>
-        
-        <lastmod>2022-05-19T00:00:00-05:00</lastmod>
-        
-
-        
-        <changefreq>daily</changefreq>
-        
-
-        
-        <priority>0.7</priority>
-        
-
-    </url>
-    
-    <url>
-        <loc>https://whyjun.github.io/algorithm/Red-Black-Tree</loc>
-        
-        <lastmod>2022-05-15T00:00:00-05:00</lastmod>
-        
-
-        
-        <changefreq>daily</changefreq>
-        
-
-        
-        <priority>0.7</priority>
-        
-
-    </url>
-    
-    <url>
-        <loc>https://whyjun.github.io/books/Read-Clean-Code-In-Go-09</loc>
-        
-        <lastmod>2022-03-08T00:00:00-06:00</lastmod>
-        
-
-        
-        <changefreq>daily</changefreq>
-        
-
-        
-        <priority>0.7</priority>
-        
-
-    </url>
-    
-    <url>
-        <loc>https://whyjun.github.io/books/Read-Clean-Code-In-Go-08</loc>
-        
-        <lastmod>2022-03-05T00:00:00-06:00</lastmod>
-        
-
-        
-        <changefreq>daily</changefreq>
-        
-
-        
-        <priority>0.7</priority>
-        
-
-    </url>
-    
-    <url>
-        <loc>https://whyjun.github.io/books/Read-Clean-Code-In-Go-07</loc>
-        
-        <lastmod>2022-03-03T00:00:00-06:00</lastmod>
-        
-
-        
-        <changefreq>daily</changefreq>
-        
-
-        
-        <priority>0.7</priority>
-        
-
-    </url>
-    
-    <url>
-        <loc>https://whyjun.github.io/books/Read-Clean-Code-In-Go-06</loc>
-        
-        <lastmod>2022-03-01T00:00:00-06:00</lastmod>
-        
-
-        
-        <changefreq>daily</changefreq>
-        
-
-        
-        <priority>0.7</priority>
-        
-
-    </url>
-    
-    <url>
-        <loc>https://whyjun.github.io/books/Read-Clean-Code-In-Go-05</loc>
-        
-        <lastmod>2022-02-28T00:00:00-06:00</lastmod>
-        
-
-        
-        <changefreq>daily</changefreq>
-        
-
-        
-        <priority>0.7</priority>
-        
-
-    </url>
-    
-    <url>
-        <loc>https://whyjun.github.io/books/Read-Clean-Code-In-Go-04</loc>
-        
-        <lastmod>2022-02-24T00:00:00-06:00</lastmod>
-        
-
-        
-        <changefreq>daily</changefreq>
-        
-
-        
-        <priority>0.7</priority>
-        
-
-    </url>
-    
-    <url>
-        <loc>https://whyjun.github.io/books/Read-Clean-Code-In-Go-03</loc>
-        
-        <lastmod>2022-02-21T00:00:00-06:00</lastmod>
-        
-
-        
-        <changefreq>daily</changefreq>
-        
-
-        
-        <priority>0.7</priority>
-        
-
-    </url>
-    
-    <url>
-        <loc>https://whyjun.github.io/books/Read-Clean-Code-In-Go-02</loc>
-        
-        <lastmod>2022-02-19T00:00:00-06:00</lastmod>
-        
-
-        
-        <changefreq>daily</changefreq>
-        
-
-        
-        <priority>0.7</priority>
-        
-
-    </url>
-    
-    <url>
-        <loc>https://whyjun.github.io/books/Read-Clean-Code-In-Go-01</loc>
-        
-        <lastmod>2022-02-18T00:00:00-06:00</lastmod>
-        
-
-        
-        <changefreq>daily</changefreq>
-        
-
-        
-        <priority>0.7</priority>
-        
-
-    </url>
-    
-    <url>
-        <loc>https://whyjun.github.io/books/Read-Clean-Code-In-Go-00</loc>
-        
-        <lastmod>2022-02-17T00:00:00-06:00</lastmod>
-        
-
-        
-        <changefreq>daily</changefreq>
+        <changefreq>weekly</changefreq>
         
 
         
@@ -266,23 +74,7 @@
         
 
         
-        <changefreq>daily</changefreq>
-        
-
-        
-        <priority>0.7</priority>
-        
-
-    </url>
-    
-    <url>
-        <loc>https://whyjun.github.io/retrospective/Retrospective-2021</loc>
-        
-        <lastmod>2021-12-31T00:00:00-06:00</lastmod>
-        
-
-        
-        <changefreq>daily</changefreq>
+        <changefreq>weekly</changefreq>
         
 
         
@@ -298,7 +90,7 @@
         
 
         
-        <changefreq>daily</changefreq>
+        <changefreq>weekly</changefreq>
         
 
         
