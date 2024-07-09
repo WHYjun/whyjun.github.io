@@ -55,8 +55,8 @@ WHERE orders @> '[{"type": "HamburgerOrder"}]';
 
 #### Pros and Cons
 
-Pros: Very flexible. Simple schema.
-Cons: Complex queries. Limited data validation.
+* Pros: Very flexible. Simple schema.
+* Cons: Complex queries. Limited data validation.
 
 ### Using a Normalized Schema
 
@@ -132,8 +132,9 @@ WHERE o.transaction_id = 1;
 ```
 
 #### Pros and Cons
-Pros: Strong data integrity. Efficient querying.
-Cons: More complex schema. Requires more tables.
+
+* Pros: Strong data integrity. Efficient querying.
+* Cons: More complex schema. Requires more tables.
 
 ### Hybrid Approach: Common Fields + JSONB
 
@@ -172,8 +173,8 @@ SELECT * FROM orders WHERE transaction_id = 1;
 
 #### Pros and Cons
 
-Pros: Flexibility with JSONB. Easier querying for common fields.
-Cons: Validation can be tricky. Slightly more complex.
+* Pros: Flexibility with JSONB. Easier querying for common fields.
+* Cons: Validation can be tricky. Slightly more complex.
 
 ## Conclusion
 

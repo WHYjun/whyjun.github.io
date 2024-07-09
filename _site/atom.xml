@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.5">Jekyll</generator><link href="https://whyjun.github.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://whyjun.github.io/" rel="alternate" type="text/html" /><updated>2024-07-08T19:41:30-05:00</updated><id>https://whyjun.github.io/atom.xml</id><title type="html">개발 기록</title><subtitle>개발자 경험(DX)을 생각하는 개발자입니다.</subtitle><author><name>Young Choi</name></author><entry xml:lang="en"><title type="html">Storing Heterogeneous Objects in PostgreSQL</title><link href="https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL" rel="alternate" type="text/html" title="Storing Heterogeneous Objects in PostgreSQL" /><published>2024-07-08T00:00:00-05:00</published><updated>2024-07-08T00:00:00-05:00</updated><id>https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL</id><content type="html" xml:base="https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL"><![CDATA[<p>Storing different types of objects in a PostgreSQL database can be tricky. But don’t worry, it’s manageable. Let’s explore three practical ways to handle this. We will keep it simple and straightforward.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.5">Jekyll</generator><link href="https://whyjun.github.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://whyjun.github.io/" rel="alternate" type="text/html" /><updated>2024-07-08T19:59:06-05:00</updated><id>https://whyjun.github.io/atom.xml</id><title type="html">개발 기록</title><subtitle>개발자 경험(DX)을 생각하는 개발자입니다.</subtitle><author><name>Young Choi</name></author><entry xml:lang="en"><title type="html">Storing Heterogeneous Objects in PostgreSQL</title><link href="https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL" rel="alternate" type="text/html" title="Storing Heterogeneous Objects in PostgreSQL" /><published>2024-07-08T00:00:00-05:00</published><updated>2024-07-08T00:00:00-05:00</updated><id>https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL</id><content type="html" xml:base="https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL"><![CDATA[<p>Storing different types of objects in a PostgreSQL database can be tricky. But don’t worry, it’s manageable. Let’s explore three practical ways to handle this. We will keep it simple and straightforward.</p>
 
 <h2 id="scenario-restaurant-order-system">Scenario: Restaurant Order System</h2>
 
@@ -38,8 +38,10 @@
 
 <h4 id="pros-and-cons">Pros and Cons</h4>
 
-<p>Pros: Very flexible. Simple schema.
-Cons: Complex queries. Limited data validation.</p>
+<ul>
+  <li>Pros: Very flexible. Simple schema.</li>
+  <li>Cons: Complex queries. Limited data validation.</li>
+</ul>
 
 <h3 id="using-a-normalized-schema">Using a Normalized Schema</h3>
 
@@ -109,8 +111,11 @@ Cons: Complex queries. Limited data validation.</p>
 </code></pre></div></div>
 
 <h4 id="pros-and-cons-1">Pros and Cons</h4>
-<p>Pros: Strong data integrity. Efficient querying.
-Cons: More complex schema. Requires more tables.</p>
+
+<ul>
+  <li>Pros: Strong data integrity. Efficient querying.</li>
+  <li>Cons: More complex schema. Requires more tables.</li>
+</ul>
 
 <h3 id="hybrid-approach-common-fields--jsonb">Hybrid Approach: Common Fields + JSONB</h3>
 
@@ -146,8 +151,10 @@ Cons: More complex schema. Requires more tables.</p>
 
 <h4 id="pros-and-cons-2">Pros and Cons</h4>
 
-<p>Pros: Flexibility with JSONB. Easier querying for common fields.
-Cons: Validation can be tricky. Slightly more complex.</p>
+<ul>
+  <li>Pros: Flexibility with JSONB. Easier querying for common fields.</li>
+  <li>Cons: Validation can be tricky. Slightly more complex.</li>
+</ul>
 
 <h2 id="conclusion">Conclusion</h2>
 

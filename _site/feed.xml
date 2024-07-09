@@ -5,8 +5,8 @@
     <description>개발자 경험(DX)을 생각하는 개발자입니다.</description>
     <link>https://whyjun.github.io/</link>
     <atom:link href="https://whyjun.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 08 Jul 2024 19:41:30 -0500</pubDate>
-    <lastBuildDate>Mon, 08 Jul 2024 19:41:30 -0500</lastBuildDate>
+    <pubDate>Mon, 08 Jul 2024 19:59:06 -0500</pubDate>
+    <lastBuildDate>Mon, 08 Jul 2024 19:59:06 -0500</lastBuildDate>
     <generator>Jekyll v3.9.5</generator>
     
       <item>
@@ -51,8 +51,10 @@
 
 &lt;h4 id=&quot;pros-and-cons&quot;&gt;Pros and Cons&lt;/h4&gt;
 
-&lt;p&gt;Pros: Very flexible. Simple schema.
-Cons: Complex queries. Limited data validation.&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Pros: Very flexible. Simple schema.&lt;/li&gt;
+  &lt;li&gt;Cons: Complex queries. Limited data validation.&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;h3 id=&quot;using-a-normalized-schema&quot;&gt;Using a Normalized Schema&lt;/h3&gt;
 
@@ -122,8 +124,11 @@ Cons: Complex queries. Limited data validation.&lt;/p&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;h4 id=&quot;pros-and-cons-1&quot;&gt;Pros and Cons&lt;/h4&gt;
-&lt;p&gt;Pros: Strong data integrity. Efficient querying.
-Cons: More complex schema. Requires more tables.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Pros: Strong data integrity. Efficient querying.&lt;/li&gt;
+  &lt;li&gt;Cons: More complex schema. Requires more tables.&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;h3 id=&quot;hybrid-approach-common-fields--jsonb&quot;&gt;Hybrid Approach: Common Fields + JSONB&lt;/h3&gt;
 
@@ -159,8 +164,10 @@ Cons: More complex schema. Requires more tables.&lt;/p&gt;
 
 &lt;h4 id=&quot;pros-and-cons-2&quot;&gt;Pros and Cons&lt;/h4&gt;
 
-&lt;p&gt;Pros: Flexibility with JSONB. Easier querying for common fields.
-Cons: Validation can be tricky. Slightly more complex.&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Pros: Flexibility with JSONB. Easier querying for common fields.&lt;/li&gt;
+  &lt;li&gt;Cons: Validation can be tricky. Slightly more complex.&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
 
