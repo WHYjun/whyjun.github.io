@@ -1,4 +1,157 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.5">Jekyll</generator><link href="https://whyjun.github.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://whyjun.github.io/" rel="alternate" type="text/html" /><updated>2024-07-08T11:55:27-05:00</updated><id>https://whyjun.github.io/atom.xml</id><title type="html">개발 기록</title><subtitle>개발자 경험(DX)을 생각하는 개발자입니다.</subtitle><author><name>Young Choi</name></author><entry xml:lang="en"><title type="html">Using Interface for Controller Requests in Java Spring Framework</title><link href="https://whyjun.github.io/blog/Using-Interface-for-Controller-Requests-in-Java%20Spring-Framework" rel="alternate" type="text/html" title="Using Interface for Controller Requests in Java Spring Framework" /><published>2024-07-06T00:00:00-05:00</published><updated>2024-07-06T00:00:00-05:00</updated><id>https://whyjun.github.io/blog/Using-Interface-for-Controller-Request</id><content type="html" xml:base="https://whyjun.github.io/blog/Using-Interface-for-Controller-Requests-in-Java%20Spring-Framework"><![CDATA[<p>When building a REST API with Java Spring Framework, handling multiple types of requests efficiently can be challenging. One effective approach is to use interfaces for controller requests. In this blog post, we’ll walk through an example using a restaurant order system. We’ll handle different types of orders (like hamburger and pizza) with a single endpoint.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.5">Jekyll</generator><link href="https://whyjun.github.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://whyjun.github.io/" rel="alternate" type="text/html" /><updated>2024-07-08T19:40:10-05:00</updated><id>https://whyjun.github.io/atom.xml</id><title type="html">개발 기록</title><subtitle>개발자 경험(DX)을 생각하는 개발자입니다.</subtitle><author><name>Young Choi</name></author><entry xml:lang="en"><title type="html">Storing Heterogeneous Objects in PostgreSQL</title><link href="https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL" rel="alternate" type="text/html" title="Storing Heterogeneous Objects in PostgreSQL" /><published>2024-07-08T00:00:00-05:00</published><updated>2024-07-08T00:00:00-05:00</updated><id>https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL</id><content type="html" xml:base="https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL"><![CDATA[<p>Storing different types of objects in a PostgreSQL database can be tricky. But don’t worry, it’s manageable. Let’s explore three practical ways to handle this. We will keep it simple and straightforward.</p>
+
+<h2 id="scenario-restaurant-order-system">Scenario: Restaurant Order System</h2>
+
+<p>Imagine we have a Transaction table that stores different types of orders. Each order type has some common fields, but also unique fields.</p>
+
+<h3 id="using-jsonb-for-orders">Using JSONB for Orders</h3>
+
+<p>The JSONB data type is flexible. It allows you to store various order types without much hassle.</p>
+
+<h4 id="jsonb-schema">JSONB Schema</h4>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">transactions</span> <span class="p">(</span>
+    <span class="n">id</span> <span class="nb">SERIAL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span>
+    <span class="n">orders</span> <span class="n">JSONB</span>
+<span class="p">);</span>
+</code></pre></div></div>
+
+<h4 id="inserting-data">Inserting Data</h4>
+
+<p>You can insert data by converting orders to JSON.</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">transactions</span> <span class="p">(</span><span class="n">orders</span><span class="p">)</span> <span class="k">VALUES</span> <span class="p">(</span>
+    <span class="s1">'[
+        {"type": "HamburgerOrder", "field1": "value1", "field2": "value2"},
+        {"type": "PizzaOrder", "field1": "value1", "field2": "value2", "uniqueField": "uniqueValue"}
+    ]'</span><span class="p">::</span><span class="n">jsonb</span>
+<span class="p">);</span>
+</code></pre></div></div>
+
+<h4 id="querying-data">Querying Data</h4>
+
+<p>Retrieving specific orders is easy.</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">transactions</span>
+<span class="k">WHERE</span> <span class="n">orders</span> <span class="o">@&gt;</span> <span class="s1">'[{"type": "HamburgerOrder"}]'</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h4 id="pros-and-cons">Pros and Cons</h4>
+
+<p>Pros: Very flexible. Simple schema.
+Cons: Complex queries. Limited data validation.</p>
+
+<h3 id="using-a-normalized-schema">Using a Normalized Schema</h3>
+
+<p>This method involves multiple tables and foreign keys. It keeps the database structure clean and efficient.</p>
+
+<h4 id="schema">Schema</h4>
+
+<p>Transactions Table:</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">transactions</span> <span class="p">(</span>
+    <span class="n">id</span> <span class="nb">SERIAL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span>
+<span class="p">);</span>
+</code></pre></div></div>
+
+<p>Orders Table:</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">orders</span> <span class="p">(</span>
+    <span class="n">id</span> <span class="nb">SERIAL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span>
+    <span class="n">transaction_id</span> <span class="nb">INT</span> <span class="k">REFERENCES</span> <span class="n">transactions</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+    <span class="k">type</span> <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">common_field1</span> <span class="nb">TEXT</span><span class="p">,</span>
+    <span class="n">common_field2</span> <span class="nb">TEXT</span>
+<span class="p">);</span>
+</code></pre></div></div>
+
+<p>HamburgerOrder Table:</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">hamburger_orders</span> <span class="p">(</span>
+    <span class="n">id</span> <span class="nb">SERIAL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span>
+    <span class="n">order_id</span> <span class="nb">INT</span> <span class="k">REFERENCES</span> <span class="n">orders</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+    <span class="n">unique_hamburger_field</span> <span class="nb">TEXT</span>
+<span class="p">);</span>
+</code></pre></div></div>
+
+<p>PizzaOrder Table:</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">pizza_orders</span> <span class="p">(</span>
+    <span class="n">id</span> <span class="nb">SERIAL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span>
+    <span class="n">order_id</span> <span class="nb">INT</span> <span class="k">REFERENCES</span> <span class="n">orders</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+    <span class="n">unique_pizza_field</span> <span class="nb">TEXT</span>
+<span class="p">);</span>
+</code></pre></div></div>
+
+<h4 id="inserting-data-1">Inserting Data</h4>
+
+<p>Insert data step-by-step.</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">transactions</span> <span class="k">DEFAULT</span> <span class="k">VALUES</span> <span class="n">RETURNING</span> <span class="n">id</span><span class="p">;</span>
+
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">orders</span> <span class="p">(</span><span class="n">transaction_id</span><span class="p">,</span> <span class="k">type</span><span class="p">,</span> <span class="n">common_field1</span><span class="p">,</span> <span class="n">common_field2</span><span class="p">)</span> <span class="k">VALUES</span>
+<span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">'HamburgerOrder'</span><span class="p">,</span> <span class="s1">'value1'</span><span class="p">,</span> <span class="s1">'value2'</span><span class="p">)</span> <span class="n">RETURNING</span> <span class="n">id</span><span class="p">;</span>
+
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">hamburger_orders</span> <span class="p">(</span><span class="n">order_id</span><span class="p">,</span> <span class="n">unique_hamburger_field</span><span class="p">)</span> <span class="k">VALUES</span>
+<span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">'hamburgerValue'</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h4 id="querying-data-1">Querying Data</h4>
+
+<p>Use JOIN queries to get all orders.</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="n">o</span><span class="p">.</span><span class="n">id</span> <span class="k">AS</span> <span class="n">order_id</span><span class="p">,</span> <span class="n">o</span><span class="p">.</span><span class="k">type</span><span class="p">,</span> <span class="n">o</span><span class="p">.</span><span class="n">common_field1</span><span class="p">,</span> <span class="n">o</span><span class="p">.</span><span class="n">common_field2</span><span class="p">,</span>
+       <span class="n">h</span><span class="p">.</span><span class="n">unique_hamburger_field</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">unique_pizza_field</span>
+<span class="k">FROM</span> <span class="n">orders</span> <span class="n">o</span>
+<span class="k">LEFT</span> <span class="k">JOIN</span> <span class="n">hamburger_orders</span> <span class="n">h</span> <span class="k">ON</span> <span class="n">o</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">h</span><span class="p">.</span><span class="n">order_id</span>
+<span class="k">LEFT</span> <span class="k">JOIN</span> <span class="n">pizza_orders</span> <span class="n">p</span> <span class="k">ON</span> <span class="n">o</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">p</span><span class="p">.</span><span class="n">order_id</span>
+<span class="k">WHERE</span> <span class="n">o</span><span class="p">.</span><span class="n">transaction_id</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h4 id="pros-and-cons-1">Pros and Cons</h4>
+<p>Pros: Strong data integrity. Efficient querying.
+Cons: More complex schema. Requires more tables.</p>
+
+<h3 id="hybrid-approach-common-fields--jsonb">Hybrid Approach: Common Fields + JSONB</h3>
+
+<p>This approach combines the best of both worlds. Common fields are stored directly in columns. Unique fields go into a JSONB column.</p>
+
+<h4 id="schema-1">Schema</h4>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">orders</span> <span class="p">(</span>
+    <span class="n">id</span> <span class="nb">SERIAL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span>
+    <span class="n">transaction_id</span> <span class="nb">INT</span> <span class="k">REFERENCES</span> <span class="n">transactions</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+    <span class="k">type</span> <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">common_field1</span> <span class="nb">TEXT</span><span class="p">,</span>
+    <span class="n">common_field2</span> <span class="nb">TEXT</span><span class="p">,</span>
+    <span class="n">specific_fields</span> <span class="n">JSONB</span>
+<span class="p">);</span>
+</code></pre></div></div>
+
+<h4 id="inserting-data-2">Inserting Data</h4>
+
+<p>Insert data with common fields and JSONB.</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">orders</span> <span class="p">(</span><span class="n">transaction_id</span><span class="p">,</span> <span class="k">type</span><span class="p">,</span> <span class="n">common_field1</span><span class="p">,</span> <span class="n">common_field2</span><span class="p">,</span> <span class="n">specific_fields</span><span class="p">)</span> <span class="k">VALUES</span>
+<span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">'HamburgerOrder'</span><span class="p">,</span> <span class="s1">'value1'</span><span class="p">,</span> <span class="s1">'value2'</span><span class="p">,</span> <span class="s1">'{"unique_hamburger_field": "hamburgerValue"}'</span><span class="p">::</span><span class="n">jsonb</span><span class="p">),</span>
+<span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">'PizzaOrder'</span><span class="p">,</span> <span class="s1">'value1'</span><span class="p">,</span> <span class="s1">'value2'</span><span class="p">,</span> <span class="s1">'{"unique_pizza_field": "pizzaValue"}'</span><span class="p">::</span><span class="n">jsonb</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h4 id="querying-data-2">Querying Data</h4>
+
+<p>Query directly from the orders table.</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">orders</span> <span class="k">WHERE</span> <span class="n">transaction_id</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h4 id="pros-and-cons-2">Pros and Cons</h4>
+
+<p>Pros: Flexibility with JSONB. Easier querying for common fields.
+Cons: Validation can be tricky. Slightly more complex.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Choosing the right method depends on your needs. JSONB is flexible but validation can be tricky. A normalized schema ensures data integrity but requires more tables. The hybrid approach offers a balanced solution. Each method has its pros and cons. Pick the one that fits your project best. Happy coding!</p>]]></content><author><name>Young Choi</name></author><category term="development" /><category term="java" /><category term="sql" /><summary type="html"><![CDATA[Storing different types of objects in a PostgreSQL database can be tricky. But don’t worry, it’s manageable. Let’s explore three practical ways to handle this. We will keep it simple and straightforward.]]></summary></entry><entry xml:lang="en"><title type="html">Using Interface for Controller Requests in Java Spring Framework</title><link href="https://whyjun.github.io/blog/Using-Interface-for-Controller-Requests-in-Java%20Spring-Framework" rel="alternate" type="text/html" title="Using Interface for Controller Requests in Java Spring Framework" /><published>2024-07-06T00:00:00-05:00</published><updated>2024-07-06T00:00:00-05:00</updated><id>https://whyjun.github.io/blog/Using-Interface-for-Controller-Request</id><content type="html" xml:base="https://whyjun.github.io/blog/Using-Interface-for-Controller-Requests-in-Java%20Spring-Framework"><![CDATA[<p>When building a REST API with Java Spring Framework, handling multiple types of requests efficiently can be challenging. One effective approach is to use interfaces for controller requests. In this blog post, we’ll walk through an example using a restaurant order system. We’ll handle different types of orders (like hamburger and pizza) with a single endpoint.</p>
 
 <h2 id="scenario-restaurant-order-system">Scenario: Restaurant Order System</h2>
 
