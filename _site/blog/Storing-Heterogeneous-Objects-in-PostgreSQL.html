@@ -153,7 +153,7 @@
 
 <p>The JSONB data type is flexible. It allows you to store various order types without much hassle.</p>
 
-<h4 id="jsonb-schema">JSONB Schema</h4>
+<h4 id="schema">Schema</h4>
 
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">transactions</span> <span class="p">(</span>
     <span class="n">id</span> <span class="nb">SERIAL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span>
@@ -190,7 +190,7 @@ Cons: Complex queries. Limited data validation.</p>
 
 <p>This method involves multiple tables and foreign keys. It keeps the database structure clean and efficient.</p>
 
-<h4 id="schema">Schema</h4>
+<h4 id="schema-1">Schema</h4>
 
 <p>Transactions Table:</p>
 
@@ -261,7 +261,7 @@ Cons: More complex schema. Requires more tables.</p>
 
 <p>This approach combines the best of both worlds. Common fields are stored directly in columns. Unique fields go into a JSONB column.</p>
 
-<h4 id="schema-1">Schema</h4>
+<h4 id="schema-2">Schema</h4>
 
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">orders</span> <span class="p">(</span>
     <span class="n">id</span> <span class="nb">SERIAL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span>

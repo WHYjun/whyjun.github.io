@@ -5,8 +5,8 @@
     <description>개발자 경험(DX)을 생각하는 개발자입니다.</description>
     <link>https://whyjun.github.io/</link>
     <atom:link href="https://whyjun.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 08 Jul 2024 19:40:10 -0500</pubDate>
-    <lastBuildDate>Mon, 08 Jul 2024 19:40:10 -0500</lastBuildDate>
+    <pubDate>Mon, 08 Jul 2024 19:41:30 -0500</pubDate>
+    <lastBuildDate>Mon, 08 Jul 2024 19:41:30 -0500</lastBuildDate>
     <generator>Jekyll v3.9.5</generator>
     
       <item>
@@ -21,7 +21,7 @@
 
 &lt;p&gt;The JSONB data type is flexible. It allows you to store various order types without much hassle.&lt;/p&gt;
 
-&lt;h4 id=&quot;jsonb-schema&quot;&gt;JSONB Schema&lt;/h4&gt;
+&lt;h4 id=&quot;schema&quot;&gt;Schema&lt;/h4&gt;
 
 &lt;div class=&quot;language-sql highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;CREATE&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;TABLE&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;transactions&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;id&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;SERIAL&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;PRIMARY&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;KEY&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
@@ -58,7 +58,7 @@ Cons: Complex queries. Limited data validation.&lt;/p&gt;
 
 &lt;p&gt;This method involves multiple tables and foreign keys. It keeps the database structure clean and efficient.&lt;/p&gt;
 
-&lt;h4 id=&quot;schema&quot;&gt;Schema&lt;/h4&gt;
+&lt;h4 id=&quot;schema-1&quot;&gt;Schema&lt;/h4&gt;
 
 &lt;p&gt;Transactions Table:&lt;/p&gt;
 
@@ -129,7 +129,7 @@ Cons: More complex schema. Requires more tables.&lt;/p&gt;
 
 &lt;p&gt;This approach combines the best of both worlds. Common fields are stored directly in columns. Unique fields go into a JSONB column.&lt;/p&gt;
 
-&lt;h4 id=&quot;schema-1&quot;&gt;Schema&lt;/h4&gt;
+&lt;h4 id=&quot;schema-2&quot;&gt;Schema&lt;/h4&gt;
 
 &lt;div class=&quot;language-sql highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;CREATE&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;TABLE&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;orders&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;id&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;SERIAL&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;PRIMARY&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;KEY&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;

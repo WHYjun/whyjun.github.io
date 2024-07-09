@@ -22,7 +22,7 @@ Imagine we have a Transaction table that stores different types of orders. Each 
 
 The JSONB data type is flexible. It allows you to store various order types without much hassle.
 
-#### JSONB Schema
+#### Schema
 
 ```sql
 CREATE TABLE transactions (
