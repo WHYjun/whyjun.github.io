@@ -5,8 +5,8 @@
     <description>개발자 경험(DX)을 생각하는 개발자입니다.</description>
     <link>https://whyjun.github.io/</link>
     <atom:link href="https://whyjun.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 08 Jul 2024 19:59:06 -0500</pubDate>
-    <lastBuildDate>Mon, 08 Jul 2024 19:59:06 -0500</lastBuildDate>
+    <pubDate>Thu, 18 Jul 2024 20:29:09 -0500</pubDate>
+    <lastBuildDate>Thu, 18 Jul 2024 20:29:09 -0500</lastBuildDate>
     <generator>Jekyll v3.9.5</generator>
     
       <item>
@@ -673,8 +673,8 @@ golangci-lint &lt;span class=&quot;nt&quot;&gt;--version&lt;/span&gt;
 &lt;p&gt;위의 코드들은 &lt;a href=&quot;https://go.dev/play/p/XthHr8HUHHL&quot;&gt;Go Playground&lt;/a&gt;에서 직접 사용해보실 수 있다.&lt;/p&gt;
 </description>
         <pubDate>Sat, 18 Dec 2021 00:00:00 -0600</pubDate>
-        <link>https://whyjun.github.io/golang/Write-Hashset-in-Go</link>
-        <guid isPermaLink="true">https://whyjun.github.io/golang/Write-Hashset-in-Go</guid>
+        <link>https://whyjun.github.io/golang/Write-Hashset-In-Go</link>
+        <guid isPermaLink="true">https://whyjun.github.io/golang/Write-Hashset-In-Go</guid>
         
         <category>golang</category>
         
