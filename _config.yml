@@ -17,8 +17,8 @@
 remote_theme: "mmistakes/so-simple-theme@3.2.0"
 skin: "/assets/css/skins/default.css"
 locale: ko-KR
-title: "개발 기록"
-description: "개발자 경험(DX)을 생각하는 개발자입니다."
+title: "Grow with Code"
+description: "Where growth begins with every line of code."
 baseurl: "" # the subpath of your site, e.g. "/blog"
 url: "https://whyjun.github.io"
 logo: "/assets/images/young-choi-gopher-image.png"
@@ -57,10 +57,10 @@ paginate_path: /page:num/
 search_full_content: true # can have performance implications for large sites
 
 # Polyglot
-languages: ["ko"]
-default_lang: "ko"
-exclude_from_localization: ["assets"]
-parallel_localizaion: false
+# languages: ["ko"]
+# default_lang: "ko"
+# exclude_from_localization: ["assets"]
+# parallel_localizaion: false
 
 # Taxonomy pages
 category_archive_path: "/categories/#"
