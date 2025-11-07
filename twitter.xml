@@ -1,4 +1,49 @@
----
-layout: sharing_feed
-sharing_site: twitter
----
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Grow with Code</title>
+    <description>Where growth begins with every line of code.</description>
+    <link>https://whyjun.github.io/</link>
+    <atom:link href="https://whyjun.github.io/twitter.xml" rel="self" type="application/rss+xml" />
+    <pubDate>Thu, 06 Nov 2025 23:41:37 -0800</pubDate>
+    <lastBuildDate>Thu, 06 Nov 2025 23:41:37 -0800</lastBuildDate>
+    <generator>Jekyll v3.10.0</generator>
+    
+    
+      <item>
+        <title>Storing Heterogeneous Objects in PostgreSQL</title>
+        <pubDate>Mon, 08 Jul 2024 00:00:00 -0700</pubDate>
+        <link>https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL</link>
+        <guid isPermaLink="true">https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL</guid>
+      </item>
+    
+      <item>
+        <title>Using Interface for Controller Requests in Java Spring Framework</title>
+        <pubDate>Sat, 06 Jul 2024 00:00:00 -0700</pubDate>
+        <link>https://whyjun.github.io/blog/Using-Interface-for-Controller-Requests-in-Java%20Spring-Framework</link>
+        <guid isPermaLink="true">https://whyjun.github.io/blog/Using-Interface-for-Controller-Requests-in-Java%20Spring-Framework</guid>
+      </item>
+    
+      <item>
+        <title>The Importance of Signals from Test Codes</title>
+        <pubDate>Sun, 30 Jun 2024 00:00:00 -0700</pubDate>
+        <link>https://whyjun.github.io/blog/The-Importance-of-Signals-from-Test-Codes</link>
+        <guid isPermaLink="true">https://whyjun.github.io/blog/The-Importance-of-Signals-from-Test-Codes</guid>
+      </item>
+    
+      <item>
+        <title>Go에서 omitempty 태그 사용하기</title>
+        <pubDate>Wed, 15 Mar 2023 00:00:00 -0700</pubDate>
+        <link>https://whyjun.github.io/golang/Golang-Omitempty-Tag</link>
+        <guid isPermaLink="true">https://whyjun.github.io/golang/Golang-Omitempty-Tag</guid>
+      </item>
+    
+      <item>
+        <title>golangcli-lint로 Go 코드 규칙 적용하기</title>
+        <pubDate>Wed, 08 Mar 2023 00:00:00 -0800</pubDate>
+        <link>https://whyjun.github.io/golang/Use-GolangCI-Lint</link>
+        <guid isPermaLink="true">https://whyjun.github.io/golang/Use-GolangCI-Lint</guid>
+      </item>
+    
+  </channel>
+</rss>
