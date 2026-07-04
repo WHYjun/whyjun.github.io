@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Grow with Code</title>
-    <description>Where growth begins with every line of code.</description>
+    <title>Young&apos;s Notes</title>
+    <description>Notes from my software engineering journey: what I learn, what I try, and how I set things up.</description>
     <link>https://whyjun.github.io/</link>
     <atom:link href="https://whyjun.github.io/twitter.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Fri, 03 Jul 2026 17:47:34 -0700</pubDate>
-    <lastBuildDate>Fri, 03 Jul 2026 17:47:34 -0700</lastBuildDate>
+    <pubDate>Fri, 03 Jul 2026 18:02:13 -0700</pubDate>
+    <lastBuildDate>Fri, 03 Jul 2026 18:02:13 -0700</lastBuildDate>
     <generator>Jekyll v3.10.0</generator>
     
     
