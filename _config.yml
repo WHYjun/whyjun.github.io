@@ -67,16 +67,20 @@ category_archive_path: "/categories/#"
 tag_archive_path: "/tags/#"
 
 # Exclude from processing.
-# The following items will not be processed, by default. Create a custom list
-# to override the default setting.
-# exclude:
-#   - Gemfile
-#   - Gemfile.lock
-#   - node_modules
-#   - vendor/bundle/
-#   - vendor/cache/
-#   - vendor/gems/
-#   - vendor/ruby/
+# The following items will not be processed. This overrides Jekyll's default
+# exclude list, so the defaults are repeated here alongside our own additions.
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - CLAUDE.md
+  - .claude
+  - publi.sh
+  - README.md
 
 plugins:
   - jekyll-seo-tag

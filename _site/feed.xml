@@ -5,21 +5,104 @@
     <description>Where growth begins with every line of code.</description>
     <link>https://whyjun.github.io/</link>
     <atom:link href="https://whyjun.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 06 Nov 2025 23:41:37 -0800</pubDate>
-    <lastBuildDate>Thu, 06 Nov 2025 23:41:37 -0800</lastBuildDate>
+    <pubDate>Fri, 03 Jul 2026 17:47:34 -0700</pubDate>
+    <lastBuildDate>Fri, 03 Jul 2026 17:47:34 -0700</lastBuildDate>
     <generator>Jekyll v3.10.0</generator>
     
       <item>
+        <title>How to Use Git Worktrees with Claude Code</title>
+        <description>&lt;p&gt;When Claude Code runs a long task, it edits files in your working directory. If you want to keep working while it does, you end up fighting over the same files. Git worktrees solve this. They let one repository check out several branches into separate folders at once, so Claude can work in one folder while you stay in another.&lt;/p&gt;
+
+&lt;h2 id=&quot;what-is-a-git-worktree&quot;&gt;What Is a Git Worktree&lt;/h2&gt;
+
+&lt;p&gt;A worktree is an extra working directory attached to your existing repository. Each worktree sits on its own branch and has its own files on disk, but they all share one &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.git&lt;/code&gt; history. You are not cloning the repo again, so you do not pay for a second copy of the object database.&lt;/p&gt;
+
+&lt;p&gt;For Claude Code this means isolation. Point Claude at a worktree on a feature branch, and its edits, builds, and test runs stay out of your main checkout.&lt;/p&gt;
+
+&lt;h2 id=&quot;creating-a-worktree&quot;&gt;Creating a Worktree&lt;/h2&gt;
+
+&lt;p&gt;Use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;git worktree add&lt;/code&gt;. Pass a path for the new folder and the branch to check out.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git worktree add ../myproject-feature feature-branch
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This creates &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;myproject-feature&lt;/code&gt; next to your repo, checked out to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;feature-branch&lt;/code&gt;. If the branch does not exist yet, create it in the same command with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;-b&lt;/code&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git worktree add &lt;span class=&quot;nt&quot;&gt;-b&lt;/span&gt; new-feature ../myproject-feature
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;You now have two folders. Your original one stays where it was. The new one is on &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;new-feature&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;running-claude-code-in-the-worktree&quot;&gt;Running Claude Code in the Worktree&lt;/h2&gt;
+
+&lt;p&gt;Open a terminal in the worktree folder and start Claude there.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; ../myproject-feature
+claude
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Claude now reads and writes files inside &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;myproject-feature&lt;/code&gt; only. You can go back to your main folder and keep editing, run the app, or start a second Claude session on a different branch. The two sessions never touch the same files.&lt;/p&gt;
+
+&lt;p&gt;Claude Code can also manage this for you. When you ask a subagent to work in isolation, it can create a temporary worktree, do its work there, and clean it up when the branch has no changes left.&lt;/p&gt;
+
+&lt;h2 id=&quot;listing-and-removing-worktrees&quot;&gt;Listing and Removing Worktrees&lt;/h2&gt;
+
+&lt;p&gt;Check what you have with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;git worktree list&lt;/code&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git worktree list
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;When you are done with a worktree, remove it. This deletes the folder and unregisters it from the repo.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git worktree remove ../myproject-feature
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;If you deleted the folder by hand, run &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;git worktree prune&lt;/code&gt; to clear the stale entry.&lt;/p&gt;
+
+&lt;h2 id=&quot;when-worktrees-help&quot;&gt;When Worktrees Help&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Reviewing Claude’s changes on a branch while you keep working on another.&lt;/li&gt;
+  &lt;li&gt;Running two Claude sessions in parallel on separate features.&lt;/li&gt;
+  &lt;li&gt;Testing a build without stashing or committing half-finished work.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;when-they-get-in-the-way&quot;&gt;When They Get in the Way&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Small changes where a single branch switch would do.&lt;/li&gt;
+  &lt;li&gt;Tooling that hardcodes an absolute path and breaks in a second folder.&lt;/li&gt;
+  &lt;li&gt;Node or build caches that you now have to install once per worktree.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;Git worktrees give Claude Code a folder of its own without a second clone. Create one with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;git worktree add&lt;/code&gt;, run Claude inside it, and remove it with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;git worktree remove&lt;/code&gt; when the branch is merged. If you often want Claude to work while you keep going, keep a spare worktree around and hand it the branch. Happy coding!&lt;/p&gt;
+</description>
+        <pubDate>Fri, 03 Jul 2026 00:00:00 -0700</pubDate>
+        <link>https://whyjun.github.io/blog/How-to-Use-Git-Worktrees-with-Claude-Code</link>
+        <guid isPermaLink="true">https://whyjun.github.io/blog/How-to-Use-Git-Worktrees-with-Claude-Code</guid>
+        
+        <category>claude-code</category>
+        
+        <category>git</category>
+        
+        
+        <category>development</category>
+        
+      </item>
+    
+      <item>
         <title>Storing Heterogeneous Objects in PostgreSQL</title>
-        <description>&lt;p&gt;Storing different types of objects in a PostgreSQL database can be tricky. But don’t worry, it’s manageable. Let’s explore three practical ways to handle this. We will keep it simple and straightforward.&lt;/p&gt;
+        <description>&lt;p&gt;Storing different types of objects in one PostgreSQL table is tricky. Each type shares a few fields and carries its own. There are three practical ways to handle it, and each one trades flexibility for structure in a different spot.&lt;/p&gt;
 
 &lt;h2 id=&quot;scenario-restaurant-order-system&quot;&gt;Scenario: Restaurant Order System&lt;/h2&gt;
 
-&lt;p&gt;Imagine we have a Transaction table that stores different types of orders. Each order type has some common fields, but also unique fields.&lt;/p&gt;
+&lt;p&gt;Imagine a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;transactions&lt;/code&gt; table that stores different types of orders. Each order type has some common fields and some unique ones.&lt;/p&gt;
 
 &lt;h3 id=&quot;using-jsonb-for-orders&quot;&gt;Using JSONB for Orders&lt;/h3&gt;
 
-&lt;p&gt;The JSONB data type is flexible. It allows you to store various order types without much hassle.&lt;/p&gt;
+&lt;p&gt;The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;JSONB&lt;/code&gt; type is flexible. It lets you store different order types in one column without committing to a fixed shape.&lt;/p&gt;
 
 &lt;h4 id=&quot;schema&quot;&gt;Schema&lt;/h4&gt;
 
@@ -31,7 +114,7 @@
 
 &lt;h4 id=&quot;inserting-data&quot;&gt;Inserting Data&lt;/h4&gt;
 
-&lt;p&gt;You can insert data by converting orders to JSON.&lt;/p&gt;
+&lt;p&gt;You insert data by writing the orders as JSON.&lt;/p&gt;
 
 &lt;div class=&quot;language-sql highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;INSERT&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;INTO&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;transactions&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;orders&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;VALUES&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
     &lt;span class=&quot;s1&quot;&gt;&apos;[
@@ -43,7 +126,7 @@
 
 &lt;h4 id=&quot;querying-data&quot;&gt;Querying Data&lt;/h4&gt;
 
-&lt;p&gt;Retrieving specific orders is easy.&lt;/p&gt;
+&lt;p&gt;Retrieving specific orders stays simple.&lt;/p&gt;
 
 &lt;div class=&quot;language-sql highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;SELECT&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;FROM&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;transactions&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;WHERE&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;orders&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;@&amp;gt;&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&apos;[{&quot;type&quot;: &quot;HamburgerOrder&quot;}]&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
@@ -58,7 +141,7 @@
 
 &lt;h3 id=&quot;using-a-normalized-schema&quot;&gt;Using a Normalized Schema&lt;/h3&gt;
 
-&lt;p&gt;This method involves multiple tables and foreign keys. It keeps the database structure clean and efficient.&lt;/p&gt;
+&lt;p&gt;This method splits the data across several tables joined by foreign keys. It keeps the structure explicit and efficient.&lt;/p&gt;
 
 &lt;h4 id=&quot;schema-1&quot;&gt;Schema&lt;/h4&gt;
 
@@ -100,7 +183,7 @@
 
 &lt;h4 id=&quot;inserting-data-1&quot;&gt;Inserting Data&lt;/h4&gt;
 
-&lt;p&gt;Insert data step-by-step.&lt;/p&gt;
+&lt;p&gt;Insert the rows step by step.&lt;/p&gt;
 
 &lt;div class=&quot;language-sql highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;INSERT&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;INTO&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;transactions&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;DEFAULT&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;VALUES&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;RETURNING&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
@@ -113,7 +196,7 @@
 
 &lt;h4 id=&quot;querying-data-1&quot;&gt;Querying Data&lt;/h4&gt;
 
-&lt;p&gt;Use JOIN queries to get all orders.&lt;/p&gt;
+&lt;p&gt;Use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;JOIN&lt;/code&gt; queries to pull the orders back together.&lt;/p&gt;
 
 &lt;div class=&quot;language-sql highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;SELECT&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;o&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;id&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;AS&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;order_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;o&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;o&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;common_field1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;o&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;common_field2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
        &lt;span class=&quot;n&quot;&gt;h&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;unique_hamburger_field&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;unique_pizza_field&lt;/span&gt;
@@ -132,7 +215,7 @@
 
 &lt;h3 id=&quot;hybrid-approach-common-fields--jsonb&quot;&gt;Hybrid Approach: Common Fields + JSONB&lt;/h3&gt;
 
-&lt;p&gt;This approach combines the best of both worlds. Common fields are stored directly in columns. Unique fields go into a JSONB column.&lt;/p&gt;
+&lt;p&gt;This approach mixes both. Common fields live in their own columns. Unique fields go into a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;JSONB&lt;/code&gt; column.&lt;/p&gt;
 
 &lt;h4 id=&quot;schema-2&quot;&gt;Schema&lt;/h4&gt;
 
@@ -148,7 +231,7 @@
 
 &lt;h4 id=&quot;inserting-data-2&quot;&gt;Inserting Data&lt;/h4&gt;
 
-&lt;p&gt;Insert data with common fields and JSONB.&lt;/p&gt;
+&lt;p&gt;Insert the common fields as columns and the rest as JSON.&lt;/p&gt;
 
 &lt;div class=&quot;language-sql highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;INSERT&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;INTO&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;orders&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;transaction_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;common_field1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;common_field2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;specific_fields&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;VALUES&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&apos;HamburgerOrder&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&apos;value1&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&apos;value2&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&apos;{&quot;unique_hamburger_field&quot;: &quot;hamburgerValue&quot;}&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;jsonb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
@@ -157,7 +240,7 @@
 
 &lt;h4 id=&quot;querying-data-2&quot;&gt;Querying Data&lt;/h4&gt;
 
-&lt;p&gt;Query directly from the orders table.&lt;/p&gt;
+&lt;p&gt;Query the common fields straight from the columns.&lt;/p&gt;
 
 &lt;div class=&quot;language-sql highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;SELECT&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;FROM&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;orders&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;WHERE&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;transaction_id&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
@@ -171,7 +254,7 @@
 
 &lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
 
-&lt;p&gt;Choosing the right method depends on your needs. JSONB is flexible but validation can be tricky. A normalized schema ensures data integrity but requires more tables. The hybrid approach offers a balanced solution. Each method has its pros and cons. Pick the one that fits your project best. Happy coding!&lt;/p&gt;
+&lt;p&gt;The right method depends on how strict your data has to be. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;JSONB&lt;/code&gt; is flexible but hard to validate. A normalized schema protects integrity but adds tables and joins. The hybrid keeps common fields queryable while leaving room for the odd ones. Pick the one that matches the shape of your data. Happy coding!&lt;/p&gt;
 </description>
         <pubDate>Mon, 08 Jul 2024 00:00:00 -0700</pubDate>
         <link>https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL</link>
@@ -188,15 +271,15 @@
     
       <item>
         <title>Using Interface for Controller Requests in Java Spring Framework</title>
-        <description>&lt;p&gt;When building a REST API with Java Spring Framework, handling multiple types of requests efficiently can be challenging. One effective approach is to use interfaces for controller requests. In this blog post, we’ll walk through an example using a restaurant order system. We’ll handle different types of orders (like hamburger and pizza) with a single endpoint.&lt;/p&gt;
+        <description>&lt;p&gt;When you build a REST API with Spring, one endpoint often has to accept several kinds of request. Using an interface for the request body lets a single endpoint handle them all. The example here is a restaurant order system, where one &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/v1/orders&lt;/code&gt; endpoint takes both hamburger and pizza orders.&lt;/p&gt;
 
 &lt;h2 id=&quot;scenario-restaurant-order-system&quot;&gt;Scenario: Restaurant Order System&lt;/h2&gt;
 
-&lt;p&gt;Imagine we have an endpoint /v1/orders that accepts different types of orders. Each order type has some common fields, but also unique fields. We’ll use an interface called Order and implement it with specific classes for each order type. Let’s dive in.&lt;/p&gt;
+&lt;p&gt;We have an endpoint &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/v1/orders&lt;/code&gt; that accepts different order types. Every order shares a few fields and adds its own. We define an &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Order&lt;/code&gt; interface and implement it with one class per order type.&lt;/p&gt;
 
 &lt;h3 id=&quot;step-1-define-the-order-interface&quot;&gt;Step 1: Define the Order Interface&lt;/h3&gt;
 
-&lt;p&gt;First, we create an Order interface with common fields that all orders will have.&lt;/p&gt;
+&lt;p&gt;Start with an &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Order&lt;/code&gt; interface holding what every order has in common.&lt;/p&gt;
 
 &lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;interface&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Order&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
     &lt;span class=&quot;nc&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getOrderType&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
@@ -205,7 +288,7 @@
 
 &lt;h3 id=&quot;step-2-implement-order-types&quot;&gt;Step 2: Implement Order Types&lt;/h3&gt;
 
-&lt;p&gt;Next, we create classes for specific order types, like HamburgerOrder and PizzaOrder.&lt;/p&gt;
+&lt;p&gt;Then write a class per order type, like &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;HamburgerOrder&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PizzaOrder&lt;/code&gt;.&lt;/p&gt;
 
 &lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;lombok.Data&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;javax.validation.constraints.NotNull&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
@@ -239,7 +322,7 @@
 
 &lt;h3 id=&quot;step-3-create-the-controller&quot;&gt;Step 3: Create the Controller&lt;/h3&gt;
 
-&lt;p&gt;Now, we create the controller to handle the /v1/orders POST request. We’ll use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;@RequestBody&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;@Valid&lt;/code&gt; annotations to ensure the request body is correctly validated.&lt;/p&gt;
+&lt;p&gt;The controller handles the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/v1/orders&lt;/code&gt; POST request. The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;@RequestBody&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;@Valid&lt;/code&gt; annotations bind and validate the incoming JSON.&lt;/p&gt;
 
 &lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.http.HttpStatus&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.http.ResponseEntity&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
@@ -272,7 +355,7 @@
 
 &lt;h3 id=&quot;step-4-configure-jackson-for-polymorphic-deserialization&quot;&gt;Step 4: Configure Jackson for Polymorphic Deserialization&lt;/h3&gt;
 
-&lt;p&gt;To handle polymorphic deserialization, we need to configure Jackson. This allows us to deserialize JSON into the correct Order implementation.&lt;/p&gt;
+&lt;p&gt;Jackson needs to know which class to build from the JSON. Annotate the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Order&lt;/code&gt; interface so it reads the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;orderType&lt;/code&gt; field and picks the matching implementation.&lt;/p&gt;
 
 &lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.fasterxml.jackson.annotation.JsonSubTypes&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.fasterxml.jackson.annotation.JsonTypeInfo&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
@@ -293,7 +376,7 @@
 
 &lt;h3 id=&quot;step-5-add-global-validation-handling&quot;&gt;Step 5: Add Global Validation Handling&lt;/h3&gt;
 
-&lt;p&gt;Finally, add global exception handling to manage validation errors.&lt;/p&gt;
+&lt;p&gt;Finally, handle validation errors in one place.&lt;/p&gt;
 
 &lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.http.HttpStatus&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.http.ResponseEntity&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
@@ -313,7 +396,7 @@
 
 &lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
 
-&lt;p&gt;Using interfaces for controller requests in Java Spring Framework allows you to handle multiple types of requests cleanly and efficiently. In this example, we created an Order interface and implemented specific order types, handled polymorphic deserialization with Jackson, and ensured validation with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;@Valid&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;@RequestBody&lt;/code&gt;. This approach makes your code more flexible and easier to maintain. Happy coding!&lt;/p&gt;
+&lt;p&gt;An interface for the request body lets one endpoint accept many order types without a pile of branching at the door. We defined an &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Order&lt;/code&gt; interface, implemented it per type, let Jackson pick the right class from &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;orderType&lt;/code&gt;, and validated with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;@Valid&lt;/code&gt;. Adding a new order type now means writing one class and one Jackson subtype, and nothing else has to change. Happy coding!&lt;/p&gt;
 </description>
         <pubDate>Sat, 06 Jul 2024 00:00:00 -0700</pubDate>
         <link>https://whyjun.github.io/blog/Using-Interface-for-Controller-Requests-in-Java Spring-Framework</link>
@@ -328,56 +411,40 @@
     
       <item>
         <title>The Importance of Signals from Test Codes</title>
-        <description>&lt;p&gt;When you write test code, it can tell you a lot about your main code. If you find it hard to write tests, it often means there are problems in your code design. Let’s explore why these signals are important and what they can teach you.&lt;/p&gt;
+        <description>&lt;p&gt;When you write tests, they tell you a lot about your main code. If a test is hard to write, the problem is usually in the code you are testing, not in the test. Those difficulties are signals, and they are worth reading.&lt;/p&gt;
 
 &lt;h2 id=&quot;why-test-codes-matter&quot;&gt;Why Test Codes Matter&lt;/h2&gt;
 
-&lt;p&gt;Test codes are like a mirror for your main code. They show you its strengths and weaknesses. Here are some key signals to watch for:&lt;/p&gt;
+&lt;p&gt;Tests are a mirror for your main code. They show its strengths and its weak spots. A few signals to watch for:&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;Difficulty Writing Tests: If you struggle to write tests, your code might be too complex or not modular.&lt;/li&gt;
-  &lt;li&gt;Excessive Mocking: If you need to mock too many things, your code might be tightly coupled.&lt;/li&gt;
-  &lt;li&gt;Long Setup Times: If setting up a test takes a long time, your code may have too many dependencies.&lt;/li&gt;
-  &lt;li&gt;Hidden Dependencies: If certain dependencies are not obvious, your code might be hard to maintain or extend.&lt;/li&gt;
+  &lt;li&gt;Difficulty writing tests: the code might be too complex or not modular.&lt;/li&gt;
+  &lt;li&gt;Excessive mocking: the code might be tightly coupled.&lt;/li&gt;
+  &lt;li&gt;Long setup times: the code might carry too many dependencies.&lt;/li&gt;
+  &lt;li&gt;Hidden dependencies: the code might be hard to maintain or extend.&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h2 id=&quot;key-signals-and-what-they-mean&quot;&gt;Key Signals and What They Mean&lt;/h2&gt;
 
 &lt;h3 id=&quot;excessive-mocking&quot;&gt;Excessive Mocking&lt;/h3&gt;
 
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;What It Is&lt;/strong&gt;: Mocking means creating fake objects that mimic real ones.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;The Signal&lt;/strong&gt;: Needing too many mocks usually means your classes are too dependent on each other.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;The Solution&lt;/strong&gt;: Improve your code design. Break down large classes into smaller, independent ones.&lt;/li&gt;
-&lt;/ul&gt;
+&lt;p&gt;Mocking replaces a real dependency with a fake one. A few mocks are normal. When a single test needs many of them, the class under test leans on too many other classes. The fix is in the design: break the large class into smaller ones that can stand on their own.&lt;/p&gt;
 
 &lt;h3 id=&quot;long-setup-times&quot;&gt;Long Setup Times&lt;/h3&gt;
 
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;What It Is&lt;/strong&gt;: Setting up tests should be quick and easy.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;The Signal&lt;/strong&gt;: Long setup times can mean your code has too many dependencies or lacks modularity.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;The Solution&lt;/strong&gt;: Simplify your code. Use dependency injection to reduce setup complexity.&lt;/li&gt;
-&lt;/ul&gt;
+&lt;p&gt;Setting up a test should be quick. When it drags, the code usually has too many dependencies or too little structure. Dependency injection helps here, since the test can supply what it needs instead of building the whole world first.&lt;/p&gt;
 
 &lt;h3 id=&quot;difficulty-isolating-tests&quot;&gt;Difficulty Isolating Tests&lt;/h3&gt;
 
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;What It Is&lt;/strong&gt;: Each test should run independently.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;The Signal&lt;/strong&gt;: If tests affect each other, your code might have hidden dependencies.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;The Solution&lt;/strong&gt;: Make your code more modular. Ensure each part of your code does one thing well.&lt;/li&gt;
-&lt;/ul&gt;
+&lt;p&gt;Each test should run on its own. When one test changes the outcome of another, the code has shared state hiding somewhere. Make each unit do one thing so the tests stop leaking into each other.&lt;/p&gt;
 
 &lt;h3 id=&quot;hidden-dependencies&quot;&gt;Hidden Dependencies&lt;/h3&gt;
 
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;What It Is&lt;/strong&gt;: Hidden dependencies are those that are not immediately obvious, such as using Instant.now directly within a method.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;The Signal&lt;/strong&gt;: If you find that certain parts of your code rely on hidden dependencies, it’s hard to write unit tests without mocks.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;The Solution&lt;/strong&gt;: Use dependency inversion. For example, instead of setting the current timestamp using Instant.now directly, inject a clock interface and use it to get the current time. This decouples your code from the specific implementation and makes it easier to test.&lt;/li&gt;
-&lt;/ul&gt;
+&lt;p&gt;Some dependencies are not visible in a method’s signature. Calling &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Instant.now()&lt;/code&gt; inside a method is one of them: the method quietly depends on the system clock, so you cannot test it without controlling time. Dependency inversion fixes this. Instead of reading the clock directly, inject a clock interface and ask it for the current time.&lt;/p&gt;
 
 &lt;h4 id=&quot;implementing-dependency-inversion&quot;&gt;Implementing Dependency Inversion&lt;/h4&gt;
 
-&lt;p&gt;Here’s a practical example to illustrate how to handle hidden dependencies using dependency inversion:&lt;/p&gt;
+&lt;p&gt;Here is the same idea in code.&lt;/p&gt;
 
 &lt;p&gt;Before:&lt;/p&gt;
 
@@ -419,26 +486,20 @@
 
 &lt;h2 id=&quot;benefits-of-listening-to-these-signals&quot;&gt;Benefits of Listening to These Signals&lt;/h2&gt;
 
-&lt;p&gt;By paying attention to these signals, you can improve your code design. This makes your code:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Easier to Understand: Clear, modular code is easier to read and maintain.&lt;/li&gt;
-  &lt;li&gt;More Reliable: Well-designed code has fewer bugs and is easier to test.&lt;/li&gt;
-  &lt;li&gt;More Flexible: Good design makes it easier to add new features.&lt;/li&gt;
-&lt;/ul&gt;
+&lt;p&gt;Reading these signals improves the design. Modular code is easier to follow, has fewer places for bugs to hide, and takes less effort to extend when the requirements change.&lt;/p&gt;
 
 &lt;h2 id=&quot;practical-steps-to-improve-your-code&quot;&gt;Practical Steps to Improve Your Code&lt;/h2&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;Refactor Regularly: Don’t wait until your code is a mess. Refactor as you go to keep your code clean.&lt;/li&gt;
-  &lt;li&gt;Use Dependency Injection: This reduces the need for mocks and makes your code more modular.&lt;/li&gt;
-  &lt;li&gt;Write Small, Focused Functions: Each function should do one thing and do it well. This makes them easier to test.&lt;/li&gt;
-  &lt;li&gt;Identify and Eliminate Hidden Dependencies: Use patterns like port-adapter and dependency inversion to decouple your code.&lt;/li&gt;
+  &lt;li&gt;Refactor regularly. Don’t wait until the code is a mess. Clean it up as you go.&lt;/li&gt;
+  &lt;li&gt;Use dependency injection. It reduces the need for mocks and keeps the code modular.&lt;/li&gt;
+  &lt;li&gt;Write small, focused functions. Each one should do a single thing, which makes it easy to test.&lt;/li&gt;
+  &lt;li&gt;Find and remove hidden dependencies. Patterns like port-adapter and dependency inversion decouple your code.&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
 
-&lt;p&gt;Test codes are valuable tools. They don’t just check if your code works; they also show you where it needs improvement. By paying attention to the signals from your test codes, you can make your code more robust, easier to maintain, and more enjoyable to work with. Keep your tests simple, listen to what they’re telling you, and your code will thank you.&lt;/p&gt;
+&lt;p&gt;Tests do more than check that your code works. They point at where the design is weak. When a test is painful to write, listen to it and fix the code underneath instead of forcing the test around it. Keep your tests simple, and let them guide the design.&lt;/p&gt;
 </description>
         <pubDate>Sun, 30 Jun 2024 00:00:00 -0700</pubDate>
         <link>https://whyjun.github.io/blog/The-Importance-of-Signals-from-Test-Codes</link>

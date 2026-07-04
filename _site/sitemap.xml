@@ -4,6 +4,22 @@
         xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     
     <url>
+        <loc>https://whyjun.github.io/blog/How-to-Use-Git-Worktrees-with-Claude-Code</loc>
+        
+        <lastmod>2026-07-03T00:00:00-07:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.7</priority>
+        
+
+    </url>
+    
+    <url>
         <loc>https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL</loc>
         
         <lastmod>2024-07-08T00:00:00-07:00</lastmod>

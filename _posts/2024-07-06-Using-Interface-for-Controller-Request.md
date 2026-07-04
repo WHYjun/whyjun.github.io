@@ -11,15 +11,15 @@ sharing:
   twitter: Using Interface for Controller Requests in Java Spring Framework
 ---
 
-When building a REST API with Java Spring Framework, handling multiple types of requests efficiently can be challenging. One effective approach is to use interfaces for controller requests. In this blog post, we'll walk through an example using a restaurant order system. We'll handle different types of orders (like hamburger and pizza) with a single endpoint.
+When you build a REST API with Spring, one endpoint often has to accept several kinds of request. Using an interface for the request body lets a single endpoint handle them all. The example here is a restaurant order system, where one `/v1/orders` endpoint takes both hamburger and pizza orders.
 
 ## Scenario: Restaurant Order System
 
-Imagine we have an endpoint /v1/orders that accepts different types of orders. Each order type has some common fields, but also unique fields. We'll use an interface called Order and implement it with specific classes for each order type. Let's dive in.
+We have an endpoint `/v1/orders` that accepts different order types. Every order shares a few fields and adds its own. We define an `Order` interface and implement it with one class per order type.
 
 ### Step 1: Define the Order Interface
 
-First, we create an Order interface with common fields that all orders will have.
+Start with an `Order` interface holding what every order has in common.
 
 ```java
 public interface Order {
@@ -29,7 +29,7 @@ public interface Order {
 
 ### Step 2: Implement Order Types
 
-Next, we create classes for specific order types, like HamburgerOrder and PizzaOrder.
+Then write a class per order type, like `HamburgerOrder` and `PizzaOrder`.
 
 ```java
 import lombok.Data;
@@ -65,7 +65,7 @@ public class PizzaOrder implements Order {
 
 ### Step 3: Create the Controller
 
-Now, we create the controller to handle the /v1/orders POST request. We'll use `@RequestBody` and `@Valid` annotations to ensure the request body is correctly validated.
+The controller handles the `/v1/orders` POST request. The `@RequestBody` and `@Valid` annotations bind and validate the incoming JSON.
 
 ```java
 import org.springframework.http.HttpStatus;
@@ -99,7 +99,7 @@ public class OrderController {
 
 ### Step 4: Configure Jackson for Polymorphic Deserialization
 
-To handle polymorphic deserialization, we need to configure Jackson. This allows us to deserialize JSON into the correct Order implementation.
+Jackson needs to know which class to build from the JSON. Annotate the `Order` interface so it reads the `orderType` field and picks the matching implementation.
 
 ```java
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -121,7 +121,7 @@ public interface Order {
 
 ### Step 5: Add Global Validation Handling
 
-Finally, add global exception handling to manage validation errors.
+Finally, handle validation errors in one place.
 
 ```java
 import org.springframework.http.HttpStatus;
@@ -142,4 +142,4 @@ public class GlobalExceptionHandler {
 
 ## Conclusion
 
-Using interfaces for controller requests in Java Spring Framework allows you to handle multiple types of requests cleanly and efficiently. In this example, we created an Order interface and implemented specific order types, handled polymorphic deserialization with Jackson, and ensured validation with `@Valid` and `@RequestBody`. This approach makes your code more flexible and easier to maintain. Happy coding!
+An interface for the request body lets one endpoint accept many order types without a pile of branching at the door. We defined an `Order` interface, implemented it per type, let Jackson pick the right class from `orderType`, and validated with `@Valid`. Adding a new order type now means writing one class and one Jackson subtype, and nothing else has to change. Happy coding!

@@ -11,46 +11,38 @@ sharing:
   twitter: The Importance of Signals from Test Codes
 ---
 
-When you write test code, it can tell you a lot about your main code. If you find it hard to write tests, it often means there are problems in your code design. Let's explore why these signals are important and what they can teach you.
+When you write tests, they tell you a lot about your main code. If a test is hard to write, the problem is usually in the code you are testing, not in the test. Those difficulties are signals, and they are worth reading.
 
 ## Why Test Codes Matter
 
-Test codes are like a mirror for your main code. They show you its strengths and weaknesses. Here are some key signals to watch for:
+Tests are a mirror for your main code. They show its strengths and its weak spots. A few signals to watch for:
 
-* Difficulty Writing Tests: If you struggle to write tests, your code might be too complex or not modular.
-* Excessive Mocking: If you need to mock too many things, your code might be tightly coupled.
-* Long Setup Times: If setting up a test takes a long time, your code may have too many dependencies.
-* Hidden Dependencies: If certain dependencies are not obvious, your code might be hard to maintain or extend.
+* Difficulty writing tests: the code might be too complex or not modular.
+* Excessive mocking: the code might be tightly coupled.
+* Long setup times: the code might carry too many dependencies.
+* Hidden dependencies: the code might be hard to maintain or extend.
 
 ## Key Signals and What They Mean
 
 ### Excessive Mocking
 
-* **What It Is**: Mocking means creating fake objects that mimic real ones.
-* **The Signal**: Needing too many mocks usually means your classes are too dependent on each other.
-* **The Solution**: Improve your code design. Break down large classes into smaller, independent ones.
+Mocking replaces a real dependency with a fake one. A few mocks are normal. When a single test needs many of them, the class under test leans on too many other classes. The fix is in the design: break the large class into smaller ones that can stand on their own.
 
 ### Long Setup Times
 
-* **What It Is**: Setting up tests should be quick and easy.
-* **The Signal**: Long setup times can mean your code has too many dependencies or lacks modularity.
-* **The Solution**: Simplify your code. Use dependency injection to reduce setup complexity.
+Setting up a test should be quick. When it drags, the code usually has too many dependencies or too little structure. Dependency injection helps here, since the test can supply what it needs instead of building the whole world first.
 
 ### Difficulty Isolating Tests
 
-* **What It Is**: Each test should run independently.
-* **The Signal**: If tests affect each other, your code might have hidden dependencies.
-* **The Solution**: Make your code more modular. Ensure each part of your code does one thing well.
+Each test should run on its own. When one test changes the outcome of another, the code has shared state hiding somewhere. Make each unit do one thing so the tests stop leaking into each other.
 
 ### Hidden Dependencies
 
-* **What It Is**: Hidden dependencies are those that are not immediately obvious, such as using Instant.now directly within a method.
-* **The Signal**: If you find that certain parts of your code rely on hidden dependencies, it's hard to write unit tests without mocks.
-* **The Solution**: Use dependency inversion. For example, instead of setting the current timestamp using Instant.now directly, inject a clock interface and use it to get the current time. This decouples your code from the specific implementation and makes it easier to test.
+Some dependencies are not visible in a method's signature. Calling `Instant.now()` inside a method is one of them: the method quietly depends on the system clock, so you cannot test it without controlling time. Dependency inversion fixes this. Instead of reading the clock directly, inject a clock interface and ask it for the current time.
 
 #### Implementing Dependency Inversion
 
-Here's a practical example to illustrate how to handle hidden dependencies using dependency inversion:
+Here is the same idea in code.
 
 Before:
 
@@ -94,19 +86,15 @@ public class Event {
 
 ## Benefits of Listening to These Signals
 
-By paying attention to these signals, you can improve your code design. This makes your code:
-
-* Easier to Understand: Clear, modular code is easier to read and maintain.
-* More Reliable: Well-designed code has fewer bugs and is easier to test.
-* More Flexible: Good design makes it easier to add new features.
+Reading these signals improves the design. Modular code is easier to follow, has fewer places for bugs to hide, and takes less effort to extend when the requirements change.
 
 ## Practical Steps to Improve Your Code
 
-* Refactor Regularly: Don’t wait until your code is a mess. Refactor as you go to keep your code clean.
-* Use Dependency Injection: This reduces the need for mocks and makes your code more modular.
-* Write Small, Focused Functions: Each function should do one thing and do it well. This makes them easier to test.
-* Identify and Eliminate Hidden Dependencies: Use patterns like port-adapter and dependency inversion to decouple your code.
+* Refactor regularly. Don't wait until the code is a mess. Clean it up as you go.
+* Use dependency injection. It reduces the need for mocks and keeps the code modular.
+* Write small, focused functions. Each one should do a single thing, which makes it easy to test.
+* Find and remove hidden dependencies. Patterns like port-adapter and dependency inversion decouple your code.
 
 ## Conclusion
 
-Test codes are valuable tools. They don’t just check if your code works; they also show you where it needs improvement. By paying attention to the signals from your test codes, you can make your code more robust, easier to maintain, and more enjoyable to work with. Keep your tests simple, listen to what they’re telling you, and your code will thank you.
+Tests do more than check that your code works. They point at where the design is weak. When a test is painful to write, listen to it and fix the code underneath instead of forcing the test around it. Keep your tests simple, and let them guide the design.

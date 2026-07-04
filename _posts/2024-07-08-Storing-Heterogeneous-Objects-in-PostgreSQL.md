@@ -12,15 +12,15 @@ sharing:
   twitter: Storing Heterogeneous Objects in PostgreSQL
 ---
 
-Storing different types of objects in a PostgreSQL database can be tricky. But don't worry, it's manageable. Let's explore three practical ways to handle this. We will keep it simple and straightforward.
+Storing different types of objects in one PostgreSQL table is tricky. Each type shares a few fields and carries its own. There are three practical ways to handle it, and each one trades flexibility for structure in a different spot.
 
 ## Scenario: Restaurant Order System
 
-Imagine we have a Transaction table that stores different types of orders. Each order type has some common fields, but also unique fields.
+Imagine a `transactions` table that stores different types of orders. Each order type has some common fields and some unique ones.
 
 ### Using JSONB for Orders
 
-The JSONB data type is flexible. It allows you to store various order types without much hassle.
+The `JSONB` type is flexible. It lets you store different order types in one column without committing to a fixed shape.
 
 #### Schema
 
@@ -33,7 +33,7 @@ CREATE TABLE transactions (
 
 #### Inserting Data
 
-You can insert data by converting orders to JSON.
+You insert data by writing the orders as JSON.
 
 ```sql
 INSERT INTO transactions (orders) VALUES (
@@ -46,7 +46,7 @@ INSERT INTO transactions (orders) VALUES (
 
 #### Querying Data
 
-Retrieving specific orders is easy.
+Retrieving specific orders stays simple.
 
 ```sql
 SELECT * FROM transactions
@@ -60,7 +60,7 @@ WHERE orders @> '[{"type": "HamburgerOrder"}]';
 
 ### Using a Normalized Schema
 
-This method involves multiple tables and foreign keys. It keeps the database structure clean and efficient.
+This method splits the data across several tables joined by foreign keys. It keeps the structure explicit and efficient.
 
 #### Schema
 
@@ -106,7 +106,7 @@ CREATE TABLE pizza_orders (
 
 #### Inserting Data
 
-Insert data step-by-step.
+Insert the rows step by step.
 
 ```sql
 INSERT INTO transactions DEFAULT VALUES RETURNING id;
@@ -120,7 +120,7 @@ INSERT INTO hamburger_orders (order_id, unique_hamburger_field) VALUES
 
 #### Querying Data
 
-Use JOIN queries to get all orders.
+Use `JOIN` queries to pull the orders back together.
 
 ```sql
 SELECT o.id AS order_id, o.type, o.common_field1, o.common_field2,
@@ -138,7 +138,7 @@ WHERE o.transaction_id = 1;
 
 ### Hybrid Approach: Common Fields + JSONB
 
-This approach combines the best of both worlds. Common fields are stored directly in columns. Unique fields go into a JSONB column.
+This approach mixes both. Common fields live in their own columns. Unique fields go into a `JSONB` column.
 
 #### Schema
 
@@ -155,7 +155,7 @@ CREATE TABLE orders (
 
 #### Inserting Data
 
-Insert data with common fields and JSONB.
+Insert the common fields as columns and the rest as JSON.
 
 ```sql
 INSERT INTO orders (transaction_id, type, common_field1, common_field2, specific_fields) VALUES
@@ -165,7 +165,7 @@ INSERT INTO orders (transaction_id, type, common_field1, common_field2, specific
 
 #### Querying Data
 
-Query directly from the orders table.
+Query the common fields straight from the columns.
 
 ```sql
 SELECT * FROM orders WHERE transaction_id = 1;
@@ -178,4 +178,4 @@ SELECT * FROM orders WHERE transaction_id = 1;
 
 ## Conclusion
 
-Choosing the right method depends on your needs. JSONB is flexible but validation can be tricky. A normalized schema ensures data integrity but requires more tables. The hybrid approach offers a balanced solution. Each method has its pros and cons. Pick the one that fits your project best. Happy coding!
+The right method depends on how strict your data has to be. `JSONB` is flexible but hard to validate. A normalized schema protects integrity but adds tables and joins. The hybrid keeps common fields queryable while leaving room for the odd ones. Pick the one that matches the shape of your data. Happy coding!

@@ -21,8 +21,8 @@
 <meta property="og:title" content="Storing Heterogeneous Objects in PostgreSQL" />
 <meta name="author" content="Young Choi" />
 <meta property="og:locale" content="ko_KR" />
-<meta name="description" content="Storing different types of objects in a PostgreSQL database can be tricky. But don’t worry, it’s manageable. Let’s explore three practical ways to handle this. We will keep it simple and straightforward." />
-<meta property="og:description" content="Storing different types of objects in a PostgreSQL database can be tricky. But don’t worry, it’s manageable. Let’s explore three practical ways to handle this. We will keep it simple and straightforward." />
+<meta name="description" content="Storing different types of objects in one PostgreSQL table is tricky. Each type shares a few fields and carries its own. There are three practical ways to handle it, and each one trades flexibility for structure in a different spot." />
+<meta property="og:description" content="Storing different types of objects in one PostgreSQL table is tricky. Each type shares a few fields and carries its own. There are three practical ways to handle it, and each one trades flexibility for structure in a different spot." />
 <link rel="canonical" href="https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL" />
 <meta property="og:url" content="https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL" />
 <meta property="og:site_name" content="Grow with Code" />
@@ -33,7 +33,7 @@
 <meta name="twitter:site" content="@youngchoi_dev" />
 <meta name="twitter:creator" content="@https://x.com/youngchoi_dev" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Young Choi"},"dateModified":"2024-07-08T00:00:00-07:00","datePublished":"2024-07-08T00:00:00-07:00","description":"Storing different types of objects in a PostgreSQL database can be tricky. But don’t worry, it’s manageable. Let’s explore three practical ways to handle this. We will keep it simple and straightforward.","headline":"Storing Heterogeneous Objects in PostgreSQL","mainEntityOfPage":{"@type":"WebPage","@id":"https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://whyjun.github.io/assets/images/young-choi-gopher-image.png"},"name":"Young Choi"},"url":"https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Young Choi"},"dateModified":"2024-07-08T00:00:00-07:00","datePublished":"2024-07-08T00:00:00-07:00","description":"Storing different types of objects in one PostgreSQL table is tricky. Each type shares a few fields and carries its own. There are three practical ways to handle it, and each one trades flexibility for structure in a different spot.","headline":"Storing Heterogeneous Objects in PostgreSQL","mainEntityOfPage":{"@type":"WebPage","@id":"https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://whyjun.github.io/assets/images/young-choi-gopher-image.png"},"name":"Young Choi"},"url":"https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -143,15 +143,15 @@
 
       <div class="page-content">
         <div class="e-content">
-          <p>Storing different types of objects in a PostgreSQL database can be tricky. But don’t worry, it’s manageable. Let’s explore three practical ways to handle this. We will keep it simple and straightforward.</p>
+          <p>Storing different types of objects in one PostgreSQL table is tricky. Each type shares a few fields and carries its own. There are three practical ways to handle it, and each one trades flexibility for structure in a different spot.</p>
 
 <h2 id="scenario-restaurant-order-system">Scenario: Restaurant Order System</h2>
 
-<p>Imagine we have a Transaction table that stores different types of orders. Each order type has some common fields, but also unique fields.</p>
+<p>Imagine a <code class="language-plaintext highlighter-rouge">transactions</code> table that stores different types of orders. Each order type has some common fields and some unique ones.</p>
 
 <h3 id="using-jsonb-for-orders">Using JSONB for Orders</h3>
 
-<p>The JSONB data type is flexible. It allows you to store various order types without much hassle.</p>
+<p>The <code class="language-plaintext highlighter-rouge">JSONB</code> type is flexible. It lets you store different order types in one column without committing to a fixed shape.</p>
 
 <h4 id="schema">Schema</h4>
 
@@ -163,7 +163,7 @@
 
 <h4 id="inserting-data">Inserting Data</h4>
 
-<p>You can insert data by converting orders to JSON.</p>
+<p>You insert data by writing the orders as JSON.</p>
 
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">transactions</span> <span class="p">(</span><span class="n">orders</span><span class="p">)</span> <span class="k">VALUES</span> <span class="p">(</span>
     <span class="s1">'[
@@ -175,7 +175,7 @@
 
 <h4 id="querying-data">Querying Data</h4>
 
-<p>Retrieving specific orders is easy.</p>
+<p>Retrieving specific orders stays simple.</p>
 
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">transactions</span>
 <span class="k">WHERE</span> <span class="n">orders</span> <span class="o">@&gt;</span> <span class="s1">'[{"type": "HamburgerOrder"}]'</span><span class="p">;</span>
@@ -190,7 +190,7 @@
 
 <h3 id="using-a-normalized-schema">Using a Normalized Schema</h3>
 
-<p>This method involves multiple tables and foreign keys. It keeps the database structure clean and efficient.</p>
+<p>This method splits the data across several tables joined by foreign keys. It keeps the structure explicit and efficient.</p>
 
 <h4 id="schema-1">Schema</h4>
 
@@ -232,7 +232,7 @@
 
 <h4 id="inserting-data-1">Inserting Data</h4>
 
-<p>Insert data step-by-step.</p>
+<p>Insert the rows step by step.</p>
 
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">transactions</span> <span class="k">DEFAULT</span> <span class="k">VALUES</span> <span class="n">RETURNING</span> <span class="n">id</span><span class="p">;</span>
 
@@ -245,7 +245,7 @@
 
 <h4 id="querying-data-1">Querying Data</h4>
 
-<p>Use JOIN queries to get all orders.</p>
+<p>Use <code class="language-plaintext highlighter-rouge">JOIN</code> queries to pull the orders back together.</p>
 
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="n">o</span><span class="p">.</span><span class="n">id</span> <span class="k">AS</span> <span class="n">order_id</span><span class="p">,</span> <span class="n">o</span><span class="p">.</span><span class="k">type</span><span class="p">,</span> <span class="n">o</span><span class="p">.</span><span class="n">common_field1</span><span class="p">,</span> <span class="n">o</span><span class="p">.</span><span class="n">common_field2</span><span class="p">,</span>
        <span class="n">h</span><span class="p">.</span><span class="n">unique_hamburger_field</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">unique_pizza_field</span>
@@ -264,7 +264,7 @@
 
 <h3 id="hybrid-approach-common-fields--jsonb">Hybrid Approach: Common Fields + JSONB</h3>
 
-<p>This approach combines the best of both worlds. Common fields are stored directly in columns. Unique fields go into a JSONB column.</p>
+<p>This approach mixes both. Common fields live in their own columns. Unique fields go into a <code class="language-plaintext highlighter-rouge">JSONB</code> column.</p>
 
 <h4 id="schema-2">Schema</h4>
 
@@ -280,7 +280,7 @@
 
 <h4 id="inserting-data-2">Inserting Data</h4>
 
-<p>Insert data with common fields and JSONB.</p>
+<p>Insert the common fields as columns and the rest as JSON.</p>
 
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">orders</span> <span class="p">(</span><span class="n">transaction_id</span><span class="p">,</span> <span class="k">type</span><span class="p">,</span> <span class="n">common_field1</span><span class="p">,</span> <span class="n">common_field2</span><span class="p">,</span> <span class="n">specific_fields</span><span class="p">)</span> <span class="k">VALUES</span>
 <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">'HamburgerOrder'</span><span class="p">,</span> <span class="s1">'value1'</span><span class="p">,</span> <span class="s1">'value2'</span><span class="p">,</span> <span class="s1">'{"unique_hamburger_field": "hamburgerValue"}'</span><span class="p">::</span><span class="n">jsonb</span><span class="p">),</span>
@@ -289,7 +289,7 @@
 
 <h4 id="querying-data-2">Querying Data</h4>
 
-<p>Query directly from the orders table.</p>
+<p>Query the common fields straight from the columns.</p>
 
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">orders</span> <span class="k">WHERE</span> <span class="n">transaction_id</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
 </code></pre></div></div>
@@ -303,7 +303,7 @@
 
 <h2 id="conclusion">Conclusion</h2>
 
-<p>Choosing the right method depends on your needs. JSONB is flexible but validation can be tricky. A normalized schema ensures data integrity but requires more tables. The hybrid approach offers a balanced solution. Each method has its pros and cons. Pick the one that fits your project best. Happy coding!</p>
+<p>The right method depends on how strict your data has to be. <code class="language-plaintext highlighter-rouge">JSONB</code> is flexible but hard to validate. A normalized schema protects integrity but adds tables and joins. The hybrid keeps common fields queryable while leaving room for the odd ones. Pick the one that matches the shape of your data. Happy coding!</p>
 
         </div>
       
@@ -335,6 +335,14 @@
   
 
   
+    <a class="page-next" href="/blog/How-to-Use-Git-Worktrees-with-Claude-Code">
+      <h4 class="page-pagination-label">Next</h4>
+      <span class="page-pagination-title">
+        How to Use Git Worktrees with Claude Code
+ <i class="fas fa-arrow-right"></i>
+      </span>
+    </a>
+  
 </nav>
 
       </div>
@@ -348,7 +356,7 @@
 <!-- end custom footer snippets -->
 <div class="copyright">
     
-      <p>&copy; 2025 Grow with Code. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://github.com/mmistakes/so-simple-theme" rel="nofollow">So Simple</a>.</p>
+      <p>&copy; 2026 Grow with Code. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://github.com/mmistakes/so-simple-theme" rel="nofollow">So Simple</a>.</p>
     
   </div>
 </footer>

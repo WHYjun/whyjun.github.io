@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<!--
+    So Simple Jekyll Theme 3.2.0
+    Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+    Free for personal and commercial use under the MIT license
+    https://github.com/mmistakes/so-simple-theme/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+
+  
+    
+    <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>How to Use Git Worktrees with Claude Code | Grow with Code</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="How to Use Git Worktrees with Claude Code" />
+<meta name="author" content="Young Choi" />
+<meta property="og:locale" content="ko_KR" />
+<meta name="description" content="When Claude Code runs a long task, it edits files in your working directory. If you want to keep working while it does, you end up fighting over the same files. Git worktrees solve this. They let one repository check out several branches into separate folders at once, so Claude can work in one folder while you stay in another." />
+<meta property="og:description" content="When Claude Code runs a long task, it edits files in your working directory. If you want to keep working while it does, you end up fighting over the same files. Git worktrees solve this. They let one repository check out several branches into separate folders at once, so Claude can work in one folder while you stay in another." />
+<link rel="canonical" href="https://whyjun.github.io/blog/How-to-Use-Git-Worktrees-with-Claude-Code" />
+<meta property="og:url" content="https://whyjun.github.io/blog/How-to-Use-Git-Worktrees-with-Claude-Code" />
+<meta property="og:site_name" content="Grow with Code" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2026-07-03T00:00:00-07:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="How to Use Git Worktrees with Claude Code" />
+<meta name="twitter:site" content="@youngchoi_dev" />
+<meta name="twitter:creator" content="@https://x.com/youngchoi_dev" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Young Choi"},"dateModified":"2026-07-03T00:00:00-07:00","datePublished":"2026-07-03T00:00:00-07:00","description":"When Claude Code runs a long task, it edits files in your working directory. If you want to keep working while it does, you end up fighting over the same files. Git worktrees solve this. They let one repository check out several branches into separate folders at once, so Claude can work in one folder while you stay in another.","headline":"How to Use Git Worktrees with Claude Code","mainEntityOfPage":{"@type":"WebPage","@id":"https://whyjun.github.io/blog/How-to-Use-Git-Worktrees-with-Claude-Code"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://whyjun.github.io/assets/images/young-choi-gopher-image.png"},"name":"Young Choi"},"url":"https://whyjun.github.io/blog/How-to-Use-Git-Worktrees-with-Claude-Code"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  
+
+  <script>
+    /* Cut the mustard */
+    if ( 'querySelector' in document && 'addEventListener' in window ) {
+      document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + 'js';
+    }
+  </script>
+
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/skins/default.css">
+  
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,700,700i|Lora:400,400i,700,700i">
+  <link rel="alternate" type="application/atom+xml" title="Grow with Code" href="/atom.xml">
+<!-- start custom head snippets -->
+
+<!-- insert favicons. use http://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+</head>
+
+
+  <body class="layout--post  how-to-use-git-worktrees-with-claude-code">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#primary-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    
+  <div class="navigation-wrapper">
+    <a href="#menu-toggle" id="menu-toggle">Menu</a>
+    <nav id="primary-nav" class="site-nav animated drop">
+      <ul><li><a href="/posts/">Posts</a></li><li><a href="/categories/">Categories</a></li><li><a href="/tags/">Tags</a></li><li><a href="/search/">Search</a></li></ul>
+    </nav>
+  </div><!-- /.navigation-wrapper -->
+
+
+    <header class="masthead">
+  <div class="wrap">
+    
+      <a href="/" class="site-logo" rel="home" title="Grow with Code">
+        <img src="/assets/images/young-choi-gopher-image.png" class="site-logo-img animated fadeInDown" alt="Grow with Code">
+      </a>
+    
+    
+    
+      
+        <div class="site-title animated fadeIn"><a href="/">Grow with Code</a></div>
+      
+      <p class="site-description animated fadeIn" itemprop="description">Where growth begins with every line of code.</p>
+    
+  </div>
+</header><!-- /.masthead -->
+
+
+    <main id="main" class="main-content" aria-label="Content">
+  <article class="h-entry">
+    
+
+    <div class="page-wrapper">
+      <header class="page-header">
+        
+        
+        <h1 id="page-title" class="page-title p-name">How to Use Git Worktrees with Claude Code
+</h1>
+        
+      </header>
+
+      <div class="page-sidebar">
+        <div class="page-author h-card p-author"><img src="/assets/images/young-choi-gopher-image.png" class="author-avatar u-photo" alt="Young Choi"><div class="author-info"><div class="author-name">
+        <span class="p-name">Young Choi</span>
+      </div><ul class="author-links"><li class="author-link">
+            <a class="u-url" rel="me" href="https://github.com/whyjun"><i class="fab fa-github-square fa-lg" title="GitHub"></i></a>
+          </li></ul><!-- 
+
+<span class="read-time">2 min read</span>
+ -->
+    <time class="page-date dt-published" datetime="2026-07-03T00:00:00-07:00"><a class="u-url" href="">July 3, 2026</a>
+</time>
+
+  </div>
+</div>
+
+        
+  <h3 class="page-taxonomies-title">Categories</h3>
+  
+  <ul class="page-taxonomies"><li class="page-taxonomy"><a class="p-category" href="/categories/#development" title="Pages filed under development">development</a></li>
+  </ul>
+
+
+        <!-- 
+  <h3 class="page-taxonomies-title">Tags</h3>
+  
+  <ul class="page-taxonomies"><li class="page-taxonomy"><a href="/tags/#claude-code" title="Pages tagged claude-code" rel="tag">claude-code</a></li><li class="page-taxonomy"><a href="/tags/#git" title="Pages tagged git" rel="tag">git</a></li>
+  </ul>
+ -->
+
+      </div>
+
+      <div class="page-content">
+        <div class="e-content">
+          <p>When Claude Code runs a long task, it edits files in your working directory. If you want to keep working while it does, you end up fighting over the same files. Git worktrees solve this. They let one repository check out several branches into separate folders at once, so Claude can work in one folder while you stay in another.</p>
+
+<h2 id="what-is-a-git-worktree">What Is a Git Worktree</h2>
+
+<p>A worktree is an extra working directory attached to your existing repository. Each worktree sits on its own branch and has its own files on disk, but they all share one <code class="language-plaintext highlighter-rouge">.git</code> history. You are not cloning the repo again, so you do not pay for a second copy of the object database.</p>
+
+<p>For Claude Code this means isolation. Point Claude at a worktree on a feature branch, and its edits, builds, and test runs stay out of your main checkout.</p>
+
+<h2 id="creating-a-worktree">Creating a Worktree</h2>
+
+<p>Use <code class="language-plaintext highlighter-rouge">git worktree add</code>. Pass a path for the new folder and the branch to check out.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git worktree add ../myproject-feature feature-branch
+</code></pre></div></div>
+
+<p>This creates <code class="language-plaintext highlighter-rouge">myproject-feature</code> next to your repo, checked out to <code class="language-plaintext highlighter-rouge">feature-branch</code>. If the branch does not exist yet, create it in the same command with <code class="language-plaintext highlighter-rouge">-b</code>.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git worktree add <span class="nt">-b</span> new-feature ../myproject-feature
+</code></pre></div></div>
+
+<p>You now have two folders. Your original one stays where it was. The new one is on <code class="language-plaintext highlighter-rouge">new-feature</code>.</p>
+
+<h2 id="running-claude-code-in-the-worktree">Running Claude Code in the Worktree</h2>
+
+<p>Open a terminal in the worktree folder and start Claude there.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd</span> ../myproject-feature
+claude
+</code></pre></div></div>
+
+<p>Claude now reads and writes files inside <code class="language-plaintext highlighter-rouge">myproject-feature</code> only. You can go back to your main folder and keep editing, run the app, or start a second Claude session on a different branch. The two sessions never touch the same files.</p>
+
+<p>Claude Code can also manage this for you. When you ask a subagent to work in isolation, it can create a temporary worktree, do its work there, and clean it up when the branch has no changes left.</p>
+
+<h2 id="listing-and-removing-worktrees">Listing and Removing Worktrees</h2>
+
+<p>Check what you have with <code class="language-plaintext highlighter-rouge">git worktree list</code>.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git worktree list
+</code></pre></div></div>
+
+<p>When you are done with a worktree, remove it. This deletes the folder and unregisters it from the repo.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git worktree remove ../myproject-feature
+</code></pre></div></div>
+
+<p>If you deleted the folder by hand, run <code class="language-plaintext highlighter-rouge">git worktree prune</code> to clear the stale entry.</p>
+
+<h2 id="when-worktrees-help">When Worktrees Help</h2>
+
+<ul>
+  <li>Reviewing Claude’s changes on a branch while you keep working on another.</li>
+  <li>Running two Claude sessions in parallel on separate features.</li>
+  <li>Testing a build without stashing or committing half-finished work.</li>
+</ul>
+
+<h2 id="when-they-get-in-the-way">When They Get in the Way</h2>
+
+<ul>
+  <li>Small changes where a single branch switch would do.</li>
+  <li>Tooling that hardcodes an absolute path and breaks in a second folder.</li>
+  <li>Node or build caches that you now have to install once per worktree.</li>
+</ul>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Git worktrees give Claude Code a folder of its own without a second clone. Create one with <code class="language-plaintext highlighter-rouge">git worktree add</code>, run Claude inside it, and remove it with <code class="language-plaintext highlighter-rouge">git worktree remove</code> when the branch is merged. If you often want Claude to work while you keep going, keep a spare worktree around and hand it the branch. Happy coding!</p>
+
+        </div>
+      
+        <a href="https://www.buymeacoffee.com/youngchoi"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=youngchoi&button_colour=FFDD00&font_colour=000000&font_family=Comic&outline_colour=000000&coffee_colour=ffffff"></a>
+
+        <script src="https://utteranc.es/client.js" repo="whyjun/whyjun.github.io" issue-term="title" label="💬 comment"
+          theme="github-light" crossorigin="anonymous" async>
+        </script>
+
+        <!-- 
+        <div class="page-share">
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwhyjun.github.io%2Fblog%2FHow-to-Use-Git-Worktrees-with-Claude-Code" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--facebook btn--small"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i> <span>Share</span></a>
+  <a href="https://twitter.com/intent/tweet?text=How+to+Use+Git+Worktrees+with+Claude+Code%20https%3A%2F%2Fwhyjun.github.io%2Fblog%2FHow-to-Use-Git-Worktrees-with-Claude-Code" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--twitter btn--small"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i> <span>Tweet</span></a>
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fwhyjun.github.io%2Fblog%2FHow-to-Use-Git-Worktrees-with-Claude-Code" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--linkedin btn--small"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i> <span>LinkedIn</span></a>
+  <a href="https://reddit.com/submit?title=How+to+Use+Git+Worktrees+with+Claude+Code&url=https%3A%2F%2Fwhyjun.github.io%2Fblog%2FHow-to-Use-Git-Worktrees-with-Claude-Code" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--reddit btn--small"><i class="fab fa-fw fa-reddit" aria-hidden="true"></i> <span>Reddit</span></a>
+</div>
+
+         -->
+
+        <nav class="page-pagination" role="navigation">
+  
+    <a class="page-previous" href="/blog/Storing-Heterogeneous-Objects-in-PostgreSQL">
+      <h4 class="page-pagination-label">Previous</h4>
+      <span class="page-pagination-title">
+        <i class="fas fa-arrow-left"></i> Storing Heterogeneous Objects in PostgreSQL
+
+      </span>
+    </a>
+  
+
+  
+</nav>
+
+      </div>
+    </div>
+  </article>
+</main>
+
+    <footer id="footer" class="site-footer">
+  <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+<div class="copyright">
+    
+      <p>&copy; 2026 Grow with Code. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://github.com/mmistakes/so-simple-theme" rel="nofollow">So Simple</a>.</p>
+    
+  </div>
+</footer>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://use.fontawesome.com/releases/v5.0.12/js/all.js"></script><!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-73KQ7TR7X4"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-73KQ7TR7X4');
+  </script>
+
+
+  </body>
+
+</html>

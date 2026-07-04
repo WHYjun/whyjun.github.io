@@ -58,3 +58,7 @@ npm-debug.log*
 
 # environment variable
 .env
+
+# claude
+.claude
+CLAUDE.md
