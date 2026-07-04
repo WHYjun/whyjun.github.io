@@ -1,12 +1,78 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="https://whyjun.github.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://whyjun.github.io/" rel="alternate" type="text/html" /><updated>2025-11-06T23:41:37-08:00</updated><id>https://whyjun.github.io/atom.xml</id><title type="html">Grow with Code</title><subtitle>Where growth begins with every line of code.</subtitle><author><name>Young Choi</name></author><entry xml:lang="en"><title type="html">Storing Heterogeneous Objects in PostgreSQL</title><link href="https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL" rel="alternate" type="text/html" title="Storing Heterogeneous Objects in PostgreSQL" /><published>2024-07-08T00:00:00-07:00</published><updated>2024-07-08T00:00:00-07:00</updated><id>https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL</id><content type="html" xml:base="https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL"><![CDATA[<p>Storing different types of objects in a PostgreSQL database can be tricky. But don’t worry, it’s manageable. Let’s explore three practical ways to handle this. We will keep it simple and straightforward.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="https://whyjun.github.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://whyjun.github.io/" rel="alternate" type="text/html" /><updated>2026-07-03T17:47:34-07:00</updated><id>https://whyjun.github.io/atom.xml</id><title type="html">Grow with Code</title><subtitle>Where growth begins with every line of code.</subtitle><author><name>Young Choi</name></author><entry xml:lang="en"><title type="html">How to Use Git Worktrees with Claude Code</title><link href="https://whyjun.github.io/blog/How-to-Use-Git-Worktrees-with-Claude-Code" rel="alternate" type="text/html" title="How to Use Git Worktrees with Claude Code" /><published>2026-07-03T00:00:00-07:00</published><updated>2026-07-03T00:00:00-07:00</updated><id>https://whyjun.github.io/blog/How-to-Use-Git-Worktrees-with-Claude-Code</id><content type="html" xml:base="https://whyjun.github.io/blog/How-to-Use-Git-Worktrees-with-Claude-Code"><![CDATA[<p>When Claude Code runs a long task, it edits files in your working directory. If you want to keep working while it does, you end up fighting over the same files. Git worktrees solve this. They let one repository check out several branches into separate folders at once, so Claude can work in one folder while you stay in another.</p>
+
+<h2 id="what-is-a-git-worktree">What Is a Git Worktree</h2>
+
+<p>A worktree is an extra working directory attached to your existing repository. Each worktree sits on its own branch and has its own files on disk, but they all share one <code class="language-plaintext highlighter-rouge">.git</code> history. You are not cloning the repo again, so you do not pay for a second copy of the object database.</p>
+
+<p>For Claude Code this means isolation. Point Claude at a worktree on a feature branch, and its edits, builds, and test runs stay out of your main checkout.</p>
+
+<h2 id="creating-a-worktree">Creating a Worktree</h2>
+
+<p>Use <code class="language-plaintext highlighter-rouge">git worktree add</code>. Pass a path for the new folder and the branch to check out.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git worktree add ../myproject-feature feature-branch
+</code></pre></div></div>
+
+<p>This creates <code class="language-plaintext highlighter-rouge">myproject-feature</code> next to your repo, checked out to <code class="language-plaintext highlighter-rouge">feature-branch</code>. If the branch does not exist yet, create it in the same command with <code class="language-plaintext highlighter-rouge">-b</code>.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git worktree add <span class="nt">-b</span> new-feature ../myproject-feature
+</code></pre></div></div>
+
+<p>You now have two folders. Your original one stays where it was. The new one is on <code class="language-plaintext highlighter-rouge">new-feature</code>.</p>
+
+<h2 id="running-claude-code-in-the-worktree">Running Claude Code in the Worktree</h2>
+
+<p>Open a terminal in the worktree folder and start Claude there.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd</span> ../myproject-feature
+claude
+</code></pre></div></div>
+
+<p>Claude now reads and writes files inside <code class="language-plaintext highlighter-rouge">myproject-feature</code> only. You can go back to your main folder and keep editing, run the app, or start a second Claude session on a different branch. The two sessions never touch the same files.</p>
+
+<p>Claude Code can also manage this for you. When you ask a subagent to work in isolation, it can create a temporary worktree, do its work there, and clean it up when the branch has no changes left.</p>
+
+<h2 id="listing-and-removing-worktrees">Listing and Removing Worktrees</h2>
+
+<p>Check what you have with <code class="language-plaintext highlighter-rouge">git worktree list</code>.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git worktree list
+</code></pre></div></div>
+
+<p>When you are done with a worktree, remove it. This deletes the folder and unregisters it from the repo.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git worktree remove ../myproject-feature
+</code></pre></div></div>
+
+<p>If you deleted the folder by hand, run <code class="language-plaintext highlighter-rouge">git worktree prune</code> to clear the stale entry.</p>
+
+<h2 id="when-worktrees-help">When Worktrees Help</h2>
+
+<ul>
+  <li>Reviewing Claude’s changes on a branch while you keep working on another.</li>
+  <li>Running two Claude sessions in parallel on separate features.</li>
+  <li>Testing a build without stashing or committing half-finished work.</li>
+</ul>
+
+<h2 id="when-they-get-in-the-way">When They Get in the Way</h2>
+
+<ul>
+  <li>Small changes where a single branch switch would do.</li>
+  <li>Tooling that hardcodes an absolute path and breaks in a second folder.</li>
+  <li>Node or build caches that you now have to install once per worktree.</li>
+</ul>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Git worktrees give Claude Code a folder of its own without a second clone. Create one with <code class="language-plaintext highlighter-rouge">git worktree add</code>, run Claude inside it, and remove it with <code class="language-plaintext highlighter-rouge">git worktree remove</code> when the branch is merged. If you often want Claude to work while you keep going, keep a spare worktree around and hand it the branch. Happy coding!</p>]]></content><author><name>Young Choi</name></author><category term="development" /><category term="claude-code" /><category term="git" /><summary type="html"><![CDATA[When Claude Code runs a long task, it edits files in your working directory. If you want to keep working while it does, you end up fighting over the same files. Git worktrees solve this. They let one repository check out several branches into separate folders at once, so Claude can work in one folder while you stay in another.]]></summary></entry><entry xml:lang="en"><title type="html">Storing Heterogeneous Objects in PostgreSQL</title><link href="https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL" rel="alternate" type="text/html" title="Storing Heterogeneous Objects in PostgreSQL" /><published>2024-07-08T00:00:00-07:00</published><updated>2024-07-08T00:00:00-07:00</updated><id>https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL</id><content type="html" xml:base="https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL"><![CDATA[<p>Storing different types of objects in one PostgreSQL table is tricky. Each type shares a few fields and carries its own. There are three practical ways to handle it, and each one trades flexibility for structure in a different spot.</p>
 
 <h2 id="scenario-restaurant-order-system">Scenario: Restaurant Order System</h2>
 
-<p>Imagine we have a Transaction table that stores different types of orders. Each order type has some common fields, but also unique fields.</p>
+<p>Imagine a <code class="language-plaintext highlighter-rouge">transactions</code> table that stores different types of orders. Each order type has some common fields and some unique ones.</p>
 
 <h3 id="using-jsonb-for-orders">Using JSONB for Orders</h3>
 
-<p>The JSONB data type is flexible. It allows you to store various order types without much hassle.</p>
+<p>The <code class="language-plaintext highlighter-rouge">JSONB</code> type is flexible. It lets you store different order types in one column without committing to a fixed shape.</p>
 
 <h4 id="schema">Schema</h4>
 
@@ -18,7 +84,7 @@
 
 <h4 id="inserting-data">Inserting Data</h4>
 
-<p>You can insert data by converting orders to JSON.</p>
+<p>You insert data by writing the orders as JSON.</p>
 
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">transactions</span> <span class="p">(</span><span class="n">orders</span><span class="p">)</span> <span class="k">VALUES</span> <span class="p">(</span>
     <span class="s1">'[
@@ -30,7 +96,7 @@
 
 <h4 id="querying-data">Querying Data</h4>
 
-<p>Retrieving specific orders is easy.</p>
+<p>Retrieving specific orders stays simple.</p>
 
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">transactions</span>
 <span class="k">WHERE</span> <span class="n">orders</span> <span class="o">@&gt;</span> <span class="s1">'[{"type": "HamburgerOrder"}]'</span><span class="p">;</span>
@@ -45,7 +111,7 @@
 
 <h3 id="using-a-normalized-schema">Using a Normalized Schema</h3>
 
-<p>This method involves multiple tables and foreign keys. It keeps the database structure clean and efficient.</p>
+<p>This method splits the data across several tables joined by foreign keys. It keeps the structure explicit and efficient.</p>
 
 <h4 id="schema-1">Schema</h4>
 
@@ -87,7 +153,7 @@
 
 <h4 id="inserting-data-1">Inserting Data</h4>
 
-<p>Insert data step-by-step.</p>
+<p>Insert the rows step by step.</p>
 
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">transactions</span> <span class="k">DEFAULT</span> <span class="k">VALUES</span> <span class="n">RETURNING</span> <span class="n">id</span><span class="p">;</span>
 
@@ -100,7 +166,7 @@
 
 <h4 id="querying-data-1">Querying Data</h4>
 
-<p>Use JOIN queries to get all orders.</p>
+<p>Use <code class="language-plaintext highlighter-rouge">JOIN</code> queries to pull the orders back together.</p>
 
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="n">o</span><span class="p">.</span><span class="n">id</span> <span class="k">AS</span> <span class="n">order_id</span><span class="p">,</span> <span class="n">o</span><span class="p">.</span><span class="k">type</span><span class="p">,</span> <span class="n">o</span><span class="p">.</span><span class="n">common_field1</span><span class="p">,</span> <span class="n">o</span><span class="p">.</span><span class="n">common_field2</span><span class="p">,</span>
        <span class="n">h</span><span class="p">.</span><span class="n">unique_hamburger_field</span><span class="p">,</span> <span class="n">p</span><span class="p">.</span><span class="n">unique_pizza_field</span>
@@ -119,7 +185,7 @@
 
 <h3 id="hybrid-approach-common-fields--jsonb">Hybrid Approach: Common Fields + JSONB</h3>
 
-<p>This approach combines the best of both worlds. Common fields are stored directly in columns. Unique fields go into a JSONB column.</p>
+<p>This approach mixes both. Common fields live in their own columns. Unique fields go into a <code class="language-plaintext highlighter-rouge">JSONB</code> column.</p>
 
 <h4 id="schema-2">Schema</h4>
 
@@ -135,7 +201,7 @@
 
 <h4 id="inserting-data-2">Inserting Data</h4>
 
-<p>Insert data with common fields and JSONB.</p>
+<p>Insert the common fields as columns and the rest as JSON.</p>
 
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">orders</span> <span class="p">(</span><span class="n">transaction_id</span><span class="p">,</span> <span class="k">type</span><span class="p">,</span> <span class="n">common_field1</span><span class="p">,</span> <span class="n">common_field2</span><span class="p">,</span> <span class="n">specific_fields</span><span class="p">)</span> <span class="k">VALUES</span>
 <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">'HamburgerOrder'</span><span class="p">,</span> <span class="s1">'value1'</span><span class="p">,</span> <span class="s1">'value2'</span><span class="p">,</span> <span class="s1">'{"unique_hamburger_field": "hamburgerValue"}'</span><span class="p">::</span><span class="n">jsonb</span><span class="p">),</span>
@@ -144,7 +210,7 @@
 
 <h4 id="querying-data-2">Querying Data</h4>
 
-<p>Query directly from the orders table.</p>
+<p>Query the common fields straight from the columns.</p>
 
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">orders</span> <span class="k">WHERE</span> <span class="n">transaction_id</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
 </code></pre></div></div>
@@ -158,15 +224,15 @@
 
 <h2 id="conclusion">Conclusion</h2>
 
-<p>Choosing the right method depends on your needs. JSONB is flexible but validation can be tricky. A normalized schema ensures data integrity but requires more tables. The hybrid approach offers a balanced solution. Each method has its pros and cons. Pick the one that fits your project best. Happy coding!</p>]]></content><author><name>Young Choi</name></author><category term="development" /><category term="java" /><category term="sql" /><summary type="html"><![CDATA[Storing different types of objects in a PostgreSQL database can be tricky. But don’t worry, it’s manageable. Let’s explore three practical ways to handle this. We will keep it simple and straightforward.]]></summary></entry><entry xml:lang="en"><title type="html">Using Interface for Controller Requests in Java Spring Framework</title><link href="https://whyjun.github.io/blog/Using-Interface-for-Controller-Requests-in-Java%20Spring-Framework" rel="alternate" type="text/html" title="Using Interface for Controller Requests in Java Spring Framework" /><published>2024-07-06T00:00:00-07:00</published><updated>2024-07-06T00:00:00-07:00</updated><id>https://whyjun.github.io/blog/Using-Interface-for-Controller-Request</id><content type="html" xml:base="https://whyjun.github.io/blog/Using-Interface-for-Controller-Requests-in-Java%20Spring-Framework"><![CDATA[<p>When building a REST API with Java Spring Framework, handling multiple types of requests efficiently can be challenging. One effective approach is to use interfaces for controller requests. In this blog post, we’ll walk through an example using a restaurant order system. We’ll handle different types of orders (like hamburger and pizza) with a single endpoint.</p>
+<p>The right method depends on how strict your data has to be. <code class="language-plaintext highlighter-rouge">JSONB</code> is flexible but hard to validate. A normalized schema protects integrity but adds tables and joins. The hybrid keeps common fields queryable while leaving room for the odd ones. Pick the one that matches the shape of your data. Happy coding!</p>]]></content><author><name>Young Choi</name></author><category term="development" /><category term="java" /><category term="sql" /><summary type="html"><![CDATA[Storing different types of objects in one PostgreSQL table is tricky. Each type shares a few fields and carries its own. There are three practical ways to handle it, and each one trades flexibility for structure in a different spot.]]></summary></entry><entry xml:lang="en"><title type="html">Using Interface for Controller Requests in Java Spring Framework</title><link href="https://whyjun.github.io/blog/Using-Interface-for-Controller-Requests-in-Java%20Spring-Framework" rel="alternate" type="text/html" title="Using Interface for Controller Requests in Java Spring Framework" /><published>2024-07-06T00:00:00-07:00</published><updated>2024-07-06T00:00:00-07:00</updated><id>https://whyjun.github.io/blog/Using-Interface-for-Controller-Request</id><content type="html" xml:base="https://whyjun.github.io/blog/Using-Interface-for-Controller-Requests-in-Java%20Spring-Framework"><![CDATA[<p>When you build a REST API with Spring, one endpoint often has to accept several kinds of request. Using an interface for the request body lets a single endpoint handle them all. The example here is a restaurant order system, where one <code class="language-plaintext highlighter-rouge">/v1/orders</code> endpoint takes both hamburger and pizza orders.</p>
 
 <h2 id="scenario-restaurant-order-system">Scenario: Restaurant Order System</h2>
 
-<p>Imagine we have an endpoint /v1/orders that accepts different types of orders. Each order type has some common fields, but also unique fields. We’ll use an interface called Order and implement it with specific classes for each order type. Let’s dive in.</p>
+<p>We have an endpoint <code class="language-plaintext highlighter-rouge">/v1/orders</code> that accepts different order types. Every order shares a few fields and adds its own. We define an <code class="language-plaintext highlighter-rouge">Order</code> interface and implement it with one class per order type.</p>
 
 <h3 id="step-1-define-the-order-interface">Step 1: Define the Order Interface</h3>
 
-<p>First, we create an Order interface with common fields that all orders will have.</p>
+<p>Start with an <code class="language-plaintext highlighter-rouge">Order</code> interface holding what every order has in common.</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Order</span> <span class="o">{</span>
     <span class="nc">String</span> <span class="nf">getOrderType</span><span class="o">();</span>
@@ -175,7 +241,7 @@
 
 <h3 id="step-2-implement-order-types">Step 2: Implement Order Types</h3>
 
-<p>Next, we create classes for specific order types, like HamburgerOrder and PizzaOrder.</p>
+<p>Then write a class per order type, like <code class="language-plaintext highlighter-rouge">HamburgerOrder</code> and <code class="language-plaintext highlighter-rouge">PizzaOrder</code>.</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">lombok.Data</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">javax.validation.constraints.NotNull</span><span class="o">;</span>
@@ -209,7 +275,7 @@
 
 <h3 id="step-3-create-the-controller">Step 3: Create the Controller</h3>
 
-<p>Now, we create the controller to handle the /v1/orders POST request. We’ll use <code class="language-plaintext highlighter-rouge">@RequestBody</code> and <code class="language-plaintext highlighter-rouge">@Valid</code> annotations to ensure the request body is correctly validated.</p>
+<p>The controller handles the <code class="language-plaintext highlighter-rouge">/v1/orders</code> POST request. The <code class="language-plaintext highlighter-rouge">@RequestBody</code> and <code class="language-plaintext highlighter-rouge">@Valid</code> annotations bind and validate the incoming JSON.</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">org.springframework.http.HttpStatus</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">org.springframework.http.ResponseEntity</span><span class="o">;</span>
@@ -242,7 +308,7 @@
 
 <h3 id="step-4-configure-jackson-for-polymorphic-deserialization">Step 4: Configure Jackson for Polymorphic Deserialization</h3>
 
-<p>To handle polymorphic deserialization, we need to configure Jackson. This allows us to deserialize JSON into the correct Order implementation.</p>
+<p>Jackson needs to know which class to build from the JSON. Annotate the <code class="language-plaintext highlighter-rouge">Order</code> interface so it reads the <code class="language-plaintext highlighter-rouge">orderType</code> field and picks the matching implementation.</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">com.fasterxml.jackson.annotation.JsonSubTypes</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">com.fasterxml.jackson.annotation.JsonTypeInfo</span><span class="o">;</span>
@@ -263,7 +329,7 @@
 
 <h3 id="step-5-add-global-validation-handling">Step 5: Add Global Validation Handling</h3>
 
-<p>Finally, add global exception handling to manage validation errors.</p>
+<p>Finally, handle validation errors in one place.</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">org.springframework.http.HttpStatus</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">org.springframework.http.ResponseEntity</span><span class="o">;</span>
@@ -283,56 +349,40 @@
 
 <h2 id="conclusion">Conclusion</h2>
 
-<p>Using interfaces for controller requests in Java Spring Framework allows you to handle multiple types of requests cleanly and efficiently. In this example, we created an Order interface and implemented specific order types, handled polymorphic deserialization with Jackson, and ensured validation with <code class="language-plaintext highlighter-rouge">@Valid</code> and <code class="language-plaintext highlighter-rouge">@RequestBody</code>. This approach makes your code more flexible and easier to maintain. Happy coding!</p>]]></content><author><name>Young Choi</name></author><category term="development" /><category term="java" /><summary type="html"><![CDATA[When building a REST API with Java Spring Framework, handling multiple types of requests efficiently can be challenging. One effective approach is to use interfaces for controller requests. In this blog post, we’ll walk through an example using a restaurant order system. We’ll handle different types of orders (like hamburger and pizza) with a single endpoint.]]></summary></entry><entry xml:lang="en"><title type="html">The Importance of Signals from Test Codes</title><link href="https://whyjun.github.io/blog/The-Importance-of-Signals-from-Test-Codes" rel="alternate" type="text/html" title="The Importance of Signals from Test Codes" /><published>2024-06-30T00:00:00-07:00</published><updated>2024-06-30T00:00:00-07:00</updated><id>https://whyjun.github.io/blog/The%20Importance-of-Signals-from-Test-Codes</id><content type="html" xml:base="https://whyjun.github.io/blog/The-Importance-of-Signals-from-Test-Codes"><![CDATA[<p>When you write test code, it can tell you a lot about your main code. If you find it hard to write tests, it often means there are problems in your code design. Let’s explore why these signals are important and what they can teach you.</p>
+<p>An interface for the request body lets one endpoint accept many order types without a pile of branching at the door. We defined an <code class="language-plaintext highlighter-rouge">Order</code> interface, implemented it per type, let Jackson pick the right class from <code class="language-plaintext highlighter-rouge">orderType</code>, and validated with <code class="language-plaintext highlighter-rouge">@Valid</code>. Adding a new order type now means writing one class and one Jackson subtype, and nothing else has to change. Happy coding!</p>]]></content><author><name>Young Choi</name></author><category term="development" /><category term="java" /><summary type="html"><![CDATA[When you build a REST API with Spring, one endpoint often has to accept several kinds of request. Using an interface for the request body lets a single endpoint handle them all. The example here is a restaurant order system, where one /v1/orders endpoint takes both hamburger and pizza orders.]]></summary></entry><entry xml:lang="en"><title type="html">The Importance of Signals from Test Codes</title><link href="https://whyjun.github.io/blog/The-Importance-of-Signals-from-Test-Codes" rel="alternate" type="text/html" title="The Importance of Signals from Test Codes" /><published>2024-06-30T00:00:00-07:00</published><updated>2024-06-30T00:00:00-07:00</updated><id>https://whyjun.github.io/blog/The%20Importance-of-Signals-from-Test-Codes</id><content type="html" xml:base="https://whyjun.github.io/blog/The-Importance-of-Signals-from-Test-Codes"><![CDATA[<p>When you write tests, they tell you a lot about your main code. If a test is hard to write, the problem is usually in the code you are testing, not in the test. Those difficulties are signals, and they are worth reading.</p>
 
 <h2 id="why-test-codes-matter">Why Test Codes Matter</h2>
 
-<p>Test codes are like a mirror for your main code. They show you its strengths and weaknesses. Here are some key signals to watch for:</p>
+<p>Tests are a mirror for your main code. They show its strengths and its weak spots. A few signals to watch for:</p>
 
 <ul>
-  <li>Difficulty Writing Tests: If you struggle to write tests, your code might be too complex or not modular.</li>
-  <li>Excessive Mocking: If you need to mock too many things, your code might be tightly coupled.</li>
-  <li>Long Setup Times: If setting up a test takes a long time, your code may have too many dependencies.</li>
-  <li>Hidden Dependencies: If certain dependencies are not obvious, your code might be hard to maintain or extend.</li>
+  <li>Difficulty writing tests: the code might be too complex or not modular.</li>
+  <li>Excessive mocking: the code might be tightly coupled.</li>
+  <li>Long setup times: the code might carry too many dependencies.</li>
+  <li>Hidden dependencies: the code might be hard to maintain or extend.</li>
 </ul>
 
 <h2 id="key-signals-and-what-they-mean">Key Signals and What They Mean</h2>
 
 <h3 id="excessive-mocking">Excessive Mocking</h3>
 
-<ul>
-  <li><strong>What It Is</strong>: Mocking means creating fake objects that mimic real ones.</li>
-  <li><strong>The Signal</strong>: Needing too many mocks usually means your classes are too dependent on each other.</li>
-  <li><strong>The Solution</strong>: Improve your code design. Break down large classes into smaller, independent ones.</li>
-</ul>
+<p>Mocking replaces a real dependency with a fake one. A few mocks are normal. When a single test needs many of them, the class under test leans on too many other classes. The fix is in the design: break the large class into smaller ones that can stand on their own.</p>
 
 <h3 id="long-setup-times">Long Setup Times</h3>
 
-<ul>
-  <li><strong>What It Is</strong>: Setting up tests should be quick and easy.</li>
-  <li><strong>The Signal</strong>: Long setup times can mean your code has too many dependencies or lacks modularity.</li>
-  <li><strong>The Solution</strong>: Simplify your code. Use dependency injection to reduce setup complexity.</li>
-</ul>
+<p>Setting up a test should be quick. When it drags, the code usually has too many dependencies or too little structure. Dependency injection helps here, since the test can supply what it needs instead of building the whole world first.</p>
 
 <h3 id="difficulty-isolating-tests">Difficulty Isolating Tests</h3>
 
-<ul>
-  <li><strong>What It Is</strong>: Each test should run independently.</li>
-  <li><strong>The Signal</strong>: If tests affect each other, your code might have hidden dependencies.</li>
-  <li><strong>The Solution</strong>: Make your code more modular. Ensure each part of your code does one thing well.</li>
-</ul>
+<p>Each test should run on its own. When one test changes the outcome of another, the code has shared state hiding somewhere. Make each unit do one thing so the tests stop leaking into each other.</p>
 
 <h3 id="hidden-dependencies">Hidden Dependencies</h3>
 
-<ul>
-  <li><strong>What It Is</strong>: Hidden dependencies are those that are not immediately obvious, such as using Instant.now directly within a method.</li>
-  <li><strong>The Signal</strong>: If you find that certain parts of your code rely on hidden dependencies, it’s hard to write unit tests without mocks.</li>
-  <li><strong>The Solution</strong>: Use dependency inversion. For example, instead of setting the current timestamp using Instant.now directly, inject a clock interface and use it to get the current time. This decouples your code from the specific implementation and makes it easier to test.</li>
-</ul>
+<p>Some dependencies are not visible in a method’s signature. Calling <code class="language-plaintext highlighter-rouge">Instant.now()</code> inside a method is one of them: the method quietly depends on the system clock, so you cannot test it without controlling time. Dependency inversion fixes this. Instead of reading the clock directly, inject a clock interface and ask it for the current time.</p>
 
 <h4 id="implementing-dependency-inversion">Implementing Dependency Inversion</h4>
 
-<p>Here’s a practical example to illustrate how to handle hidden dependencies using dependency inversion:</p>
+<p>Here is the same idea in code.</p>
 
 <p>Before:</p>
 
@@ -374,26 +424,20 @@
 
 <h2 id="benefits-of-listening-to-these-signals">Benefits of Listening to These Signals</h2>
 
-<p>By paying attention to these signals, you can improve your code design. This makes your code:</p>
-
-<ul>
-  <li>Easier to Understand: Clear, modular code is easier to read and maintain.</li>
-  <li>More Reliable: Well-designed code has fewer bugs and is easier to test.</li>
-  <li>More Flexible: Good design makes it easier to add new features.</li>
-</ul>
+<p>Reading these signals improves the design. Modular code is easier to follow, has fewer places for bugs to hide, and takes less effort to extend when the requirements change.</p>
 
 <h2 id="practical-steps-to-improve-your-code">Practical Steps to Improve Your Code</h2>
 
 <ul>
-  <li>Refactor Regularly: Don’t wait until your code is a mess. Refactor as you go to keep your code clean.</li>
-  <li>Use Dependency Injection: This reduces the need for mocks and makes your code more modular.</li>
-  <li>Write Small, Focused Functions: Each function should do one thing and do it well. This makes them easier to test.</li>
-  <li>Identify and Eliminate Hidden Dependencies: Use patterns like port-adapter and dependency inversion to decouple your code.</li>
+  <li>Refactor regularly. Don’t wait until the code is a mess. Clean it up as you go.</li>
+  <li>Use dependency injection. It reduces the need for mocks and keeps the code modular.</li>
+  <li>Write small, focused functions. Each one should do a single thing, which makes it easy to test.</li>
+  <li>Find and remove hidden dependencies. Patterns like port-adapter and dependency inversion decouple your code.</li>
 </ul>
 
 <h2 id="conclusion">Conclusion</h2>
 
-<p>Test codes are valuable tools. They don’t just check if your code works; they also show you where it needs improvement. By paying attention to the signals from your test codes, you can make your code more robust, easier to maintain, and more enjoyable to work with. Keep your tests simple, listen to what they’re telling you, and your code will thank you.</p>]]></content><author><name>Young Choi</name></author><category term="development" /><category term="test" /><summary type="html"><![CDATA[When you write test code, it can tell you a lot about your main code. If you find it hard to write tests, it often means there are problems in your code design. Let’s explore why these signals are important and what they can teach you.]]></summary></entry><entry xml:lang="ko"><title type="html">Go에서 omitempty 태그 사용하기</title><link href="https://whyjun.github.io/golang/Golang-Omitempty-Tag" rel="alternate" type="text/html" title="Go에서 omitempty 태그 사용하기" /><published>2023-03-15T00:00:00-07:00</published><updated>2023-03-15T00:00:00-07:00</updated><id>https://whyjun.github.io/golang/Golang-Omitempty-Tag</id><content type="html" xml:base="https://whyjun.github.io/golang/Golang-Omitempty-Tag"><![CDATA[<p>Go로 웹 서버를 개발하다 보면 JSON 데이터를 주고 받는 경우가 많이 있습니다. struct를 JSON으로 바꿀 때 값이 Zero Value(각 type별 기본 값)이거나 nil인 경우 그 값을 보내지 않아야할 때가 있습니다. 이런 경우, <code class="language-plaintext highlighter-rouge">omitempty</code> 태그를 활용하면 JSON에서 쉽게 생략할 수 있습니다.</p>
+<p>Tests do more than check that your code works. They point at where the design is weak. When a test is painful to write, listen to it and fix the code underneath instead of forcing the test around it. Keep your tests simple, and let them guide the design.</p>]]></content><author><name>Young Choi</name></author><category term="development" /><category term="test" /><summary type="html"><![CDATA[When you write tests, they tell you a lot about your main code. If a test is hard to write, the problem is usually in the code you are testing, not in the test. Those difficulties are signals, and they are worth reading.]]></summary></entry><entry xml:lang="ko"><title type="html">Go에서 omitempty 태그 사용하기</title><link href="https://whyjun.github.io/golang/Golang-Omitempty-Tag" rel="alternate" type="text/html" title="Go에서 omitempty 태그 사용하기" /><published>2023-03-15T00:00:00-07:00</published><updated>2023-03-15T00:00:00-07:00</updated><id>https://whyjun.github.io/golang/Golang-Omitempty-Tag</id><content type="html" xml:base="https://whyjun.github.io/golang/Golang-Omitempty-Tag"><![CDATA[<p>Go로 웹 서버를 개발하다 보면 JSON 데이터를 주고 받는 경우가 많이 있습니다. struct를 JSON으로 바꿀 때 값이 Zero Value(각 type별 기본 값)이거나 nil인 경우 그 값을 보내지 않아야할 때가 있습니다. 이런 경우, <code class="language-plaintext highlighter-rouge">omitempty</code> 태그를 활용하면 JSON에서 쉽게 생략할 수 있습니다.</p>
 
 <p>struct 필드에 <code class="language-plaintext highlighter-rouge">omitempty</code> 태그가 있다면, Go 언어의 JSON 인코더는 그 필드의 값이 Zero Value거나 nil일 때 그 필드를 생략합니다. 이는 JSON으로 데이터를 보내고 받는 API를 개발할 때 유용하고 특히 JSON 메세지의 사이즈를 줄일 수 있다는 장점이 있습니다.</p>
 

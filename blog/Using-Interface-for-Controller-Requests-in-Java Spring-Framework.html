@@ -21,8 +21,8 @@
 <meta property="og:title" content="Using Interface for Controller Requests in Java Spring Framework" />
 <meta name="author" content="Young Choi" />
 <meta property="og:locale" content="ko_KR" />
-<meta name="description" content="When building a REST API with Java Spring Framework, handling multiple types of requests efficiently can be challenging. One effective approach is to use interfaces for controller requests. In this blog post, we’ll walk through an example using a restaurant order system. We’ll handle different types of orders (like hamburger and pizza) with a single endpoint." />
-<meta property="og:description" content="When building a REST API with Java Spring Framework, handling multiple types of requests efficiently can be challenging. One effective approach is to use interfaces for controller requests. In this blog post, we’ll walk through an example using a restaurant order system. We’ll handle different types of orders (like hamburger and pizza) with a single endpoint." />
+<meta name="description" content="When you build a REST API with Spring, one endpoint often has to accept several kinds of request. Using an interface for the request body lets a single endpoint handle them all. The example here is a restaurant order system, where one /v1/orders endpoint takes both hamburger and pizza orders." />
+<meta property="og:description" content="When you build a REST API with Spring, one endpoint often has to accept several kinds of request. Using an interface for the request body lets a single endpoint handle them all. The example here is a restaurant order system, where one /v1/orders endpoint takes both hamburger and pizza orders." />
 <link rel="canonical" href="https://whyjun.github.io/blog/Using-Interface-for-Controller-Requests-in-Java%20Spring-Framework" />
 <meta property="og:url" content="https://whyjun.github.io/blog/Using-Interface-for-Controller-Requests-in-Java%20Spring-Framework" />
 <meta property="og:site_name" content="Grow with Code" />
@@ -33,7 +33,7 @@
 <meta name="twitter:site" content="@youngchoi_dev" />
 <meta name="twitter:creator" content="@https://x.com/youngchoi_dev" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Young Choi"},"dateModified":"2024-07-06T00:00:00-07:00","datePublished":"2024-07-06T00:00:00-07:00","description":"When building a REST API with Java Spring Framework, handling multiple types of requests efficiently can be challenging. One effective approach is to use interfaces for controller requests. In this blog post, we’ll walk through an example using a restaurant order system. We’ll handle different types of orders (like hamburger and pizza) with a single endpoint.","headline":"Using Interface for Controller Requests in Java Spring Framework","mainEntityOfPage":{"@type":"WebPage","@id":"https://whyjun.github.io/blog/Using-Interface-for-Controller-Requests-in-Java%20Spring-Framework"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://whyjun.github.io/assets/images/young-choi-gopher-image.png"},"name":"Young Choi"},"url":"https://whyjun.github.io/blog/Using-Interface-for-Controller-Requests-in-Java%20Spring-Framework"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Young Choi"},"dateModified":"2024-07-06T00:00:00-07:00","datePublished":"2024-07-06T00:00:00-07:00","description":"When you build a REST API with Spring, one endpoint often has to accept several kinds of request. Using an interface for the request body lets a single endpoint handle them all. The example here is a restaurant order system, where one /v1/orders endpoint takes both hamburger and pizza orders.","headline":"Using Interface for Controller Requests in Java Spring Framework","mainEntityOfPage":{"@type":"WebPage","@id":"https://whyjun.github.io/blog/Using-Interface-for-Controller-Requests-in-Java%20Spring-Framework"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://whyjun.github.io/assets/images/young-choi-gopher-image.png"},"name":"Young Choi"},"url":"https://whyjun.github.io/blog/Using-Interface-for-Controller-Requests-in-Java%20Spring-Framework"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -143,15 +143,15 @@
 
       <div class="page-content">
         <div class="e-content">
-          <p>When building a REST API with Java Spring Framework, handling multiple types of requests efficiently can be challenging. One effective approach is to use interfaces for controller requests. In this blog post, we’ll walk through an example using a restaurant order system. We’ll handle different types of orders (like hamburger and pizza) with a single endpoint.</p>
+          <p>When you build a REST API with Spring, one endpoint often has to accept several kinds of request. Using an interface for the request body lets a single endpoint handle them all. The example here is a restaurant order system, where one <code class="language-plaintext highlighter-rouge">/v1/orders</code> endpoint takes both hamburger and pizza orders.</p>
 
 <h2 id="scenario-restaurant-order-system">Scenario: Restaurant Order System</h2>
 
-<p>Imagine we have an endpoint /v1/orders that accepts different types of orders. Each order type has some common fields, but also unique fields. We’ll use an interface called Order and implement it with specific classes for each order type. Let’s dive in.</p>
+<p>We have an endpoint <code class="language-plaintext highlighter-rouge">/v1/orders</code> that accepts different order types. Every order shares a few fields and adds its own. We define an <code class="language-plaintext highlighter-rouge">Order</code> interface and implement it with one class per order type.</p>
 
 <h3 id="step-1-define-the-order-interface">Step 1: Define the Order Interface</h3>
 
-<p>First, we create an Order interface with common fields that all orders will have.</p>
+<p>Start with an <code class="language-plaintext highlighter-rouge">Order</code> interface holding what every order has in common.</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Order</span> <span class="o">{</span>
     <span class="nc">String</span> <span class="nf">getOrderType</span><span class="o">();</span>
@@ -160,7 +160,7 @@
 
 <h3 id="step-2-implement-order-types">Step 2: Implement Order Types</h3>
 
-<p>Next, we create classes for specific order types, like HamburgerOrder and PizzaOrder.</p>
+<p>Then write a class per order type, like <code class="language-plaintext highlighter-rouge">HamburgerOrder</code> and <code class="language-plaintext highlighter-rouge">PizzaOrder</code>.</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">lombok.Data</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">javax.validation.constraints.NotNull</span><span class="o">;</span>
@@ -194,7 +194,7 @@
 
 <h3 id="step-3-create-the-controller">Step 3: Create the Controller</h3>
 
-<p>Now, we create the controller to handle the /v1/orders POST request. We’ll use <code class="language-plaintext highlighter-rouge">@RequestBody</code> and <code class="language-plaintext highlighter-rouge">@Valid</code> annotations to ensure the request body is correctly validated.</p>
+<p>The controller handles the <code class="language-plaintext highlighter-rouge">/v1/orders</code> POST request. The <code class="language-plaintext highlighter-rouge">@RequestBody</code> and <code class="language-plaintext highlighter-rouge">@Valid</code> annotations bind and validate the incoming JSON.</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">org.springframework.http.HttpStatus</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">org.springframework.http.ResponseEntity</span><span class="o">;</span>
@@ -227,7 +227,7 @@
 
 <h3 id="step-4-configure-jackson-for-polymorphic-deserialization">Step 4: Configure Jackson for Polymorphic Deserialization</h3>
 
-<p>To handle polymorphic deserialization, we need to configure Jackson. This allows us to deserialize JSON into the correct Order implementation.</p>
+<p>Jackson needs to know which class to build from the JSON. Annotate the <code class="language-plaintext highlighter-rouge">Order</code> interface so it reads the <code class="language-plaintext highlighter-rouge">orderType</code> field and picks the matching implementation.</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">com.fasterxml.jackson.annotation.JsonSubTypes</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">com.fasterxml.jackson.annotation.JsonTypeInfo</span><span class="o">;</span>
@@ -248,7 +248,7 @@
 
 <h3 id="step-5-add-global-validation-handling">Step 5: Add Global Validation Handling</h3>
 
-<p>Finally, add global exception handling to manage validation errors.</p>
+<p>Finally, handle validation errors in one place.</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">org.springframework.http.HttpStatus</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">org.springframework.http.ResponseEntity</span><span class="o">;</span>
@@ -268,7 +268,7 @@
 
 <h2 id="conclusion">Conclusion</h2>
 
-<p>Using interfaces for controller requests in Java Spring Framework allows you to handle multiple types of requests cleanly and efficiently. In this example, we created an Order interface and implemented specific order types, handled polymorphic deserialization with Jackson, and ensured validation with <code class="language-plaintext highlighter-rouge">@Valid</code> and <code class="language-plaintext highlighter-rouge">@RequestBody</code>. This approach makes your code more flexible and easier to maintain. Happy coding!</p>
+<p>An interface for the request body lets one endpoint accept many order types without a pile of branching at the door. We defined an <code class="language-plaintext highlighter-rouge">Order</code> interface, implemented it per type, let Jackson pick the right class from <code class="language-plaintext highlighter-rouge">orderType</code>, and validated with <code class="language-plaintext highlighter-rouge">@Valid</code>. Adding a new order type now means writing one class and one Jackson subtype, and nothing else has to change. Happy coding!</p>
 
         </div>
       
@@ -321,7 +321,7 @@
 <!-- end custom footer snippets -->
 <div class="copyright">
     
-      <p>&copy; 2025 Grow with Code. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://github.com/mmistakes/so-simple-theme" rel="nofollow">So Simple</a>.</p>
+      <p>&copy; 2026 Grow with Code. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://github.com/mmistakes/so-simple-theme" rel="nofollow">So Simple</a>.</p>
     
   </div>
 </footer>

@@ -21,8 +21,8 @@
 <meta property="og:title" content="The Importance of Signals from Test Codes" />
 <meta name="author" content="Young Choi" />
 <meta property="og:locale" content="ko_KR" />
-<meta name="description" content="When you write test code, it can tell you a lot about your main code. If you find it hard to write tests, it often means there are problems in your code design. Let’s explore why these signals are important and what they can teach you." />
-<meta property="og:description" content="When you write test code, it can tell you a lot about your main code. If you find it hard to write tests, it often means there are problems in your code design. Let’s explore why these signals are important and what they can teach you." />
+<meta name="description" content="When you write tests, they tell you a lot about your main code. If a test is hard to write, the problem is usually in the code you are testing, not in the test. Those difficulties are signals, and they are worth reading." />
+<meta property="og:description" content="When you write tests, they tell you a lot about your main code. If a test is hard to write, the problem is usually in the code you are testing, not in the test. Those difficulties are signals, and they are worth reading." />
 <link rel="canonical" href="https://whyjun.github.io/blog/The-Importance-of-Signals-from-Test-Codes" />
 <meta property="og:url" content="https://whyjun.github.io/blog/The-Importance-of-Signals-from-Test-Codes" />
 <meta property="og:site_name" content="Grow with Code" />
@@ -33,7 +33,7 @@
 <meta name="twitter:site" content="@youngchoi_dev" />
 <meta name="twitter:creator" content="@https://x.com/youngchoi_dev" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Young Choi"},"dateModified":"2024-06-30T00:00:00-07:00","datePublished":"2024-06-30T00:00:00-07:00","description":"When you write test code, it can tell you a lot about your main code. If you find it hard to write tests, it often means there are problems in your code design. Let’s explore why these signals are important and what they can teach you.","headline":"The Importance of Signals from Test Codes","mainEntityOfPage":{"@type":"WebPage","@id":"https://whyjun.github.io/blog/The-Importance-of-Signals-from-Test-Codes"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://whyjun.github.io/assets/images/young-choi-gopher-image.png"},"name":"Young Choi"},"url":"https://whyjun.github.io/blog/The-Importance-of-Signals-from-Test-Codes"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Young Choi"},"dateModified":"2024-06-30T00:00:00-07:00","datePublished":"2024-06-30T00:00:00-07:00","description":"When you write tests, they tell you a lot about your main code. If a test is hard to write, the problem is usually in the code you are testing, not in the test. Those difficulties are signals, and they are worth reading.","headline":"The Importance of Signals from Test Codes","mainEntityOfPage":{"@type":"WebPage","@id":"https://whyjun.github.io/blog/The-Importance-of-Signals-from-Test-Codes"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://whyjun.github.io/assets/images/young-choi-gopher-image.png"},"name":"Young Choi"},"url":"https://whyjun.github.io/blog/The-Importance-of-Signals-from-Test-Codes"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -117,7 +117,7 @@
             <a class="u-url" rel="me" href="https://github.com/whyjun"><i class="fab fa-github-square fa-lg" title="GitHub"></i></a>
           </li></ul><!-- 
 
-<span class="read-time">3 min read</span>
+<span class="read-time">2 min read</span>
  -->
     <time class="page-date dt-published" datetime="2024-06-30T00:00:00-07:00"><a class="u-url" href="">June 30, 2024</a>
 </time>
@@ -143,56 +143,40 @@
 
       <div class="page-content">
         <div class="e-content">
-          <p>When you write test code, it can tell you a lot about your main code. If you find it hard to write tests, it often means there are problems in your code design. Let’s explore why these signals are important and what they can teach you.</p>
+          <p>When you write tests, they tell you a lot about your main code. If a test is hard to write, the problem is usually in the code you are testing, not in the test. Those difficulties are signals, and they are worth reading.</p>
 
 <h2 id="why-test-codes-matter">Why Test Codes Matter</h2>
 
-<p>Test codes are like a mirror for your main code. They show you its strengths and weaknesses. Here are some key signals to watch for:</p>
+<p>Tests are a mirror for your main code. They show its strengths and its weak spots. A few signals to watch for:</p>
 
 <ul>
-  <li>Difficulty Writing Tests: If you struggle to write tests, your code might be too complex or not modular.</li>
-  <li>Excessive Mocking: If you need to mock too many things, your code might be tightly coupled.</li>
-  <li>Long Setup Times: If setting up a test takes a long time, your code may have too many dependencies.</li>
-  <li>Hidden Dependencies: If certain dependencies are not obvious, your code might be hard to maintain or extend.</li>
+  <li>Difficulty writing tests: the code might be too complex or not modular.</li>
+  <li>Excessive mocking: the code might be tightly coupled.</li>
+  <li>Long setup times: the code might carry too many dependencies.</li>
+  <li>Hidden dependencies: the code might be hard to maintain or extend.</li>
 </ul>
 
 <h2 id="key-signals-and-what-they-mean">Key Signals and What They Mean</h2>
 
 <h3 id="excessive-mocking">Excessive Mocking</h3>
 
-<ul>
-  <li><strong>What It Is</strong>: Mocking means creating fake objects that mimic real ones.</li>
-  <li><strong>The Signal</strong>: Needing too many mocks usually means your classes are too dependent on each other.</li>
-  <li><strong>The Solution</strong>: Improve your code design. Break down large classes into smaller, independent ones.</li>
-</ul>
+<p>Mocking replaces a real dependency with a fake one. A few mocks are normal. When a single test needs many of them, the class under test leans on too many other classes. The fix is in the design: break the large class into smaller ones that can stand on their own.</p>
 
 <h3 id="long-setup-times">Long Setup Times</h3>
 
-<ul>
-  <li><strong>What It Is</strong>: Setting up tests should be quick and easy.</li>
-  <li><strong>The Signal</strong>: Long setup times can mean your code has too many dependencies or lacks modularity.</li>
-  <li><strong>The Solution</strong>: Simplify your code. Use dependency injection to reduce setup complexity.</li>
-</ul>
+<p>Setting up a test should be quick. When it drags, the code usually has too many dependencies or too little structure. Dependency injection helps here, since the test can supply what it needs instead of building the whole world first.</p>
 
 <h3 id="difficulty-isolating-tests">Difficulty Isolating Tests</h3>
 
-<ul>
-  <li><strong>What It Is</strong>: Each test should run independently.</li>
-  <li><strong>The Signal</strong>: If tests affect each other, your code might have hidden dependencies.</li>
-  <li><strong>The Solution</strong>: Make your code more modular. Ensure each part of your code does one thing well.</li>
-</ul>
+<p>Each test should run on its own. When one test changes the outcome of another, the code has shared state hiding somewhere. Make each unit do one thing so the tests stop leaking into each other.</p>
 
 <h3 id="hidden-dependencies">Hidden Dependencies</h3>
 
-<ul>
-  <li><strong>What It Is</strong>: Hidden dependencies are those that are not immediately obvious, such as using Instant.now directly within a method.</li>
-  <li><strong>The Signal</strong>: If you find that certain parts of your code rely on hidden dependencies, it’s hard to write unit tests without mocks.</li>
-  <li><strong>The Solution</strong>: Use dependency inversion. For example, instead of setting the current timestamp using Instant.now directly, inject a clock interface and use it to get the current time. This decouples your code from the specific implementation and makes it easier to test.</li>
-</ul>
+<p>Some dependencies are not visible in a method’s signature. Calling <code class="language-plaintext highlighter-rouge">Instant.now()</code> inside a method is one of them: the method quietly depends on the system clock, so you cannot test it without controlling time. Dependency inversion fixes this. Instead of reading the clock directly, inject a clock interface and ask it for the current time.</p>
 
 <h4 id="implementing-dependency-inversion">Implementing Dependency Inversion</h4>
 
-<p>Here’s a practical example to illustrate how to handle hidden dependencies using dependency inversion:</p>
+<p>Here is the same idea in code.</p>
 
 <p>Before:</p>
 
@@ -234,26 +218,20 @@
 
 <h2 id="benefits-of-listening-to-these-signals">Benefits of Listening to These Signals</h2>
 
-<p>By paying attention to these signals, you can improve your code design. This makes your code:</p>
-
-<ul>
-  <li>Easier to Understand: Clear, modular code is easier to read and maintain.</li>
-  <li>More Reliable: Well-designed code has fewer bugs and is easier to test.</li>
-  <li>More Flexible: Good design makes it easier to add new features.</li>
-</ul>
+<p>Reading these signals improves the design. Modular code is easier to follow, has fewer places for bugs to hide, and takes less effort to extend when the requirements change.</p>
 
 <h2 id="practical-steps-to-improve-your-code">Practical Steps to Improve Your Code</h2>
 
 <ul>
-  <li>Refactor Regularly: Don’t wait until your code is a mess. Refactor as you go to keep your code clean.</li>
-  <li>Use Dependency Injection: This reduces the need for mocks and makes your code more modular.</li>
-  <li>Write Small, Focused Functions: Each function should do one thing and do it well. This makes them easier to test.</li>
-  <li>Identify and Eliminate Hidden Dependencies: Use patterns like port-adapter and dependency inversion to decouple your code.</li>
+  <li>Refactor regularly. Don’t wait until the code is a mess. Clean it up as you go.</li>
+  <li>Use dependency injection. It reduces the need for mocks and keeps the code modular.</li>
+  <li>Write small, focused functions. Each one should do a single thing, which makes it easy to test.</li>
+  <li>Find and remove hidden dependencies. Patterns like port-adapter and dependency inversion decouple your code.</li>
 </ul>
 
 <h2 id="conclusion">Conclusion</h2>
 
-<p>Test codes are valuable tools. They don’t just check if your code works; they also show you where it needs improvement. By paying attention to the signals from your test codes, you can make your code more robust, easier to maintain, and more enjoyable to work with. Keep your tests simple, listen to what they’re telling you, and your code will thank you.</p>
+<p>Tests do more than check that your code works. They point at where the design is weak. When a test is painful to write, listen to it and fix the code underneath instead of forcing the test around it. Keep your tests simple, and let them guide the design.</p>
 
         </div>
       
@@ -306,7 +284,7 @@
 <!-- end custom footer snippets -->
 <div class="copyright">
     
-      <p>&copy; 2025 Grow with Code. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://github.com/mmistakes/so-simple-theme" rel="nofollow">So Simple</a>.</p>
+      <p>&copy; 2026 Grow with Code. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://github.com/mmistakes/so-simple-theme" rel="nofollow">So Simple</a>.</p>
     
   </div>
 </footer>
