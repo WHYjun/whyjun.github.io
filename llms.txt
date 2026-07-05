@@ -1,0 +1,30 @@
+# Young's Notes
+
+> Notes from Young Choi's software engineering journey: what he learns, what he tries, and how he sets things up. Recent writing focuses on agentic coding (Claude Code, AI skills, developer workflows); earlier posts cover Go, Java/Spring, SQL, and testing. Posts are in English and Korean.
+
+- Author: Young Choi (@whyjun / @youngchoi_dev)
+- Site: https://whyjun.github.io
+- Language: English and Korean (ko-KR)
+
+## Agentic coding & AI
+
+- [The Best AI Transformation Strategy Is Sharing Skills](https://whyjun.github.io/blog/The-Best-AI-Transformation-Strategy-Is-Sharing-Skills): Why sharing reusable agent skills across a team beats handing out more AI seats. English.
+- [How to Use Git Worktrees with Claude Code](https://whyjun.github.io/blog/How-to-Use-Git-Worktrees-with-Claude-Code): Running parallel Claude Code sessions in isolated git worktrees. English.
+
+## Development (Java, SQL, testing)
+
+- [Storing Heterogeneous Objects in PostgreSQL](https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL): Three ways to store mixed object types in one Postgres table (JSONB, normalized, hybrid) and their trade-offs. English.
+- [Using Interface for Controller Requests in Java Spring Framework](https://whyjun.github.io/blog/Using-Interface-for-Controller-Requests-in-Java%20Spring-Framework): Using interfaces to shape controller request objects in Spring. English.
+- [The Importance of Signals from Test Codes](https://whyjun.github.io/blog/The-Importance-of-Signals-from-Test-Codes): What test code signals about the health of a codebase. English.
+
+## Go / Golang
+
+- [golangci-lint로 Go 코드 규칙 적용하기 (Applying Go code rules with golangci-lint)](https://whyjun.github.io/golang/Use-GolangCI-Lint): Installing and using golangci-lint to enforce Go code standards. Korean.
+- [Go에서 omitempty 태그 사용하기 (Using the omitempty tag in Go)](https://whyjun.github.io/golang/Golang-Omitempty-Tag): How the JSON `omitempty` struct tag behaves in Go. Korean.
+- [Go에서 Enum 사용하기 그리고 주의할 점 (Using enums in Go and gotchas)](https://whyjun.github.io/golang/Enum-in-Golang): Idiomatic enum patterns in Go and their pitfalls. Korean.
+- [Go에서 HashSet 구현하기 (Implementing a HashSet in Go)](https://whyjun.github.io/golang/Write-Hashset-In-Go): Building a set type in Go using maps. Korean.
+
+## Optional
+
+- [Full post index](https://whyjun.github.io/posts/): Chronological list of all posts.
+- [Sitemap](https://whyjun.github.io/sitemap.xml): Machine-readable list of all URLs.
