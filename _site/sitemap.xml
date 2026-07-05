@@ -4,6 +4,22 @@
         xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     
     <url>
+        <loc>https://whyjun.github.io/blog/The-Best-AI-Transformation-Strategy-Is-Sharing-Skills</loc>
+        
+        <lastmod>2026-07-04T00:00:00-07:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.7</priority>
+        
+
+    </url>
+    
+    <url>
         <loc>https://whyjun.github.io/blog/How-to-Use-Git-Worktrees-with-Claude-Code</loc>
         
         <lastmod>2026-07-03T00:00:00-07:00</lastmod>
