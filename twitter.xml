@@ -5,10 +5,17 @@
     <description>Notes from my software engineering journey: what I learn, what I try, and how I set things up.</description>
     <link>https://whyjun.github.io/</link>
     <atom:link href="https://whyjun.github.io/twitter.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Fri, 03 Jul 2026 19:14:45 -0700</pubDate>
-    <lastBuildDate>Fri, 03 Jul 2026 19:14:45 -0700</lastBuildDate>
+    <pubDate>Sat, 04 Jul 2026 20:27:32 -0700</pubDate>
+    <lastBuildDate>Sat, 04 Jul 2026 20:27:32 -0700</lastBuildDate>
     <generator>Jekyll v3.10.0</generator>
     
+    
+      <item>
+        <title>The Best AI Transformation Strategy Is Sharing Skills</title>
+        <pubDate>Sat, 04 Jul 2026 00:00:00 -0700</pubDate>
+        <link>https://whyjun.github.io/blog/The-Best-AI-Transformation-Strategy-Is-Sharing-Skills</link>
+        <guid isPermaLink="true">https://whyjun.github.io/blog/The-Best-AI-Transformation-Strategy-Is-Sharing-Skills</guid>
+      </item>
     
       <item>
         <title>How to Use Git Worktrees with Claude Code</title>
@@ -36,13 +43,6 @@
         <pubDate>Sun, 30 Jun 2024 00:00:00 -0700</pubDate>
         <link>https://whyjun.github.io/blog/The-Importance-of-Signals-from-Test-Codes</link>
         <guid isPermaLink="true">https://whyjun.github.io/blog/The-Importance-of-Signals-from-Test-Codes</guid>
-      </item>
-    
-      <item>
-        <title>Go에서 omitempty 태그 사용하기</title>
-        <pubDate>Wed, 15 Mar 2023 00:00:00 -0700</pubDate>
-        <link>https://whyjun.github.io/golang/Golang-Omitempty-Tag</link>
-        <guid isPermaLink="true">https://whyjun.github.io/golang/Golang-Omitempty-Tag</guid>
       </item>
     
   </channel>
