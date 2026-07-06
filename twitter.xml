@@ -5,10 +5,17 @@
     <description>Notes from my software engineering journey: what I learn, what I try, and how I set things up.</description>
     <link>https://whyjun.github.io/</link>
     <atom:link href="https://whyjun.github.io/twitter.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Sat, 04 Jul 2026 22:31:09 -0700</pubDate>
-    <lastBuildDate>Sat, 04 Jul 2026 22:31:09 -0700</lastBuildDate>
+    <pubDate>Sun, 05 Jul 2026 18:58:08 -0700</pubDate>
+    <lastBuildDate>Sun, 05 Jul 2026 18:58:08 -0700</lastBuildDate>
     <generator>Jekyll v3.10.0</generator>
     
+    
+      <item>
+        <title>The 2026 Way to Write a Set in Go</title>
+        <pubDate>Sun, 05 Jul 2026 00:00:00 -0700</pubDate>
+        <link>https://whyjun.github.io/golang/The-2026-Way-to-Write-a-Set-in-Go</link>
+        <guid isPermaLink="true">https://whyjun.github.io/golang/The-2026-Way-to-Write-a-Set-in-Go</guid>
+      </item>
     
       <item>
         <title>The Best AI Transformation Strategy Is Sharing Skills</title>
@@ -36,13 +43,6 @@
         <pubDate>Sat, 06 Jul 2024 00:00:00 -0700</pubDate>
         <link>https://whyjun.github.io/blog/Using-Interface-for-Controller-Requests-in-Java%20Spring-Framework</link>
         <guid isPermaLink="true">https://whyjun.github.io/blog/Using-Interface-for-Controller-Requests-in-Java%20Spring-Framework</guid>
-      </item>
-    
-      <item>
-        <title>The Importance of Signals from Test Codes</title>
-        <pubDate>Sun, 30 Jun 2024 00:00:00 -0700</pubDate>
-        <link>https://whyjun.github.io/blog/The-Importance-of-Signals-from-Test-Codes</link>
-        <guid isPermaLink="true">https://whyjun.github.io/blog/The-Importance-of-Signals-from-Test-Codes</guid>
       </item>
     
   </channel>

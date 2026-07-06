@@ -1,4 +1,120 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="https://whyjun.github.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://whyjun.github.io/" rel="alternate" type="text/html" /><updated>2026-07-04T22:31:09-07:00</updated><id>https://whyjun.github.io/atom.xml</id><title type="html">Young’s Notes</title><subtitle>Notes from my software engineering journey: what I learn, what I try, and how I set things up.</subtitle><author><name>Young Choi</name></author><entry xml:lang="en"><title type="html">The Best AI Transformation Strategy Is Sharing Skills</title><link href="https://whyjun.github.io/blog/The-Best-AI-Transformation-Strategy-Is-Sharing-Skills" rel="alternate" type="text/html" title="The Best AI Transformation Strategy Is Sharing Skills" /><published>2026-07-04T00:00:00-07:00</published><updated>2026-07-04T00:00:00-07:00</updated><id>https://whyjun.github.io/blog/The-Best-AI-Transformation-Strategy-Is-Sharing-Skills</id><content type="html" xml:base="https://whyjun.github.io/blog/The-Best-AI-Transformation-Strategy-Is-Sharing-Skills"><![CDATA[<p>Most AI adoption plans start with tools and seats. Buy the licenses, run a workshop, tell everyone to use the agent. Adoption climbs for a week, then flattens. Everyone has the same model, and yet the results vary wildly from one person to the next.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="https://whyjun.github.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://whyjun.github.io/" rel="alternate" type="text/html" /><updated>2026-07-05T18:58:08-07:00</updated><id>https://whyjun.github.io/atom.xml</id><title type="html">Young’s Notes</title><subtitle>Notes from my software engineering journey: what I learn, what I try, and how I set things up.</subtitle><author><name>Young Choi</name></author><entry xml:lang="en"><title type="html">The 2026 Way to Write a Set in Go</title><link href="https://whyjun.github.io/golang/The-2026-Way-to-Write-a-Set-in-Go" rel="alternate" type="text/html" title="The 2026 Way to Write a Set in Go" /><published>2026-07-05T00:00:00-07:00</published><updated>2026-07-05T00:00:00-07:00</updated><id>https://whyjun.github.io/golang/The-2026-Way-to-Write-a-Set-in-Go</id><content type="html" xml:base="https://whyjun.github.io/golang/The-2026-Way-to-Write-a-Set-in-Go"><![CDATA[<p>Back in 2021 I wrote a Korean post about building a <code class="language-plaintext highlighter-rouge">Set</code> in Go. I wasn’t arguing that Go needed one built in, I was solving algorithm problems, Advent of Code mostly, and kept running into spots where a set was the natural tool for the job. So I built one. Go is now at 1.26.4, the standard library has picked up generics, iterators, and a <code class="language-plaintext highlighter-rouge">maps</code> package along the way, and there’s still no <code class="language-plaintext highlighter-rouge">Set</code> type in sight (a <a href="https://github.com/golang/go/issues/69230">proposal for one</a> has been open for years without landing). That’s fine. The same trick from 2021 still solves the problem in 2026, it just looks a lot better written today.</p>
+
+<h2 id="the-trick-hasnt-changed">The Trick Hasn’t Changed</h2>
+
+<p>A <code class="language-plaintext highlighter-rouge">Set</code> is a <code class="language-plaintext highlighter-rouge">map</code> where you only care about the keys. Go’s <code class="language-plaintext highlighter-rouge">map</code> already gives you O(1) inserts, lookups, and deletes with no duplicate keys, which is exactly what a set needs. The empty <code class="language-plaintext highlighter-rouge">struct{}</code> value costs zero bytes, so you’re not paying for values you’ll never read.</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">type</span> <span class="n">Set</span><span class="p">[</span><span class="n">T</span> <span class="n">comparable</span><span class="p">]</span> <span class="k">map</span><span class="p">[</span><span class="n">T</span><span class="p">]</span><span class="k">struct</span><span class="p">{}</span>
+</code></pre></div></div>
+
+<p>That’s the whole idea. What changed since 2021 is everything around it.</p>
+
+<h2 id="from-interface-to-real-generics">From <code class="language-plaintext highlighter-rouge">interface{}</code> to Real Generics</h2>
+
+<p>The 2021 version had to write <code class="language-plaintext highlighter-rouge">map[interface{}]struct{}</code>, because Go had no generics yet. Every value going in or out needed a type assertion, and the compiler couldn’t stop you from mixing an <code class="language-plaintext highlighter-rouge">int</code> and a <code class="language-plaintext highlighter-rouge">string</code> in the same set.</p>
+
+<p>With generics, <code class="language-plaintext highlighter-rouge">Set[T comparable]</code> gives you a type parameter instead. <code class="language-plaintext highlighter-rouge">comparable</code> is the built-in constraint for any type Go can use as a map key, so the set stays type-safe without you writing a single assertion.</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">func</span> <span class="n">NewSet</span><span class="p">[</span><span class="n">T</span> <span class="n">comparable</span><span class="p">](</span><span class="n">items</span> <span class="o">...</span><span class="n">T</span><span class="p">)</span> <span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">]</span> <span class="p">{</span>
+	<span class="n">s</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">))</span>
+	<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">item</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">items</span> <span class="p">{</span>
+		<span class="n">s</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="n">s</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="p">(</span><span class="n">s</span> <span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="n">Add</span><span class="p">(</span><span class="n">v</span> <span class="n">T</span><span class="p">)</span> <span class="p">{</span>
+	<span class="n">s</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="k">struct</span><span class="p">{}{}</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="p">(</span><span class="n">s</span> <span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="n">Remove</span><span class="p">(</span><span class="n">v</span> <span class="n">T</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nb">delete</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="p">(</span><span class="n">s</span> <span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="n">Contains</span><span class="p">(</span><span class="n">v</span> <span class="n">T</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
+	<span class="n">_</span><span class="p">,</span> <span class="n">ok</span> <span class="o">:=</span> <span class="n">s</span><span class="p">[</span><span class="n">v</span><span class="p">]</span>
+	<span class="k">return</span> <span class="n">ok</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="p">(</span><span class="n">s</span> <span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="n">Len</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">colors</span> <span class="o">:=</span> <span class="n">NewSet</span><span class="p">(</span><span class="s">"red"</span><span class="p">,</span> <span class="s">"green"</span><span class="p">,</span> <span class="s">"blue"</span><span class="p">)</span>
+<span class="n">colors</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="s">"green"</span><span class="p">)</span> <span class="c">// already there, no-op</span>
+<span class="n">colors</span><span class="o">.</span><span class="n">Remove</span><span class="p">(</span><span class="s">"red"</span><span class="p">)</span>
+
+<span class="n">colors</span><span class="o">.</span><span class="n">Contains</span><span class="p">(</span><span class="s">"green"</span><span class="p">)</span> <span class="c">// true</span>
+<span class="n">colors</span><span class="o">.</span><span class="n">Contains</span><span class="p">(</span><span class="s">"red"</span><span class="p">)</span>   <span class="c">// false</span>
+<span class="n">colors</span><span class="o">.</span><span class="n">Len</span><span class="p">()</span>              <span class="c">// 2</span>
+</code></pre></div></div>
+
+<p>Try passing an <code class="language-plaintext highlighter-rouge">int</code> into <code class="language-plaintext highlighter-rouge">colors.Add</code> and the compiler rejects it before the program ever runs. That’s the whole win over the <code class="language-plaintext highlighter-rouge">interface{}</code> version: the same map-of-empty-struct trick, minus the runtime type checks.</p>
+
+<h2 id="iterating-without-the-boilerplate">Iterating Without the Boilerplate</h2>
+
+<p>The 2021 post didn’t cover iteration, because looping over a <code class="language-plaintext highlighter-rouge">map[interface{}]struct{}</code> and asserting each key back to its real type wasn’t worth showing. Since Go 1.23, the <code class="language-plaintext highlighter-rouge">maps</code> package exposes <code class="language-plaintext highlighter-rouge">maps.Keys</code>, which returns an <code class="language-plaintext highlighter-rouge">iter.Seq[T]</code> you can range over directly.</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="s">"maps"</span>
+
+<span class="k">for</span> <span class="n">c</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">maps</span><span class="o">.</span><span class="n">Keys</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span> <span class="p">{</span>
+	<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"color:"</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>If you don’t want callers importing <code class="language-plaintext highlighter-rouge">maps</code> just to walk your set, give the type its own iterator method and return the same thing:</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="s">"iter"</span>
+
+<span class="k">func</span> <span class="p">(</span><span class="n">s</span> <span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="n">All</span><span class="p">()</span> <span class="n">iter</span><span class="o">.</span><span class="n">Seq</span><span class="p">[</span><span class="n">T</span><span class="p">]</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="n">maps</span><span class="o">.</span><span class="n">Keys</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">colors</span><span class="o">.</span><span class="n">All</span><span class="p">()</span> <span class="p">{</span>
+	<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="set-algebra-for-free">Set Algebra for Free</h2>
+
+<p>Generics also make union and intersection easy to write once, for every element type, instead of copy-pasting a version per type:</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">func</span> <span class="n">Union</span><span class="p">[</span><span class="n">T</span> <span class="n">comparable</span><span class="p">](</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">]</span> <span class="p">{</span>
+	<span class="n">result</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+	<span class="k">for</span> <span class="n">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">a</span> <span class="p">{</span>
+		<span class="n">result</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="k">for</span> <span class="n">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">b</span> <span class="p">{</span>
+		<span class="n">result</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="n">result</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="n">Intersect</span><span class="p">[</span><span class="n">T</span> <span class="n">comparable</span><span class="p">](</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">]</span> <span class="p">{</span>
+	<span class="n">result</span> <span class="o">:=</span> <span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">]{}</span>
+	<span class="k">for</span> <span class="n">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">a</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">Contains</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="p">{</span>
+			<span class="n">result</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="n">result</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span> <span class="o">:=</span> <span class="n">NewSet</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">3</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">:=</span> <span class="n">NewSet</span><span class="p">(</span><span class="m">3</span><span class="p">,</span> <span class="m">4</span><span class="p">,</span> <span class="m">5</span><span class="p">)</span>
+
+<span class="n">Union</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span><span class="o">.</span><span class="n">Len</span><span class="p">()</span>     <span class="c">// 5</span>
+<span class="n">Intersect</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span><span class="o">.</span><span class="n">Len</span><span class="p">()</span> <span class="c">// 1</span>
+</code></pre></div></div>
+
+<p>I ran every snippet above against Go 1.26.4, the latest stable release as of this writing, and checked them with <code class="language-plaintext highlighter-rouge">go vet</code> and <code class="language-plaintext highlighter-rouge">gofmt</code> before publishing.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>If you hit the same wall I hit in 2021, solving algorithm problems and reaching for a <code class="language-plaintext highlighter-rouge">Set</code> that isn’t there, the fix is still to build one, and Go still hands you good pieces to do it with: a <code class="language-plaintext highlighter-rouge">map</code>, an empty <code class="language-plaintext highlighter-rouge">struct{}</code>, and now <code class="language-plaintext highlighter-rouge">comparable</code> generics and the <code class="language-plaintext highlighter-rouge">maps</code> package to strip out the boilerplate around them. The core idea aged fine. Everything wrapped around it got sharper. Happy coding!</p>]]></content><author><name>Young Choi</name></author><category term="Golang" /><category term="golang" /><category term="generics" /><category term="data structure" /><summary type="html"><![CDATA[Back in 2021 I wrote a Korean post about building a Set in Go. I wasn’t arguing that Go needed one built in, I was solving algorithm problems, Advent of Code mostly, and kept running into spots where a set was the natural tool for the job. So I built one. Go is now at 1.26.4, the standard library has picked up generics, iterators, and a maps package along the way, and there’s still no Set type in sight (a proposal for one has been open for years without landing). That’s fine. The same trick from 2021 still solves the problem in 2026, it just looks a lot better written today.]]></summary></entry><entry xml:lang="en"><title type="html">The Best AI Transformation Strategy Is Sharing Skills</title><link href="https://whyjun.github.io/blog/The-Best-AI-Transformation-Strategy-Is-Sharing-Skills" rel="alternate" type="text/html" title="The Best AI Transformation Strategy Is Sharing Skills" /><published>2026-07-04T00:00:00-07:00</published><updated>2026-07-04T00:00:00-07:00</updated><id>https://whyjun.github.io/blog/The-Best-AI-Transformation-Strategy-Is-Sharing-Skills</id><content type="html" xml:base="https://whyjun.github.io/blog/The-Best-AI-Transformation-Strategy-Is-Sharing-Skills"><![CDATA[<p>Most AI adoption plans start with tools and seats. Buy the licenses, run a workshop, tell everyone to use the agent. Adoption climbs for a week, then flattens. Everyone has the same model, and yet the results vary wildly from one person to the next.</p>
 
 <p>I used to think the gap was skill with prompts. Some people just knew how to talk to the agent. But that framing put the burden on each person to figure it out alone, over and over. What actually moved my team was smaller and easier to pass around: a shared skill.</p>
 

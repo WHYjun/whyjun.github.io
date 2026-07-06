@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<!--
+    So Simple Jekyll Theme 3.2.0
+    Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+    Free for personal and commercial use under the MIT license
+    https://github.com/mmistakes/so-simple-theme/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+
+  
+    
+    <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>The 2026 Way to Write a Set in Go | Young’s Notes</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="The 2026 Way to Write a Set in Go" />
+<meta name="author" content="Young Choi" />
+<meta property="og:locale" content="ko_KR" />
+<meta name="description" content="Back in 2021 I wrote a Korean post about building a Set in Go. I wasn’t arguing that Go needed one built in, I was solving algorithm problems, Advent of Code mostly, and kept running into spots where a set was the natural tool for the job. So I built one. Go is now at 1.26.4, the standard library has picked up generics, iterators, and a maps package along the way, and there’s still no Set type in sight (a proposal for one has been open for years without landing). That’s fine. The same trick from 2021 still solves the problem in 2026, it just looks a lot better written today." />
+<meta property="og:description" content="Back in 2021 I wrote a Korean post about building a Set in Go. I wasn’t arguing that Go needed one built in, I was solving algorithm problems, Advent of Code mostly, and kept running into spots where a set was the natural tool for the job. So I built one. Go is now at 1.26.4, the standard library has picked up generics, iterators, and a maps package along the way, and there’s still no Set type in sight (a proposal for one has been open for years without landing). That’s fine. The same trick from 2021 still solves the problem in 2026, it just looks a lot better written today." />
+<link rel="canonical" href="https://whyjun.github.io/golang/The-2026-Way-to-Write-a-Set-in-Go" />
+<meta property="og:url" content="https://whyjun.github.io/golang/The-2026-Way-to-Write-a-Set-in-Go" />
+<meta property="og:site_name" content="Young’s Notes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2026-07-05T00:00:00-07:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="The 2026 Way to Write a Set in Go" />
+<meta name="twitter:site" content="@youngchoi_dev" />
+<meta name="twitter:creator" content="@https://x.com/youngchoi_dev" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Young Choi"},"dateModified":"2026-07-05T00:00:00-07:00","datePublished":"2026-07-05T00:00:00-07:00","description":"Back in 2021 I wrote a Korean post about building a Set in Go. I wasn’t arguing that Go needed one built in, I was solving algorithm problems, Advent of Code mostly, and kept running into spots where a set was the natural tool for the job. So I built one. Go is now at 1.26.4, the standard library has picked up generics, iterators, and a maps package along the way, and there’s still no Set type in sight (a proposal for one has been open for years without landing). That’s fine. The same trick from 2021 still solves the problem in 2026, it just looks a lot better written today.","headline":"The 2026 Way to Write a Set in Go","mainEntityOfPage":{"@type":"WebPage","@id":"https://whyjun.github.io/golang/The-2026-Way-to-Write-a-Set-in-Go"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://whyjun.github.io/assets/images/young-choi-gopher-image.png"},"name":"Young Choi"},"url":"https://whyjun.github.io/golang/The-2026-Way-to-Write-a-Set-in-Go"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  
+
+  <script>
+    /* Cut the mustard */
+    if ( 'querySelector' in document && 'addEventListener' in window ) {
+      document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + 'js';
+    }
+  </script>
+
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/skins/default.css">
+  
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,700,700i|Lora:400,400i,700,700i">
+  <link rel="alternate" type="application/atom+xml" title="Young&#39;s Notes" href="/atom.xml">
+<!-- start custom head snippets -->
+
+<!-- insert favicons. use http://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+</head>
+
+
+  <body class="layout--post  the-2026-way-to-write-a-set-in-go">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#primary-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    
+  <div class="navigation-wrapper">
+    <a href="#menu-toggle" id="menu-toggle">Menu</a>
+    <nav id="primary-nav" class="site-nav animated drop">
+      <ul><li><a href="/posts/">Posts</a></li><li><a href="/categories/">Categories</a></li><li><a href="/tags/">Tags</a></li><li><a href="/search/">Search</a></li></ul>
+    </nav>
+  </div><!-- /.navigation-wrapper -->
+
+
+    <header class="masthead">
+  <div class="wrap">
+    
+      <a href="/" class="site-logo" rel="home" title="Young's Notes">
+        <img src="/assets/images/young-choi-gopher-image.png" class="site-logo-img animated fadeInDown" alt="Young's Notes">
+      </a>
+    
+    
+    
+      
+        <div class="site-title animated fadeIn"><a href="/">Young's Notes</a></div>
+      
+      <p class="site-description animated fadeIn" itemprop="description">Notes from my software engineering journey: what I learn, what I try, and how I set things up.</p>
+    
+  </div>
+</header><!-- /.masthead -->
+
+
+    <main id="main" class="main-content" aria-label="Content">
+  <article class="h-entry">
+    
+
+    <div class="page-wrapper">
+      <header class="page-header">
+        
+        
+        <h1 id="page-title" class="page-title p-name">The 2026 Way to Write a Set in Go
+</h1>
+        
+      </header>
+
+      <div class="page-sidebar">
+        <div class="page-author h-card p-author"><img src="/assets/images/young-choi-gopher-image.png" class="author-avatar u-photo" alt="Young Choi"><div class="author-info"><div class="author-name">
+        <span class="p-name">Young Choi</span>
+      </div><ul class="author-links"><li class="author-link">
+            <a class="u-url" rel="me" href="https://github.com/whyjun"><i class="fab fa-github-square fa-lg" title="GitHub"></i></a>
+          </li></ul><!-- 
+
+<span class="read-time">3 min read</span>
+ -->
+    <time class="page-date dt-published" datetime="2026-07-05T00:00:00-07:00"><a class="u-url" href="">July 5, 2026</a>
+</time>
+
+  </div>
+</div>
+
+        
+  <h3 class="page-taxonomies-title">Categories</h3>
+  
+  <ul class="page-taxonomies"><li class="page-taxonomy"><a class="p-category" href="/categories/#golang" title="Pages filed under Golang">Golang</a></li>
+  </ul>
+
+
+        <!-- 
+  <h3 class="page-taxonomies-title">Tags</h3>
+  
+  <ul class="page-taxonomies"><li class="page-taxonomy"><a href="/tags/#data-structure" title="Pages tagged data structure" rel="tag">data structure</a></li><li class="page-taxonomy"><a href="/tags/#generics" title="Pages tagged generics" rel="tag">generics</a></li><li class="page-taxonomy"><a href="/tags/#golang" title="Pages tagged golang" rel="tag">golang</a></li>
+  </ul>
+ -->
+
+      </div>
+
+      <div class="page-content">
+        <div class="e-content">
+          <p>Back in 2021 I wrote a Korean post about building a <code class="language-plaintext highlighter-rouge">Set</code> in Go. I wasn’t arguing that Go needed one built in, I was solving algorithm problems, Advent of Code mostly, and kept running into spots where a set was the natural tool for the job. So I built one. Go is now at 1.26.4, the standard library has picked up generics, iterators, and a <code class="language-plaintext highlighter-rouge">maps</code> package along the way, and there’s still no <code class="language-plaintext highlighter-rouge">Set</code> type in sight (a <a href="https://github.com/golang/go/issues/69230">proposal for one</a> has been open for years without landing). That’s fine. The same trick from 2021 still solves the problem in 2026, it just looks a lot better written today.</p>
+
+<h2 id="the-trick-hasnt-changed">The Trick Hasn’t Changed</h2>
+
+<p>A <code class="language-plaintext highlighter-rouge">Set</code> is a <code class="language-plaintext highlighter-rouge">map</code> where you only care about the keys. Go’s <code class="language-plaintext highlighter-rouge">map</code> already gives you O(1) inserts, lookups, and deletes with no duplicate keys, which is exactly what a set needs. The empty <code class="language-plaintext highlighter-rouge">struct{}</code> value costs zero bytes, so you’re not paying for values you’ll never read.</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">type</span> <span class="n">Set</span><span class="p">[</span><span class="n">T</span> <span class="n">comparable</span><span class="p">]</span> <span class="k">map</span><span class="p">[</span><span class="n">T</span><span class="p">]</span><span class="k">struct</span><span class="p">{}</span>
+</code></pre></div></div>
+
+<p>That’s the whole idea. What changed since 2021 is everything around it.</p>
+
+<h2 id="from-interface-to-real-generics">From <code class="language-plaintext highlighter-rouge">interface{}</code> to Real Generics</h2>
+
+<p>The 2021 version had to write <code class="language-plaintext highlighter-rouge">map[interface{}]struct{}</code>, because Go had no generics yet. Every value going in or out needed a type assertion, and the compiler couldn’t stop you from mixing an <code class="language-plaintext highlighter-rouge">int</code> and a <code class="language-plaintext highlighter-rouge">string</code> in the same set.</p>
+
+<p>With generics, <code class="language-plaintext highlighter-rouge">Set[T comparable]</code> gives you a type parameter instead. <code class="language-plaintext highlighter-rouge">comparable</code> is the built-in constraint for any type Go can use as a map key, so the set stays type-safe without you writing a single assertion.</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">func</span> <span class="n">NewSet</span><span class="p">[</span><span class="n">T</span> <span class="n">comparable</span><span class="p">](</span><span class="n">items</span> <span class="o">...</span><span class="n">T</span><span class="p">)</span> <span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">]</span> <span class="p">{</span>
+	<span class="n">s</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">))</span>
+	<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">item</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">items</span> <span class="p">{</span>
+		<span class="n">s</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="n">s</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="p">(</span><span class="n">s</span> <span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="n">Add</span><span class="p">(</span><span class="n">v</span> <span class="n">T</span><span class="p">)</span> <span class="p">{</span>
+	<span class="n">s</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="k">struct</span><span class="p">{}{}</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="p">(</span><span class="n">s</span> <span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="n">Remove</span><span class="p">(</span><span class="n">v</span> <span class="n">T</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nb">delete</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="p">(</span><span class="n">s</span> <span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="n">Contains</span><span class="p">(</span><span class="n">v</span> <span class="n">T</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
+	<span class="n">_</span><span class="p">,</span> <span class="n">ok</span> <span class="o">:=</span> <span class="n">s</span><span class="p">[</span><span class="n">v</span><span class="p">]</span>
+	<span class="k">return</span> <span class="n">ok</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="p">(</span><span class="n">s</span> <span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="n">Len</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">colors</span> <span class="o">:=</span> <span class="n">NewSet</span><span class="p">(</span><span class="s">"red"</span><span class="p">,</span> <span class="s">"green"</span><span class="p">,</span> <span class="s">"blue"</span><span class="p">)</span>
+<span class="n">colors</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="s">"green"</span><span class="p">)</span> <span class="c">// already there, no-op</span>
+<span class="n">colors</span><span class="o">.</span><span class="n">Remove</span><span class="p">(</span><span class="s">"red"</span><span class="p">)</span>
+
+<span class="n">colors</span><span class="o">.</span><span class="n">Contains</span><span class="p">(</span><span class="s">"green"</span><span class="p">)</span> <span class="c">// true</span>
+<span class="n">colors</span><span class="o">.</span><span class="n">Contains</span><span class="p">(</span><span class="s">"red"</span><span class="p">)</span>   <span class="c">// false</span>
+<span class="n">colors</span><span class="o">.</span><span class="n">Len</span><span class="p">()</span>              <span class="c">// 2</span>
+</code></pre></div></div>
+
+<p>Try passing an <code class="language-plaintext highlighter-rouge">int</code> into <code class="language-plaintext highlighter-rouge">colors.Add</code> and the compiler rejects it before the program ever runs. That’s the whole win over the <code class="language-plaintext highlighter-rouge">interface{}</code> version: the same map-of-empty-struct trick, minus the runtime type checks.</p>
+
+<h2 id="iterating-without-the-boilerplate">Iterating Without the Boilerplate</h2>
+
+<p>The 2021 post didn’t cover iteration, because looping over a <code class="language-plaintext highlighter-rouge">map[interface{}]struct{}</code> and asserting each key back to its real type wasn’t worth showing. Since Go 1.23, the <code class="language-plaintext highlighter-rouge">maps</code> package exposes <code class="language-plaintext highlighter-rouge">maps.Keys</code>, which returns an <code class="language-plaintext highlighter-rouge">iter.Seq[T]</code> you can range over directly.</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="s">"maps"</span>
+
+<span class="k">for</span> <span class="n">c</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">maps</span><span class="o">.</span><span class="n">Keys</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span> <span class="p">{</span>
+	<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"color:"</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>If you don’t want callers importing <code class="language-plaintext highlighter-rouge">maps</code> just to walk your set, give the type its own iterator method and return the same thing:</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="s">"iter"</span>
+
+<span class="k">func</span> <span class="p">(</span><span class="n">s</span> <span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="n">All</span><span class="p">()</span> <span class="n">iter</span><span class="o">.</span><span class="n">Seq</span><span class="p">[</span><span class="n">T</span><span class="p">]</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="n">maps</span><span class="o">.</span><span class="n">Keys</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">colors</span><span class="o">.</span><span class="n">All</span><span class="p">()</span> <span class="p">{</span>
+	<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="set-algebra-for-free">Set Algebra for Free</h2>
+
+<p>Generics also make union and intersection easy to write once, for every element type, instead of copy-pasting a version per type:</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">func</span> <span class="n">Union</span><span class="p">[</span><span class="n">T</span> <span class="n">comparable</span><span class="p">](</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">]</span> <span class="p">{</span>
+	<span class="n">result</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+	<span class="k">for</span> <span class="n">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">a</span> <span class="p">{</span>
+		<span class="n">result</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="k">for</span> <span class="n">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">b</span> <span class="p">{</span>
+		<span class="n">result</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="n">result</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="n">Intersect</span><span class="p">[</span><span class="n">T</span> <span class="n">comparable</span><span class="p">](</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">]</span> <span class="p">{</span>
+	<span class="n">result</span> <span class="o">:=</span> <span class="n">Set</span><span class="p">[</span><span class="n">T</span><span class="p">]{}</span>
+	<span class="k">for</span> <span class="n">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">a</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">Contains</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="p">{</span>
+			<span class="n">result</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="n">result</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span> <span class="o">:=</span> <span class="n">NewSet</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">3</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">:=</span> <span class="n">NewSet</span><span class="p">(</span><span class="m">3</span><span class="p">,</span> <span class="m">4</span><span class="p">,</span> <span class="m">5</span><span class="p">)</span>
+
+<span class="n">Union</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span><span class="o">.</span><span class="n">Len</span><span class="p">()</span>     <span class="c">// 5</span>
+<span class="n">Intersect</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span><span class="o">.</span><span class="n">Len</span><span class="p">()</span> <span class="c">// 1</span>
+</code></pre></div></div>
+
+<p>I ran every snippet above against Go 1.26.4, the latest stable release as of this writing, and checked them with <code class="language-plaintext highlighter-rouge">go vet</code> and <code class="language-plaintext highlighter-rouge">gofmt</code> before publishing.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>If you hit the same wall I hit in 2021, solving algorithm problems and reaching for a <code class="language-plaintext highlighter-rouge">Set</code> that isn’t there, the fix is still to build one, and Go still hands you good pieces to do it with: a <code class="language-plaintext highlighter-rouge">map</code>, an empty <code class="language-plaintext highlighter-rouge">struct{}</code>, and now <code class="language-plaintext highlighter-rouge">comparable</code> generics and the <code class="language-plaintext highlighter-rouge">maps</code> package to strip out the boilerplate around them. The core idea aged fine. Everything wrapped around it got sharper. Happy coding!</p>
+
+        </div>
+      
+        <a href="https://www.buymeacoffee.com/youngchoi"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=youngchoi&button_colour=FFDD00&font_colour=000000&font_family=Comic&outline_colour=000000&coffee_colour=ffffff"></a>
+
+        <script src="https://utteranc.es/client.js" repo="whyjun/whyjun.github.io" issue-term="title" label="💬 comment"
+          theme="github-light" crossorigin="anonymous" async>
+        </script>
+
+        <!-- 
+        <div class="page-share">
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwhyjun.github.io%2Fgolang%2FThe-2026-Way-to-Write-a-Set-in-Go" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--facebook btn--small"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i> <span>Share</span></a>
+  <a href="https://twitter.com/intent/tweet?text=The+2026+Way+to+Write+a+Set+in+Go%20https%3A%2F%2Fwhyjun.github.io%2Fgolang%2FThe-2026-Way-to-Write-a-Set-in-Go" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--twitter btn--small"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i> <span>Tweet</span></a>
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fwhyjun.github.io%2Fgolang%2FThe-2026-Way-to-Write-a-Set-in-Go" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--linkedin btn--small"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i> <span>LinkedIn</span></a>
+  <a href="https://reddit.com/submit?title=The+2026+Way+to+Write+a+Set+in+Go&url=https%3A%2F%2Fwhyjun.github.io%2Fgolang%2FThe-2026-Way-to-Write-a-Set-in-Go" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--reddit btn--small"><i class="fab fa-fw fa-reddit" aria-hidden="true"></i> <span>Reddit</span></a>
+</div>
+
+         -->
+
+        <nav class="page-pagination" role="navigation">
+  
+    <a class="page-previous" href="/blog/The-Best-AI-Transformation-Strategy-Is-Sharing-Skills">
+      <h4 class="page-pagination-label">Previous</h4>
+      <span class="page-pagination-title">
+        <i class="fas fa-arrow-left"></i> The Best AI Transformation Strategy Is Sharing Skills
+
+      </span>
+    </a>
+  
+
+  
+</nav>
+
+      </div>
+    </div>
+  </article>
+</main>
+
+    <footer id="footer" class="site-footer">
+  <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+<div class="copyright">
+    
+      <p>&copy; 2026 Young's Notes. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://github.com/mmistakes/so-simple-theme" rel="nofollow">So Simple</a>.</p>
+    
+  </div>
+</footer>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://use.fontawesome.com/releases/v5.0.12/js/all.js"></script><!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-73KQ7TR7X4"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-73KQ7TR7X4');
+  </script>
+
+
+  </body>
+
+</html>
