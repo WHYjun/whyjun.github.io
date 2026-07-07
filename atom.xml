@@ -1,4 +1,75 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="https://whyjun.github.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://whyjun.github.io/" rel="alternate" type="text/html" /><updated>2026-07-05T18:58:08-07:00</updated><id>https://whyjun.github.io/atom.xml</id><title type="html">Young’s Notes</title><subtitle>Notes from my software engineering journey: what I learn, what I try, and how I set things up.</subtitle><author><name>Young Choi</name></author><entry xml:lang="en"><title type="html">The 2026 Way to Write a Set in Go</title><link href="https://whyjun.github.io/golang/The-2026-Way-to-Write-a-Set-in-Go" rel="alternate" type="text/html" title="The 2026 Way to Write a Set in Go" /><published>2026-07-05T00:00:00-07:00</published><updated>2026-07-05T00:00:00-07:00</updated><id>https://whyjun.github.io/golang/The-2026-Way-to-Write-a-Set-in-Go</id><content type="html" xml:base="https://whyjun.github.io/golang/The-2026-Way-to-Write-a-Set-in-Go"><![CDATA[<p>Back in 2021 I wrote a Korean post about building a <code class="language-plaintext highlighter-rouge">Set</code> in Go. I wasn’t arguing that Go needed one built in, I was solving algorithm problems, Advent of Code mostly, and kept running into spots where a set was the natural tool for the job. So I built one. Go is now at 1.26.4, the standard library has picked up generics, iterators, and a <code class="language-plaintext highlighter-rouge">maps</code> package along the way, and there’s still no <code class="language-plaintext highlighter-rouge">Set</code> type in sight (a <a href="https://github.com/golang/go/issues/69230">proposal for one</a> has been open for years without landing). That’s fine. The same trick from 2021 still solves the problem in 2026, it just looks a lot better written today.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="https://whyjun.github.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://whyjun.github.io/" rel="alternate" type="text/html" /><updated>2026-07-06T21:03:23-07:00</updated><id>https://whyjun.github.io/atom.xml</id><title type="html">Young’s Notes</title><subtitle>Notes from my software engineering journey: what I learn, what I try, and how I set things up.</subtitle><author><name>Young Choi</name></author><entry xml:lang="en"><title type="html">The 2026 Way to Write Enums in Go</title><link href="https://whyjun.github.io/golang/The-2026-Way-to-Write-Enums-in-Go" rel="alternate" type="text/html" title="The 2026 Way to Write Enums in Go" /><published>2026-07-06T00:00:00-07:00</published><updated>2026-07-06T00:00:00-07:00</updated><id>https://whyjun.github.io/golang/The-2026-Way-to-Write-Enums-in-Go</id><content type="html" xml:base="https://whyjun.github.io/golang/The-2026-Way-to-Write-Enums-in-Go"><![CDATA[<p>Back in 2022 I wrote a Korean post about faking enums in Go with a typed constant block and <code class="language-plaintext highlighter-rouge">iota</code>. Go still has no <code class="language-plaintext highlighter-rouge">enum</code> keyword in 1.26.4, and a couple of language proposals asking for one (<a href="https://github.com/golang/go/issues/19814">issue #19814</a>, <a href="https://github.com/golang/go/issues/64739">issue #64739</a>) have been open for years without landing. So the trick from 2022 is still exactly how you write an enum in Go today. What’s worth a second post is the bug hiding in that trick, because this time I actually ran it instead of just describing it.</p>
+
+<h2 id="the-trick-hasnt-changed">The Trick Hasn’t Changed</h2>
+
+<p>Go has no <code class="language-plaintext highlighter-rouge">enum</code> type, so you fake one with a named integer type and a <code class="language-plaintext highlighter-rouge">const</code> block that uses <code class="language-plaintext highlighter-rouge">iota</code> to number the values:</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">type</span> <span class="n">Status</span> <span class="kt">int</span>
+
+<span class="k">const</span> <span class="p">(</span>
+	<span class="n">StatusOK</span> <span class="n">Status</span> <span class="o">=</span> <span class="no">iota</span>
+	<span class="n">StatusError</span>
+	<span class="n">StatusPending</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">iota</code> starts at 0 and increments by one per line, so <code class="language-plaintext highlighter-rouge">StatusOK</code> is <code class="language-plaintext highlighter-rouge">0</code>, <code class="language-plaintext highlighter-rouge">StatusError</code> is <code class="language-plaintext highlighter-rouge">1</code>, and <code class="language-plaintext highlighter-rouge">StatusPending</code> is <code class="language-plaintext highlighter-rouge">2</code>. It reads cleanly and the compiler stops you from mixing a <code class="language-plaintext highlighter-rouge">Status</code> with a plain <code class="language-plaintext highlighter-rouge">int</code> by accident.</p>
+
+<h2 id="where-it-bites-you">Where It Bites You</h2>
+
+<p><code class="language-plaintext highlighter-rouge">iota</code> always starts at 0, and 0 is also Go’s zero value for <code class="language-plaintext highlighter-rouge">int</code>. If you never explicitly set a <code class="language-plaintext highlighter-rouge">Status</code> field, decoding a struct from JSON, reading an unset field from a database row, or just declaring <code class="language-plaintext highlighter-rouge">var s Status</code> all hand you <code class="language-plaintext highlighter-rouge">0</code> for free. That’s fine as long as <code class="language-plaintext highlighter-rouge">0</code> doesn’t mean something you’d act on.</p>
+
+<p>In the example above, it does. Here’s a <code class="language-plaintext highlighter-rouge">Request</code> struct with a <code class="language-plaintext highlighter-rouge">Status</code> field, and a JSON payload from a queue where whoever built it forgot to set the status:</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">type</span> <span class="n">Request</span> <span class="k">struct</span> <span class="p">{</span>
+	<span class="n">ID</span>        <span class="kt">int</span>    <span class="s">`json:"ID"`</span>
+	<span class="n">Timestamp</span> <span class="kt">int</span>    <span class="s">`json:"Timestamp"`</span>
+	<span class="n">Message</span>   <span class="kt">string</span> <span class="s">`json:"Message"`</span>
+	<span class="n">Status</span>    <span class="n">Status</span> <span class="s">`json:"Status"`</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"ID"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"Timestamp"</span><span class="p">:</span><span class="w"> </span><span class="mi">1738000000</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"Message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Example message"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>I unmarshaled that payload against the <code class="language-plaintext highlighter-rouge">Request</code> struct and printed what came out:</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">var</span> <span class="n">req</span> <span class="n">Request</span>
+<span class="n">json</span><span class="o">.</span><span class="n">Unmarshal</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">req</span><span class="p">)</span>
+<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">Status</span><span class="p">)</span> <span class="c">// 0</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">req.Status</code> decodes as <code class="language-plaintext highlighter-rouge">0</code>, which is <code class="language-plaintext highlighter-rouge">StatusOK</code>. A request that never had its status set now looks like a request that succeeded. Nothing errors, nothing panics, the bug just quietly ships. I ran this end to end rather than assuming it, and the zero-value collision is exactly as silent as it sounds: <code class="language-plaintext highlighter-rouge">go vet</code> has nothing to say about it, because <code class="language-plaintext highlighter-rouge">0</code> is a perfectly valid <code class="language-plaintext highlighter-rouge">Status</code>.</p>
+
+<h2 id="the-fix">The Fix</h2>
+
+<p>Reserve <code class="language-plaintext highlighter-rouge">0</code> for a case that means “nothing was set,” and start your real values at 1:</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">type</span> <span class="n">Status</span> <span class="kt">int</span>
+
+<span class="k">const</span> <span class="p">(</span>
+	<span class="n">StatusUnknown</span> <span class="n">Status</span> <span class="o">=</span> <span class="no">iota</span>
+	<span class="n">StatusOK</span>
+	<span class="n">StatusError</span>
+	<span class="n">StatusPending</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<p>Now the same missing-field payload decodes to <code class="language-plaintext highlighter-rouge">StatusUnknown</code> instead of <code class="language-plaintext highlighter-rouge">StatusOK</code>. A forgotten field turns into a visible, checkable state instead of a false positive for success. I reran the exact same unmarshal against this version and got <code class="language-plaintext highlighter-rouge">StatusUnknown</code> back, not <code class="language-plaintext highlighter-rouge">StatusOK</code>.</p>
+
+<p>This costs you nothing. You still get sequential values, you still get type safety, and now the zero value tells you “this was never set” instead of lying to you.</p>
+
+<h2 id="catching-it-automatically">Catching It Automatically</h2>
+
+<p>If you’d rather not rely on remembering this every time you define an enum, the <a href="https://github.com/nishanths/exhaustive"><code class="language-plaintext highlighter-rouge">exhaustive</code></a> linter (bundled with <code class="language-plaintext highlighter-rouge">golangci-lint</code>) flags <code class="language-plaintext highlighter-rouge">switch</code> statements over an enum type that don’t cover every constant. It won’t catch the zero-value trap directly, but it does force you to handle every <code class="language-plaintext highlighter-rouge">Status</code> value explicitly wherever you branch on one, which tends to surface an unhandled <code class="language-plaintext highlighter-rouge">StatusUnknown</code> case as soon as you add it.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>The core trick for an enum in Go hasn’t moved since 2022: a named integer type plus a <code class="language-plaintext highlighter-rouge">const</code>/<code class="language-plaintext highlighter-rouge">iota</code> block. What’s worth remembering is that <code class="language-plaintext highlighter-rouge">iota</code> starts at 0, and 0 is also your zero value, so your first enum constant is what every unset, forgotten, or zeroed-out <code class="language-plaintext highlighter-rouge">Status</code> silently becomes. Give that slot to an explicit <code class="language-plaintext highlighter-rouge">Unknown</code> case and the zero value stops lying to you. Happy coding!</p>]]></content><author><name>Young Choi</name></author><category term="Golang" /><category term="golang" /><category term="enums" /><summary type="html"><![CDATA[Back in 2022 I wrote a Korean post about faking enums in Go with a typed constant block and iota. Go still has no enum keyword in 1.26.4, and a couple of language proposals asking for one (issue #19814, issue #64739) have been open for years without landing. So the trick from 2022 is still exactly how you write an enum in Go today. What’s worth a second post is the bug hiding in that trick, because this time I actually ran it instead of just describing it.]]></summary></entry><entry xml:lang="en"><title type="html">The 2026 Way to Write a Set in Go</title><link href="https://whyjun.github.io/golang/The-2026-Way-to-Write-a-Set-in-Go" rel="alternate" type="text/html" title="The 2026 Way to Write a Set in Go" /><published>2026-07-05T00:00:00-07:00</published><updated>2026-07-05T00:00:00-07:00</updated><id>https://whyjun.github.io/golang/The-2026-Way-to-Write-a-Set-in-Go</id><content type="html" xml:base="https://whyjun.github.io/golang/The-2026-Way-to-Write-a-Set-in-Go"><![CDATA[<p>Back in 2021 I wrote a Korean post about building a <code class="language-plaintext highlighter-rouge">Set</code> in Go. I wasn’t arguing that Go needed one built in, I was solving algorithm problems, Advent of Code mostly, and kept running into spots where a set was the natural tool for the job. So I built one. Go is now at 1.26.4, the standard library has picked up generics, iterators, and a <code class="language-plaintext highlighter-rouge">maps</code> package along the way, and there’s still no <code class="language-plaintext highlighter-rouge">Set</code> type in sight (a <a href="https://github.com/golang/go/issues/69230">proposal for one</a> has been open for years without landing). That’s fine. The same trick from 2021 still solves the problem in 2026, it just looks a lot better written today.</p>
 
 <h2 id="the-trick-hasnt-changed">The Trick Hasn’t Changed</h2>
 
@@ -742,41 +813,4 @@ golangci-lint <span class="nt">--version</span>
 </span><span class="p">}</span><span class="w">
 </span></code></pre></div></div>
 
-<p><code class="language-plaintext highlighter-rouge">Status</code> 필드에 아무런 데이터가 들어가있지 않기 때문에 Request의 Status 값은 <code class="language-plaintext highlighter-rouge">int</code>의 <code class="language-plaintext highlighter-rouge">Zero Value</code>인 0이 될 것이다. 첫 <code class="language-plaintext highlighter-rouge">enum</code>이 <code class="language-plaintext highlighter-rouge">StatusUnknown</code>이 아니라 <code class="language-plaintext highlighter-rouge">StatusOK</code>였다면 <code class="language-plaintext highlighter-rouge">Status</code> 데이터가 없는 모든 Request들은 아무도 모르게 버그를 일으킬 것이다. 그렇기 때문에 Go에서 <code class="language-plaintext highlighter-rouge">enum</code>을 사용할 때는 <code class="language-plaintext highlighter-rouge">Zero Value</code>를 염두에 두고 꼭 첫 <code class="language-plaintext highlighter-rouge">enum</code>을 Unknown이나 Nil을 나타내는 값으로 지정하는 습관을 가져야 한다.</p>]]></content><author><name>Young Choi</name></author><category term="Golang" /><category term="golang" /><summary type="html"><![CDATA[Go 언어는 enum 타입을 제공하지 않지만 Enum으로 사용할 데이터 타입을 따로 생성 후 iota를 이용해서 비슷하게 사용할 수 있다. (예시 코드)]]></summary></entry><entry xml:lang="ko"><title type="html">Go에서 HashSet 구현하기</title><link href="https://whyjun.github.io/golang/Write-Hashset-In-Go" rel="alternate" type="text/html" title="Go에서 HashSet 구현하기" /><published>2021-12-18T00:00:00-08:00</published><updated>2021-12-18T00:00:00-08:00</updated><id>https://whyjun.github.io/golang/Write-HashSet-In-Go</id><content type="html" xml:base="https://whyjun.github.io/golang/Write-Hashset-In-Go"><![CDATA[<p>12월 18일 기준 가장 최근 버전인 Go 1.17에도 아직 <code class="language-plaintext highlighter-rouge">Set</code>이라는 자료구조가 없다. 알고리즘 문제나 Advent of Code 문제를 풀 때 <code class="language-plaintext highlighter-rouge">Set</code>을 필요로 하는 경우가 생각보다 많았어서 직접 구현해보았다.</p>
-
-<p><code class="language-plaintext highlighter-rouge">Set</code>이라는 자료구조를 통해 얻고 싶어하는 기능들을 아래와 같다.</p>
-
-<ul>
-  <li>데이터를 <strong>중복 없이</strong> 관리하고 싶을 때</li>
-  <li>데이터를 쉽게 추가하고 제거하는 기능이 필요할 때</li>
-  <li>데이터를 적은 공간 복잡도를 가진 자료구조에서 관리하고 싶을 때</li>
-</ul>
-
-<p>그리고 이러한 기능들은 Go 언어에서 제공하는 <code class="language-plaintext highlighter-rouge">map</code>을 사용하면 아래와 같이 간단하게 구현할 수 있다.</p>
-
-<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">type</span> <span class="n">set</span> <span class="k">map</span><span class="p">[</span><span class="k">interface</span><span class="p">{}]</span><span class="k">struct</span><span class="p">{}</span>
-</code></pre></div></div>
-
-<p>실제로 사용할 때는 <code class="language-plaintext highlighter-rouge">interface{}</code>를 추가하고 싶은 데이터의 자료형으로 변경해서 사용하면 된다. (e.g: <code class="language-plaintext highlighter-rouge">type set map[string]struct{}</code>) Go에서 <code class="language-plaintext highlighter-rouge">map</code>은 <code class="language-plaintext highlighter-rouge">HashTable</code>을 구현해놓은 것이기 때문에 key는 중복될 수 없고 데이터를 추가하고 제거하는 것은 O(1)으로 매우 빠르다. 그리고 빈 <code class="language-plaintext highlighter-rouge">struct{}</code>는 0바이트이기 때문에 메모리 사용도 최소화할 수 있다.</p>
-
-<p>만약 위의 타입을 그냥 사용하는 것이 다른 동료 개발자들을 헷갈리게 할 것 같다면 아래와 같이 <code class="language-plaintext highlighter-rouge">set</code>에 함수들을 추가하는 것으로 해결할 수 있다.</p>
-
-<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">func</span> <span class="p">(</span><span class="n">s</span> <span class="n">set</span><span class="p">)</span> <span class="n">Add</span><span class="p">(</span><span class="n">v</span> <span class="k">interface</span><span class="p">{})</span> <span class="p">{</span>
-	<span class="n">s</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="k">struct</span><span class="p">{}{}</span>
-<span class="p">}</span>
-
-<span class="k">func</span> <span class="p">(</span><span class="n">s</span> <span class="n">set</span><span class="p">)</span> <span class="n">Remove</span><span class="p">(</span><span class="n">v</span> <span class="k">interface</span><span class="p">{})</span> <span class="p">{</span>
-	<span class="nb">delete</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
-<span class="p">}</span>
-
-<span class="k">func</span> <span class="p">(</span><span class="n">s</span> <span class="n">set</span><span class="p">)</span> <span class="n">Contain</span><span class="p">(</span><span class="n">v</span> <span class="k">interface</span><span class="p">{})</span> <span class="kt">bool</span> <span class="p">{</span>
-	<span class="n">_</span><span class="p">,</span> <span class="n">ok</span> <span class="o">:=</span> <span class="n">s</span><span class="p">[</span><span class="n">v</span><span class="p">]</span>
-	<span class="k">return</span> <span class="n">ok</span>
-<span class="p">}</span>
-
-<span class="k">func</span> <span class="p">(</span><span class="n">s</span> <span class="n">set</span><span class="p">)</span> <span class="n">Length</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
-	<span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>위의 코드들은 <a href="https://go.dev/play/p/XthHr8HUHHL">Go Playground</a>에서 직접 사용해보실 수 있다.</p>]]></content><author><name>Young Choi</name></author><category term="Golang" /><category term="golang" /><category term="data structure" /><summary type="html"><![CDATA[12월 18일 기준 가장 최근 버전인 Go 1.17에도 아직 Set이라는 자료구조가 없다. 알고리즘 문제나 Advent of Code 문제를 풀 때 Set을 필요로 하는 경우가 생각보다 많았어서 직접 구현해보았다.]]></summary></entry></feed>
+<p><code class="language-plaintext highlighter-rouge">Status</code> 필드에 아무런 데이터가 들어가있지 않기 때문에 Request의 Status 값은 <code class="language-plaintext highlighter-rouge">int</code>의 <code class="language-plaintext highlighter-rouge">Zero Value</code>인 0이 될 것이다. 첫 <code class="language-plaintext highlighter-rouge">enum</code>이 <code class="language-plaintext highlighter-rouge">StatusUnknown</code>이 아니라 <code class="language-plaintext highlighter-rouge">StatusOK</code>였다면 <code class="language-plaintext highlighter-rouge">Status</code> 데이터가 없는 모든 Request들은 아무도 모르게 버그를 일으킬 것이다. 그렇기 때문에 Go에서 <code class="language-plaintext highlighter-rouge">enum</code>을 사용할 때는 <code class="language-plaintext highlighter-rouge">Zero Value</code>를 염두에 두고 꼭 첫 <code class="language-plaintext highlighter-rouge">enum</code>을 Unknown이나 Nil을 나타내는 값으로 지정하는 습관을 가져야 한다.</p>]]></content><author><name>Young Choi</name></author><category term="Golang" /><category term="golang" /><summary type="html"><![CDATA[Go 언어는 enum 타입을 제공하지 않지만 Enum으로 사용할 데이터 타입을 따로 생성 후 iota를 이용해서 비슷하게 사용할 수 있다. (예시 코드)]]></summary></entry></feed>

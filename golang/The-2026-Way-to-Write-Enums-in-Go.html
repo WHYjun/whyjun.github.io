@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<!--
+    So Simple Jekyll Theme 3.2.0
+    Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+    Free for personal and commercial use under the MIT license
+    https://github.com/mmistakes/so-simple-theme/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+
+  
+    
+    <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>The 2026 Way to Write Enums in Go | Young’s Notes</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="The 2026 Way to Write Enums in Go" />
+<meta name="author" content="Young Choi" />
+<meta property="og:locale" content="ko_KR" />
+<meta name="description" content="Back in 2022 I wrote a Korean post about faking enums in Go with a typed constant block and iota. Go still has no enum keyword in 1.26.4, and a couple of language proposals asking for one (issue #19814, issue #64739) have been open for years without landing. So the trick from 2022 is still exactly how you write an enum in Go today. What’s worth a second post is the bug hiding in that trick, because this time I actually ran it instead of just describing it." />
+<meta property="og:description" content="Back in 2022 I wrote a Korean post about faking enums in Go with a typed constant block and iota. Go still has no enum keyword in 1.26.4, and a couple of language proposals asking for one (issue #19814, issue #64739) have been open for years without landing. So the trick from 2022 is still exactly how you write an enum in Go today. What’s worth a second post is the bug hiding in that trick, because this time I actually ran it instead of just describing it." />
+<link rel="canonical" href="https://whyjun.github.io/golang/The-2026-Way-to-Write-Enums-in-Go" />
+<meta property="og:url" content="https://whyjun.github.io/golang/The-2026-Way-to-Write-Enums-in-Go" />
+<meta property="og:site_name" content="Young’s Notes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2026-07-06T00:00:00-07:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="The 2026 Way to Write Enums in Go" />
+<meta name="twitter:site" content="@youngchoi_dev" />
+<meta name="twitter:creator" content="@https://x.com/youngchoi_dev" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Young Choi"},"dateModified":"2026-07-06T00:00:00-07:00","datePublished":"2026-07-06T00:00:00-07:00","description":"Back in 2022 I wrote a Korean post about faking enums in Go with a typed constant block and iota. Go still has no enum keyword in 1.26.4, and a couple of language proposals asking for one (issue #19814, issue #64739) have been open for years without landing. So the trick from 2022 is still exactly how you write an enum in Go today. What’s worth a second post is the bug hiding in that trick, because this time I actually ran it instead of just describing it.","headline":"The 2026 Way to Write Enums in Go","mainEntityOfPage":{"@type":"WebPage","@id":"https://whyjun.github.io/golang/The-2026-Way-to-Write-Enums-in-Go"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://whyjun.github.io/assets/images/young-choi-gopher-image.png"},"name":"Young Choi"},"url":"https://whyjun.github.io/golang/The-2026-Way-to-Write-Enums-in-Go"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  
+
+  <script>
+    /* Cut the mustard */
+    if ( 'querySelector' in document && 'addEventListener' in window ) {
+      document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + 'js';
+    }
+  </script>
+
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/skins/default.css">
+  
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,700,700i|Lora:400,400i,700,700i">
+  <link rel="alternate" type="application/atom+xml" title="Young&#39;s Notes" href="/atom.xml">
+<!-- start custom head snippets -->
+
+<!-- insert favicons. use http://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+</head>
+
+
+  <body class="layout--post  the-2026-way-to-write-enums-in-go">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#primary-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    
+  <div class="navigation-wrapper">
+    <a href="#menu-toggle" id="menu-toggle">Menu</a>
+    <nav id="primary-nav" class="site-nav animated drop">
+      <ul><li><a href="/posts/">Posts</a></li><li><a href="/categories/">Categories</a></li><li><a href="/tags/">Tags</a></li><li><a href="/search/">Search</a></li></ul>
+    </nav>
+  </div><!-- /.navigation-wrapper -->
+
+
+    <header class="masthead">
+  <div class="wrap">
+    
+      <a href="/" class="site-logo" rel="home" title="Young's Notes">
+        <img src="/assets/images/young-choi-gopher-image.png" class="site-logo-img animated fadeInDown" alt="Young's Notes">
+      </a>
+    
+    
+    
+      
+        <div class="site-title animated fadeIn"><a href="/">Young's Notes</a></div>
+      
+      <p class="site-description animated fadeIn" itemprop="description">Notes from my software engineering journey: what I learn, what I try, and how I set things up.</p>
+    
+  </div>
+</header><!-- /.masthead -->
+
+
+    <main id="main" class="main-content" aria-label="Content">
+  <article class="h-entry">
+    
+
+    <div class="page-wrapper">
+      <header class="page-header">
+        
+        
+        <h1 id="page-title" class="page-title p-name">The 2026 Way to Write Enums in Go
+</h1>
+        
+      </header>
+
+      <div class="page-sidebar">
+        <div class="page-author h-card p-author"><img src="/assets/images/young-choi-gopher-image.png" class="author-avatar u-photo" alt="Young Choi"><div class="author-info"><div class="author-name">
+        <span class="p-name">Young Choi</span>
+      </div><ul class="author-links"><li class="author-link">
+            <a class="u-url" rel="me" href="https://github.com/whyjun"><i class="fab fa-github-square fa-lg" title="GitHub"></i></a>
+          </li></ul><!-- 
+
+<span class="read-time">3 min read</span>
+ -->
+    <time class="page-date dt-published" datetime="2026-07-06T00:00:00-07:00"><a class="u-url" href="">July 6, 2026</a>
+</time>
+
+  </div>
+</div>
+
+        
+  <h3 class="page-taxonomies-title">Categories</h3>
+  
+  <ul class="page-taxonomies"><li class="page-taxonomy"><a class="p-category" href="/categories/#golang" title="Pages filed under Golang">Golang</a></li>
+  </ul>
+
+
+        <!-- 
+  <h3 class="page-taxonomies-title">Tags</h3>
+  
+  <ul class="page-taxonomies"><li class="page-taxonomy"><a href="/tags/#enums" title="Pages tagged enums" rel="tag">enums</a></li><li class="page-taxonomy"><a href="/tags/#golang" title="Pages tagged golang" rel="tag">golang</a></li>
+  </ul>
+ -->
+
+      </div>
+
+      <div class="page-content">
+        <div class="e-content">
+          <p>Back in 2022 I wrote a Korean post about faking enums in Go with a typed constant block and <code class="language-plaintext highlighter-rouge">iota</code>. Go still has no <code class="language-plaintext highlighter-rouge">enum</code> keyword in 1.26.4, and a couple of language proposals asking for one (<a href="https://github.com/golang/go/issues/19814">issue #19814</a>, <a href="https://github.com/golang/go/issues/64739">issue #64739</a>) have been open for years without landing. So the trick from 2022 is still exactly how you write an enum in Go today. What’s worth a second post is the bug hiding in that trick, because this time I actually ran it instead of just describing it.</p>
+
+<h2 id="the-trick-hasnt-changed">The Trick Hasn’t Changed</h2>
+
+<p>Go has no <code class="language-plaintext highlighter-rouge">enum</code> type, so you fake one with a named integer type and a <code class="language-plaintext highlighter-rouge">const</code> block that uses <code class="language-plaintext highlighter-rouge">iota</code> to number the values:</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">type</span> <span class="n">Status</span> <span class="kt">int</span>
+
+<span class="k">const</span> <span class="p">(</span>
+	<span class="n">StatusOK</span> <span class="n">Status</span> <span class="o">=</span> <span class="no">iota</span>
+	<span class="n">StatusError</span>
+	<span class="n">StatusPending</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">iota</code> starts at 0 and increments by one per line, so <code class="language-plaintext highlighter-rouge">StatusOK</code> is <code class="language-plaintext highlighter-rouge">0</code>, <code class="language-plaintext highlighter-rouge">StatusError</code> is <code class="language-plaintext highlighter-rouge">1</code>, and <code class="language-plaintext highlighter-rouge">StatusPending</code> is <code class="language-plaintext highlighter-rouge">2</code>. It reads cleanly and the compiler stops you from mixing a <code class="language-plaintext highlighter-rouge">Status</code> with a plain <code class="language-plaintext highlighter-rouge">int</code> by accident.</p>
+
+<h2 id="where-it-bites-you">Where It Bites You</h2>
+
+<p><code class="language-plaintext highlighter-rouge">iota</code> always starts at 0, and 0 is also Go’s zero value for <code class="language-plaintext highlighter-rouge">int</code>. If you never explicitly set a <code class="language-plaintext highlighter-rouge">Status</code> field, decoding a struct from JSON, reading an unset field from a database row, or just declaring <code class="language-plaintext highlighter-rouge">var s Status</code> all hand you <code class="language-plaintext highlighter-rouge">0</code> for free. That’s fine as long as <code class="language-plaintext highlighter-rouge">0</code> doesn’t mean something you’d act on.</p>
+
+<p>In the example above, it does. Here’s a <code class="language-plaintext highlighter-rouge">Request</code> struct with a <code class="language-plaintext highlighter-rouge">Status</code> field, and a JSON payload from a queue where whoever built it forgot to set the status:</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">type</span> <span class="n">Request</span> <span class="k">struct</span> <span class="p">{</span>
+	<span class="n">ID</span>        <span class="kt">int</span>    <span class="s">`json:"ID"`</span>
+	<span class="n">Timestamp</span> <span class="kt">int</span>    <span class="s">`json:"Timestamp"`</span>
+	<span class="n">Message</span>   <span class="kt">string</span> <span class="s">`json:"Message"`</span>
+	<span class="n">Status</span>    <span class="n">Status</span> <span class="s">`json:"Status"`</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"ID"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"Timestamp"</span><span class="p">:</span><span class="w"> </span><span class="mi">1738000000</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"Message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Example message"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>I unmarshaled that payload against the <code class="language-plaintext highlighter-rouge">Request</code> struct and printed what came out:</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">var</span> <span class="n">req</span> <span class="n">Request</span>
+<span class="n">json</span><span class="o">.</span><span class="n">Unmarshal</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">req</span><span class="p">)</span>
+<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">Status</span><span class="p">)</span> <span class="c">// 0</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">req.Status</code> decodes as <code class="language-plaintext highlighter-rouge">0</code>, which is <code class="language-plaintext highlighter-rouge">StatusOK</code>. A request that never had its status set now looks like a request that succeeded. Nothing errors, nothing panics, the bug just quietly ships. I ran this end to end rather than assuming it, and the zero-value collision is exactly as silent as it sounds: <code class="language-plaintext highlighter-rouge">go vet</code> has nothing to say about it, because <code class="language-plaintext highlighter-rouge">0</code> is a perfectly valid <code class="language-plaintext highlighter-rouge">Status</code>.</p>
+
+<h2 id="the-fix">The Fix</h2>
+
+<p>Reserve <code class="language-plaintext highlighter-rouge">0</code> for a case that means “nothing was set,” and start your real values at 1:</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">type</span> <span class="n">Status</span> <span class="kt">int</span>
+
+<span class="k">const</span> <span class="p">(</span>
+	<span class="n">StatusUnknown</span> <span class="n">Status</span> <span class="o">=</span> <span class="no">iota</span>
+	<span class="n">StatusOK</span>
+	<span class="n">StatusError</span>
+	<span class="n">StatusPending</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<p>Now the same missing-field payload decodes to <code class="language-plaintext highlighter-rouge">StatusUnknown</code> instead of <code class="language-plaintext highlighter-rouge">StatusOK</code>. A forgotten field turns into a visible, checkable state instead of a false positive for success. I reran the exact same unmarshal against this version and got <code class="language-plaintext highlighter-rouge">StatusUnknown</code> back, not <code class="language-plaintext highlighter-rouge">StatusOK</code>.</p>
+
+<p>This costs you nothing. You still get sequential values, you still get type safety, and now the zero value tells you “this was never set” instead of lying to you.</p>
+
+<h2 id="catching-it-automatically">Catching It Automatically</h2>
+
+<p>If you’d rather not rely on remembering this every time you define an enum, the <a href="https://github.com/nishanths/exhaustive"><code class="language-plaintext highlighter-rouge">exhaustive</code></a> linter (bundled with <code class="language-plaintext highlighter-rouge">golangci-lint</code>) flags <code class="language-plaintext highlighter-rouge">switch</code> statements over an enum type that don’t cover every constant. It won’t catch the zero-value trap directly, but it does force you to handle every <code class="language-plaintext highlighter-rouge">Status</code> value explicitly wherever you branch on one, which tends to surface an unhandled <code class="language-plaintext highlighter-rouge">StatusUnknown</code> case as soon as you add it.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>The core trick for an enum in Go hasn’t moved since 2022: a named integer type plus a <code class="language-plaintext highlighter-rouge">const</code>/<code class="language-plaintext highlighter-rouge">iota</code> block. What’s worth remembering is that <code class="language-plaintext highlighter-rouge">iota</code> starts at 0, and 0 is also your zero value, so your first enum constant is what every unset, forgotten, or zeroed-out <code class="language-plaintext highlighter-rouge">Status</code> silently becomes. Give that slot to an explicit <code class="language-plaintext highlighter-rouge">Unknown</code> case and the zero value stops lying to you. Happy coding!</p>
+
+        </div>
+      
+        <a href="https://www.buymeacoffee.com/youngchoi"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=youngchoi&button_colour=FFDD00&font_colour=000000&font_family=Comic&outline_colour=000000&coffee_colour=ffffff"></a>
+
+        <script src="https://utteranc.es/client.js" repo="whyjun/whyjun.github.io" issue-term="title" label="💬 comment"
+          theme="github-light" crossorigin="anonymous" async>
+        </script>
+
+        <!-- 
+        <div class="page-share">
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwhyjun.github.io%2Fgolang%2FThe-2026-Way-to-Write-Enums-in-Go" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--facebook btn--small"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i> <span>Share</span></a>
+  <a href="https://twitter.com/intent/tweet?text=The+2026+Way+to+Write+Enums+in+Go%20https%3A%2F%2Fwhyjun.github.io%2Fgolang%2FThe-2026-Way-to-Write-Enums-in-Go" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--twitter btn--small"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i> <span>Tweet</span></a>
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fwhyjun.github.io%2Fgolang%2FThe-2026-Way-to-Write-Enums-in-Go" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--linkedin btn--small"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i> <span>LinkedIn</span></a>
+  <a href="https://reddit.com/submit?title=The+2026+Way+to+Write+Enums+in+Go&url=https%3A%2F%2Fwhyjun.github.io%2Fgolang%2FThe-2026-Way-to-Write-Enums-in-Go" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--reddit btn--small"><i class="fab fa-fw fa-reddit" aria-hidden="true"></i> <span>Reddit</span></a>
+</div>
+
+         -->
+
+        <nav class="page-pagination" role="navigation">
+  
+    <a class="page-previous" href="/golang/The-2026-Way-to-Write-a-Set-in-Go">
+      <h4 class="page-pagination-label">Previous</h4>
+      <span class="page-pagination-title">
+        <i class="fas fa-arrow-left"></i> The 2026 Way to Write a Set in Go
+
+      </span>
+    </a>
+  
+
+  
+</nav>
+
+      </div>
+    </div>
+  </article>
+</main>
+
+    <footer id="footer" class="site-footer">
+  <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+<div class="copyright">
+    
+      <p>&copy; 2026 Young's Notes. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://github.com/mmistakes/so-simple-theme" rel="nofollow">So Simple</a>.</p>
+    
+  </div>
+</footer>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://use.fontawesome.com/releases/v5.0.12/js/all.js"></script><!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-73KQ7TR7X4"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-73KQ7TR7X4');
+  </script>
+
+
+  </body>
+
+</html>
