@@ -5,9 +5,97 @@
     <description>Notes from my software engineering journey: what I learn, what I try, and how I set things up.</description>
     <link>https://whyjun.github.io/</link>
     <atom:link href="https://whyjun.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 05 Jul 2026 18:58:08 -0700</pubDate>
-    <lastBuildDate>Sun, 05 Jul 2026 18:58:08 -0700</lastBuildDate>
+    <pubDate>Mon, 06 Jul 2026 21:03:23 -0700</pubDate>
+    <lastBuildDate>Mon, 06 Jul 2026 21:03:23 -0700</lastBuildDate>
     <generator>Jekyll v3.10.0</generator>
+    
+      <item>
+        <title>The 2026 Way to Write Enums in Go</title>
+        <description>&lt;p&gt;Back in 2022 I wrote a Korean post about faking enums in Go with a typed constant block and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;iota&lt;/code&gt;. Go still has no &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;enum&lt;/code&gt; keyword in 1.26.4, and a couple of language proposals asking for one (&lt;a href=&quot;https://github.com/golang/go/issues/19814&quot;&gt;issue #19814&lt;/a&gt;, &lt;a href=&quot;https://github.com/golang/go/issues/64739&quot;&gt;issue #64739&lt;/a&gt;) have been open for years without landing. So the trick from 2022 is still exactly how you write an enum in Go today. What’s worth a second post is the bug hiding in that trick, because this time I actually ran it instead of just describing it.&lt;/p&gt;
+
+&lt;h2 id=&quot;the-trick-hasnt-changed&quot;&gt;The Trick Hasn’t Changed&lt;/h2&gt;
+
+&lt;p&gt;Go has no &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;enum&lt;/code&gt; type, so you fake one with a named integer type and a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;const&lt;/code&gt; block that uses &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;iota&lt;/code&gt; to number the values:&lt;/p&gt;
+
+&lt;div class=&quot;language-go highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Status&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;StatusOK&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Status&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;iota&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;StatusError&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;StatusPending&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;iota&lt;/code&gt; starts at 0 and increments by one per line, so &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;StatusOK&lt;/code&gt; is &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;0&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;StatusError&lt;/code&gt; is &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;1&lt;/code&gt;, and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;StatusPending&lt;/code&gt; is &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;2&lt;/code&gt;. It reads cleanly and the compiler stops you from mixing a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Status&lt;/code&gt; with a plain &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;int&lt;/code&gt; by accident.&lt;/p&gt;
+
+&lt;h2 id=&quot;where-it-bites-you&quot;&gt;Where It Bites You&lt;/h2&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;iota&lt;/code&gt; always starts at 0, and 0 is also Go’s zero value for &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;int&lt;/code&gt;. If you never explicitly set a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Status&lt;/code&gt; field, decoding a struct from JSON, reading an unset field from a database row, or just declaring &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;var s Status&lt;/code&gt; all hand you &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;0&lt;/code&gt; for free. That’s fine as long as &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;0&lt;/code&gt; doesn’t mean something you’d act on.&lt;/p&gt;
+
+&lt;p&gt;In the example above, it does. Here’s a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Request&lt;/code&gt; struct with a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Status&lt;/code&gt; field, and a JSON payload from a queue where whoever built it forgot to set the status:&lt;/p&gt;
+
+&lt;div class=&quot;language-go highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Request&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;ID&lt;/span&gt;        &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;    &lt;span class=&quot;s&quot;&gt;`json:&quot;ID&quot;`&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;Timestamp&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;    &lt;span class=&quot;s&quot;&gt;`json:&quot;Timestamp&quot;`&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;Message&lt;/span&gt;   &lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;`json:&quot;Message&quot;`&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;Status&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;Status&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;`json:&quot;Status&quot;`&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;ID&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;Timestamp&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1738000000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;Message&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Example message&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;I unmarshaled that payload against the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Request&lt;/code&gt; struct and printed what came out:&lt;/p&gt;
+
+&lt;div class=&quot;language-go highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;req&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Request&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Unmarshal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;payload&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;req&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;fmt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Println&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;req&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Status&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;// 0&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;req.Status&lt;/code&gt; decodes as &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;0&lt;/code&gt;, which is &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;StatusOK&lt;/code&gt;. A request that never had its status set now looks like a request that succeeded. Nothing errors, nothing panics, the bug just quietly ships. I ran this end to end rather than assuming it, and the zero-value collision is exactly as silent as it sounds: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;go vet&lt;/code&gt; has nothing to say about it, because &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;0&lt;/code&gt; is a perfectly valid &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Status&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;the-fix&quot;&gt;The Fix&lt;/h2&gt;
+
+&lt;p&gt;Reserve &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;0&lt;/code&gt; for a case that means “nothing was set,” and start your real values at 1:&lt;/p&gt;
+
+&lt;div class=&quot;language-go highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Status&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;StatusUnknown&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Status&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;iota&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;StatusOK&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;StatusError&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;StatusPending&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now the same missing-field payload decodes to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;StatusUnknown&lt;/code&gt; instead of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;StatusOK&lt;/code&gt;. A forgotten field turns into a visible, checkable state instead of a false positive for success. I reran the exact same unmarshal against this version and got &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;StatusUnknown&lt;/code&gt; back, not &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;StatusOK&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;This costs you nothing. You still get sequential values, you still get type safety, and now the zero value tells you “this was never set” instead of lying to you.&lt;/p&gt;
+
+&lt;h2 id=&quot;catching-it-automatically&quot;&gt;Catching It Automatically&lt;/h2&gt;
+
+&lt;p&gt;If you’d rather not rely on remembering this every time you define an enum, the &lt;a href=&quot;https://github.com/nishanths/exhaustive&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;exhaustive&lt;/code&gt;&lt;/a&gt; linter (bundled with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;golangci-lint&lt;/code&gt;) flags &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;switch&lt;/code&gt; statements over an enum type that don’t cover every constant. It won’t catch the zero-value trap directly, but it does force you to handle every &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Status&lt;/code&gt; value explicitly wherever you branch on one, which tends to surface an unhandled &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;StatusUnknown&lt;/code&gt; case as soon as you add it.&lt;/p&gt;
+
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;The core trick for an enum in Go hasn’t moved since 2022: a named integer type plus a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;const&lt;/code&gt;/&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;iota&lt;/code&gt; block. What’s worth remembering is that &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;iota&lt;/code&gt; starts at 0, and 0 is also your zero value, so your first enum constant is what every unset, forgotten, or zeroed-out &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Status&lt;/code&gt; silently becomes. Give that slot to an explicit &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Unknown&lt;/code&gt; case and the zero value stops lying to you. Happy coding!&lt;/p&gt;
+</description>
+        <pubDate>Mon, 06 Jul 2026 00:00:00 -0700</pubDate>
+        <link>https://whyjun.github.io/golang/The-2026-Way-to-Write-Enums-in-Go</link>
+        <guid isPermaLink="true">https://whyjun.github.io/golang/The-2026-Way-to-Write-Enums-in-Go</guid>
+        
+        <category>golang</category>
+        
+        <category>enums</category>
+        
+        
+        <category>Golang</category>
+        
+      </item>
     
       <item>
         <title>The 2026 Way to Write a Set in Go</title>
