@@ -1,4 +1,97 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="https://whyjun.github.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://whyjun.github.io/" rel="alternate" type="text/html" /><updated>2026-07-06T21:03:23-07:00</updated><id>https://whyjun.github.io/atom.xml</id><title type="html">Young’s Notes</title><subtitle>Notes from my software engineering journey: what I learn, what I try, and how I set things up.</subtitle><author><name>Young Choi</name></author><entry xml:lang="en"><title type="html">The 2026 Way to Write Enums in Go</title><link href="https://whyjun.github.io/golang/The-2026-Way-to-Write-Enums-in-Go" rel="alternate" type="text/html" title="The 2026 Way to Write Enums in Go" /><published>2026-07-06T00:00:00-07:00</published><updated>2026-07-06T00:00:00-07:00</updated><id>https://whyjun.github.io/golang/The-2026-Way-to-Write-Enums-in-Go</id><content type="html" xml:base="https://whyjun.github.io/golang/The-2026-Way-to-Write-Enums-in-Go"><![CDATA[<p>Back in 2022 I wrote a Korean post about faking enums in Go with a typed constant block and <code class="language-plaintext highlighter-rouge">iota</code>. Go still has no <code class="language-plaintext highlighter-rouge">enum</code> keyword in 1.26.4, and a couple of language proposals asking for one (<a href="https://github.com/golang/go/issues/19814">issue #19814</a>, <a href="https://github.com/golang/go/issues/64739">issue #64739</a>) have been open for years without landing. So the trick from 2022 is still exactly how you write an enum in Go today. What’s worth a second post is the bug hiding in that trick, because this time I actually ran it instead of just describing it.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="https://whyjun.github.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://whyjun.github.io/" rel="alternate" type="text/html" /><updated>2026-07-08T08:29:46-07:00</updated><id>https://whyjun.github.io/atom.xml</id><title type="html">Young’s Notes</title><subtitle>Notes from my software engineering journey: what I learn, what I try, and how I set things up.</subtitle><author><name>Young Choi</name></author><entry xml:lang="en"><title type="html">The 2026 Way to Lint Go Code with golangci-lint</title><link href="https://whyjun.github.io/golang/The-2026-Way-to-Lint-Go-Code-with-golangci-lint" rel="alternate" type="text/html" title="The 2026 Way to Lint Go Code with golangci-lint" /><published>2026-07-08T00:00:00-07:00</published><updated>2026-07-08T00:00:00-07:00</updated><id>https://whyjun.github.io/golang/The-2026-Way-to-Lint-Go-Code-with-golangci-lint</id><content type="html" xml:base="https://whyjun.github.io/golang/The-2026-Way-to-Lint-Go-Code-with-golangci-lint"><![CDATA[<p>Back in 2023 I wrote a Korean post about adopting <code class="language-plaintext highlighter-rouge">golangci-lint</code> on my team. We’d grown enough that reviewers were spending more time explaining idiomatic Go in PR comments than reviewing the actual logic, and we needed something automated to take that job off our plates. <code class="language-plaintext highlighter-rouge">golangci-lint</code> was the fix: instead of running <code class="language-plaintext highlighter-rouge">govet</code>, <code class="language-plaintext highlighter-rouge">gofmt</code>, and a dozen other tools one at a time, it runs all of them in parallel and caches the results. Three years later that’s still exactly why I reach for it. What’s changed is everything around it, most of all the config file, which went through a major version bump in 2025.</p>
+
+<h2 id="why-golangci-lint-still">Why golangci-lint, Still</h2>
+
+<p>The pitch hasn’t moved. Go’s ecosystem has plenty of good standalone linters, but running each one separately is slow and means juggling a dozen install commands and flag sets. <code class="language-plaintext highlighter-rouge">golangci-lint</code> wraps them behind one binary, runs them concurrently, and caches analysis results between runs so repeat lints are fast. That’s still the whole value proposition, and it’s still worth it the moment more than one person touches a repo.</p>
+
+<h2 id="installing-it">Installing It</h2>
+
+<p>I installed <code class="language-plaintext highlighter-rouge">golangci-lint</code> fresh today to write this post, and the install story has tightened up. The docs now actively discourage <code class="language-plaintext highlighter-rouge">go install</code>, calling it “not guaranteed to work” for this project, and point everyone at the binary installer instead. On Windows, that means Git Bash:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-sSfL</span> https://golangci-lint.run/install.sh | sh <span class="nt">-s</span> <span class="nt">--</span> <span class="nt">-b</span> <span class="si">$(</span>go <span class="nb">env </span>GOPATH<span class="si">)</span>/bin v2.12.2
+
+golangci-lint <span class="nt">--version</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>golangci-lint has version 2.12.2 built with go1.26.2 from c0d3ddc9 on 2026-05-06T11:07:58Z
+</code></pre></div></div>
+
+<p>That’s the current version as of this post. Pin a version in the install command instead of trusting <code class="language-plaintext highlighter-rouge">latest</code>, the same way you’d pin any other build tool.</p>
+
+<h2 id="the-config-file-got-a-major-version-bump">The Config File Got a Major Version Bump</h2>
+
+<p>This is the part of the 2023 post that’s fully out of date. <code class="language-plaintext highlighter-rouge">golangci-lint</code> v2.0.0 shipped in March 2025 with a rewritten config schema, and every <code class="language-plaintext highlighter-rouge">.golangci.yml</code> I’d written before that no longer loads as-is. The two changes that matter:</p>
+
+<ul>
+  <li>The file needs a top-level <code class="language-plaintext highlighter-rouge">version: "2"</code>.</li>
+  <li>Linters and formatters are now separate sections. Tools like <code class="language-plaintext highlighter-rouge">gofmt</code>, <code class="language-plaintext highlighter-rouge">gofumpt</code>, <code class="language-plaintext highlighter-rouge">goimports</code>, and <code class="language-plaintext highlighter-rouge">gci</code> used to live under <code class="language-plaintext highlighter-rouge">linters</code>; they moved to their own <code class="language-plaintext highlighter-rouge">formatters</code> block, because formatting code and flagging bugs in it are different jobs.</li>
+</ul>
+
+<p>Here’s a minimal config in the new shape, which I ran against a real Go file to confirm it loads and works:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">version</span><span class="pi">:</span> <span class="s2">"</span><span class="s">2"</span>
+<span class="na">linters</span><span class="pi">:</span>
+  <span class="na">default</span><span class="pi">:</span> <span class="s">standard</span>
+  <span class="na">enable</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">errorlint</span>
+<span class="na">formatters</span><span class="pi">:</span>
+  <span class="na">enable</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">gofmt</span>
+    <span class="pi">-</span> <span class="s">goimports</span>
+</code></pre></div></div>
+
+<p>If you’ve still got a v1 config lying around, don’t hand-migrate it. <code class="language-plaintext highlighter-rouge">golangci-lint migrate</code> does it for you:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>golangci-lint migrate <span class="nt">-c</span> .golangci.yml
+</code></pre></div></div>
+
+<p>I fed it an old-style config with an <code class="language-plaintext highlighter-rouge">errorlint</code> and <code class="language-plaintext highlighter-rouge">gofmt</code> entry under <code class="language-plaintext highlighter-rouge">linters</code>, and it rewrote the file in place: added <code class="language-plaintext highlighter-rouge">version: "2"</code>, moved <code class="language-plaintext highlighter-rouge">gofmt</code> into <code class="language-plaintext highlighter-rouge">formatters</code>, and warned me that <code class="language-plaintext highlighter-rouge">run.timeout</code> no longer applies because v2 disables the timeout by default. It even flagged that comments in the original file don’t survive the migration, so it’s worth a manual diff afterward rather than trusting it blindly.</p>
+
+<h2 id="running-it">Running It</h2>
+
+<p><code class="language-plaintext highlighter-rouge">golangci-lint run</code> still works exactly like before, and the linters it finds are still worth having. I wrote a small function with the exact bug my 2023 post talked about, wrapping an error with <code class="language-plaintext highlighter-rouge">%s</code> instead of <code class="language-plaintext highlighter-rouge">%w</code>:</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">func</span> <span class="n">readConfig</span><span class="p">(</span><span class="n">path</span> <span class="kt">string</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+	<span class="n">_</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">os</span><span class="o">.</span><span class="n">ReadFile</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+	<span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="n">fmt</span><span class="o">.</span><span class="n">Errorf</span><span class="p">(</span><span class="s">"reading config: %s"</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="no">nil</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>golangci-lint run ./...
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>main.go:11:43: non-wrapping format verb for fmt.Errorf. Use `%w` to format errors (errorlint)
+		return fmt.Errorf("reading config: %s", err)
+		                                        ^
+1 issues:
+* errorlint: 1
+</code></pre></div></div>
+
+<p>Same catch as three years ago: <code class="language-plaintext highlighter-rouge">%s</code> loses the wrapped error, so <code class="language-plaintext highlighter-rouge">errors.Is</code> and <code class="language-plaintext highlighter-rouge">errors.As</code> can’t see through it later, which matters more the bigger the codebase gets.</p>
+
+<p>One flag did change. The old <code class="language-plaintext highlighter-rouge">--fast</code> flag is gone; running it now just fails with an unknown-flag error. Its replacement is <code class="language-plaintext highlighter-rouge">--fast-only</code>, which filters the enabled set down to linters tagged fast:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>golangci-lint run <span class="nt">--fast-only</span> ./...
+</code></pre></div></div>
+
+<p>On my test file that came back with 0 issues, because <code class="language-plaintext highlighter-rouge">errorlint</code> isn’t tagged as a fast linter and got filtered out, exactly the trade-off you’re opting into when you reach for <code class="language-plaintext highlighter-rouge">--fast-only</code> for a quick pre-commit check instead of the full run.</p>
+
+<h2 id="visual-studio-code">Visual Studio Code</h2>
+
+<p>The <code class="language-plaintext highlighter-rouge">go.lintTool</code> and <code class="language-plaintext highlighter-rouge">go.lintFlags</code> settings I wrote about in 2023 are still there in the Go extension, but <code class="language-plaintext highlighter-rouge">go.lintTool</code> now has an extra option. <code class="language-plaintext highlighter-rouge">golangci-lint</code> means v1, and there’s a separate <code class="language-plaintext highlighter-rouge">golangci-lint-v2</code> value for the current major version:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">"go.lintTool"</span><span class="p">:</span><span class="w"> </span><span class="s2">"golangci-lint-v2"</span><span class="err">,</span><span class="w">
+</span><span class="nl">"go.lintFlags"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"--fast-only"</span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+
+<p>If you’re still on the plain <code class="language-plaintext highlighter-rouge">golangci-lint</code> setting and a v2-only config, the extension will be reading a config it doesn’t understand, so check which value you have set before you assume it’s working.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>The reason to use <code class="language-plaintext highlighter-rouge">golangci-lint</code> hasn’t changed since 2023: one tool, run in parallel, caching results, instead of a dozen linters bolted together by hand. What changed is the config file underneath it, and it changed enough that a three-year-old <code class="language-plaintext highlighter-rouge">.golangci.yml</code> won’t load until you either rewrite it by hand or let <code class="language-plaintext highlighter-rouge">golangci-lint migrate</code> do it. Run that once, fix your CI flags if you were relying on <code class="language-plaintext highlighter-rouge">--fast</code>, and the rest of the setup carries over untouched. Happy coding!</p>]]></content><author><name>Young Choi</name></author><category term="Golang" /><category term="golang" /><category term="tooling" /><category term="lint" /><summary type="html"><![CDATA[Back in 2023 I wrote a Korean post about adopting golangci-lint on my team. We’d grown enough that reviewers were spending more time explaining idiomatic Go in PR comments than reviewing the actual logic, and we needed something automated to take that job off our plates. golangci-lint was the fix: instead of running govet, gofmt, and a dozen other tools one at a time, it runs all of them in parallel and caches the results. Three years later that’s still exactly why I reach for it. What’s changed is everything around it, most of all the config file, which went through a major version bump in 2025.]]></summary></entry><entry xml:lang="en"><title type="html">The 2026 Way to Write Enums in Go</title><link href="https://whyjun.github.io/golang/The-2026-Way-to-Write-Enums-in-Go" rel="alternate" type="text/html" title="The 2026 Way to Write Enums in Go" /><published>2026-07-06T00:00:00-07:00</published><updated>2026-07-06T00:00:00-07:00</updated><id>https://whyjun.github.io/golang/The-2026-Way-to-Write-Enums-in-Go</id><content type="html" xml:base="https://whyjun.github.io/golang/The-2026-Way-to-Write-Enums-in-Go"><![CDATA[<p>Back in 2022 I wrote a Korean post about faking enums in Go with a typed constant block and <code class="language-plaintext highlighter-rouge">iota</code>. Go still has no <code class="language-plaintext highlighter-rouge">enum</code> keyword in 1.26.4, and a couple of language proposals asking for one (<a href="https://github.com/golang/go/issues/19814">issue #19814</a>, <a href="https://github.com/golang/go/issues/64739">issue #64739</a>) have been open for years without landing. So the trick from 2022 is still exactly how you write an enum in Go today. What’s worth a second post is the bug hiding in that trick, because this time I actually ran it instead of just describing it.</p>
 
 <h2 id="the-trick-hasnt-changed">The Trick Hasn’t Changed</h2>
 
@@ -760,57 +853,4 @@ golangci-lint <span class="nt">--version</span>
 
 <h2 id="사용-후기">사용 후기</h2>
 
-<p>실제로 적용해보니 코드 리뷰로 잡아내지 못한 이슈들이 꽤 있었습니다. 대표적으로 error를 <code class="language-plaintext highlighter-rouge">fmt.Errorf</code>로 래핑할 때, <code class="language-plaintext highlighter-rouge">%w</code>를 사용하지 않았던 부분입니다. <code class="language-plaintext highlighter-rouge">errors</code> 패키지를 잘 활용하지 않았다보니 알아차리지 못했지만 프로젝트의 사이즈가 커지면서 어떤 error인지를 확인해야 하는 경우가 빈번하게 발생했는데 <code class="language-plaintext highlighter-rouge">%w</code>가 아닌 <code class="language-plaintext highlighter-rouge">%s</code>나 <code class="language-plaintext highlighter-rouge">%v</code>를 사용했을 때는 <code class="language-plaintext highlighter-rouge">errors.UnWrap()</code> 함수를 사용할 수 없고 그 때문에 <code class="language-plaintext highlighter-rouge">errors.Is</code>와 <code class="language-plaintext highlighter-rouge">errors.As</code>도 활용할 수 없다는 것을 알게 되었습니다. 이처럼 Linter는 하나의 정해진 코드 규칙을 모든 개발자가 지킬 수 있게 해준다는 점을 넘어서 코드에 있는 버그들을 개발자들이 일찍 알아차릴 수 있게 해줍니다.</p>]]></content><author><name>Young Choi</name></author><category term="Golang" /><category term="golang" /><summary type="html"><![CDATA[개발팀 사이즈가 커지면서 관리해야 하는 리포지토리의 개수가 늘어났고 각각의 프로젝트가 팀을 리드하는 개발자에 따라 자유분방한 모습으로 진화했습니다. 특히 Go 언어를 처음으로 사용하는 개발자들이 늘어나면서 코드 리뷰 과정에서 Idiomatic Go에 대해서 설명하고 작성하는데 시간을 꽤 소모하게 되었습니다. 그러다보니 실제로 리뷰가 되어야 하는 부분보다 더 많은 시간을 쏟게 되는 경우가 늘어났고 이를 방지하기 위해 자동화된 도구가 필요하다라는 피드백이 나오기 시작했습니다.]]></summary></entry><entry xml:lang="ko"><title type="html">Go에서 Enum 사용하기 그리고 주의할 점</title><link href="https://whyjun.github.io/golang/Enum-in-Golang" rel="alternate" type="text/html" title="Go에서 Enum 사용하기 그리고 주의할 점" /><published>2022-01-09T00:00:00-08:00</published><updated>2022-01-09T00:00:00-08:00</updated><id>https://whyjun.github.io/golang/Enum-in-Golang</id><content type="html" xml:base="https://whyjun.github.io/golang/Enum-in-Golang"><![CDATA[<p>Go 언어는 <code class="language-plaintext highlighter-rouge">enum</code> 타입을 제공하지 않지만 <code class="language-plaintext highlighter-rouge">Enum</code>으로 사용할 데이터 타입을 따로 생성 후 <code class="language-plaintext highlighter-rouge">iota</code>를 이용해서 비슷하게 사용할 수 있다. <a href="https://go.dev/play/p/5C0w6YGPyys">(예시 코드)</a></p>
-
-<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">main</span>
-
-<span class="k">import</span> <span class="s">"fmt"</span>
-
-<span class="k">type</span> <span class="n">level</span> <span class="kt">int</span>
-<span class="k">type</span> <span class="n">Status</span> <span class="kt">int</span>
-
-<span class="k">const</span> <span class="p">(</span>
-	<span class="n">easy</span> <span class="n">level</span> <span class="o">=</span> <span class="no">iota</span> <span class="o">+</span> <span class="m">1</span>
-	<span class="n">medium</span>
-	<span class="n">hard</span>
-<span class="p">)</span>
-
-<span class="k">const</span> <span class="p">(</span>
-	<span class="n">StatusUnknown</span> <span class="n">Status</span> <span class="o">=</span> <span class="no">iota</span>
-	<span class="n">StatusOK</span>
-	<span class="n">StatusError</span>
-<span class="p">)</span>
-
-<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
-	<span class="n">levelList</span> <span class="o">:=</span> <span class="p">[]</span><span class="n">level</span><span class="p">{</span><span class="n">easy</span><span class="p">,</span> <span class="n">medium</span><span class="p">,</span> <span class="n">hard</span><span class="p">}</span>
-	<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">levelList</span><span class="p">)</span>
-	<span class="c">// Output: [1 2 3]</span>
-
-	<span class="n">statusList</span> <span class="o">:=</span> <span class="p">[]</span><span class="n">Status</span><span class="p">{</span><span class="n">StatusUnknown</span><span class="p">,</span> <span class="n">StatusOK</span><span class="p">,</span> <span class="n">StatusError</span><span class="p">}</span>
-	<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">statusList</span><span class="p">)</span>
-	<span class="c">// Output: [0 1 2]</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>주의할 점은 <code class="language-plaintext highlighter-rouge">iota</code>가 항상 0 부터 시작하기 때문에 <code class="language-plaintext highlighter-rouge">enum</code>의 첫 값을 <code class="language-plaintext highlighter-rouge">iota + 1</code>으로 해서 1 부터 시작하도록 하던지 아니면 첫 <code class="language-plaintext highlighter-rouge">enum</code>을 Unknown이나 Nil을 나타내는데 사용해야 한다. Go의 <code class="language-plaintext highlighter-rouge">Zero Value</code>때문에 예상치 못한 부작용이 생길 수 있기 때문이다.</p>
-
-<p>이벤트 큐에서 아래와 같은 <code class="language-plaintext highlighter-rouge">JSON</code> 형식의 request를 받는 시스템이 있다고 가정해보자.</p>
-
-<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">type</span> <span class="n">Request</span> <span class="k">struct</span> <span class="p">{</span>
-	<span class="n">ID</span>        <span class="kt">int</span>    <span class="s">`json:"ID"`</span>
-	<span class="n">Timestamp</span> <span class="kt">int</span>    <span class="s">`json:"Timestamp"`</span>
-	<span class="n">Message</span>   <span class="kt">string</span> <span class="s">`json:"Message"`</span>
-	<span class="n">Status</span>    <span class="n">Status</span> <span class="s">`json:"Status"`</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>만약 이 Request를 보내는 코드에서 아래와 같이 <code class="language-plaintext highlighter-rouge">Status</code>를 <code class="language-plaintext highlighter-rouge">JSON</code>에 넣는 것을 까먹고 보냈다면 어떻게 될까?</p>
-
-<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
-  </span><span class="nl">"ID"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"Timestamp"</span><span class="p">:</span><span class="w"> </span><span class="mi">1641775651</span><span class="p">,</span><span class="w">
-  </span><span class="nl">"Message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Example message"</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></code></pre></div></div>
-
-<p><code class="language-plaintext highlighter-rouge">Status</code> 필드에 아무런 데이터가 들어가있지 않기 때문에 Request의 Status 값은 <code class="language-plaintext highlighter-rouge">int</code>의 <code class="language-plaintext highlighter-rouge">Zero Value</code>인 0이 될 것이다. 첫 <code class="language-plaintext highlighter-rouge">enum</code>이 <code class="language-plaintext highlighter-rouge">StatusUnknown</code>이 아니라 <code class="language-plaintext highlighter-rouge">StatusOK</code>였다면 <code class="language-plaintext highlighter-rouge">Status</code> 데이터가 없는 모든 Request들은 아무도 모르게 버그를 일으킬 것이다. 그렇기 때문에 Go에서 <code class="language-plaintext highlighter-rouge">enum</code>을 사용할 때는 <code class="language-plaintext highlighter-rouge">Zero Value</code>를 염두에 두고 꼭 첫 <code class="language-plaintext highlighter-rouge">enum</code>을 Unknown이나 Nil을 나타내는 값으로 지정하는 습관을 가져야 한다.</p>]]></content><author><name>Young Choi</name></author><category term="Golang" /><category term="golang" /><summary type="html"><![CDATA[Go 언어는 enum 타입을 제공하지 않지만 Enum으로 사용할 데이터 타입을 따로 생성 후 iota를 이용해서 비슷하게 사용할 수 있다. (예시 코드)]]></summary></entry></feed>
+<p>실제로 적용해보니 코드 리뷰로 잡아내지 못한 이슈들이 꽤 있었습니다. 대표적으로 error를 <code class="language-plaintext highlighter-rouge">fmt.Errorf</code>로 래핑할 때, <code class="language-plaintext highlighter-rouge">%w</code>를 사용하지 않았던 부분입니다. <code class="language-plaintext highlighter-rouge">errors</code> 패키지를 잘 활용하지 않았다보니 알아차리지 못했지만 프로젝트의 사이즈가 커지면서 어떤 error인지를 확인해야 하는 경우가 빈번하게 발생했는데 <code class="language-plaintext highlighter-rouge">%w</code>가 아닌 <code class="language-plaintext highlighter-rouge">%s</code>나 <code class="language-plaintext highlighter-rouge">%v</code>를 사용했을 때는 <code class="language-plaintext highlighter-rouge">errors.UnWrap()</code> 함수를 사용할 수 없고 그 때문에 <code class="language-plaintext highlighter-rouge">errors.Is</code>와 <code class="language-plaintext highlighter-rouge">errors.As</code>도 활용할 수 없다는 것을 알게 되었습니다. 이처럼 Linter는 하나의 정해진 코드 규칙을 모든 개발자가 지킬 수 있게 해준다는 점을 넘어서 코드에 있는 버그들을 개발자들이 일찍 알아차릴 수 있게 해줍니다.</p>]]></content><author><name>Young Choi</name></author><category term="Golang" /><category term="golang" /><summary type="html"><![CDATA[개발팀 사이즈가 커지면서 관리해야 하는 리포지토리의 개수가 늘어났고 각각의 프로젝트가 팀을 리드하는 개발자에 따라 자유분방한 모습으로 진화했습니다. 특히 Go 언어를 처음으로 사용하는 개발자들이 늘어나면서 코드 리뷰 과정에서 Idiomatic Go에 대해서 설명하고 작성하는데 시간을 꽤 소모하게 되었습니다. 그러다보니 실제로 리뷰가 되어야 하는 부분보다 더 많은 시간을 쏟게 되는 경우가 늘어났고 이를 방지하기 위해 자동화된 도구가 필요하다라는 피드백이 나오기 시작했습니다.]]></summary></entry></feed>

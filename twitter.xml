@@ -5,10 +5,17 @@
     <description>Notes from my software engineering journey: what I learn, what I try, and how I set things up.</description>
     <link>https://whyjun.github.io/</link>
     <atom:link href="https://whyjun.github.io/twitter.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Mon, 06 Jul 2026 21:03:23 -0700</pubDate>
-    <lastBuildDate>Mon, 06 Jul 2026 21:03:23 -0700</lastBuildDate>
+    <pubDate>Wed, 08 Jul 2026 08:29:46 -0700</pubDate>
+    <lastBuildDate>Wed, 08 Jul 2026 08:29:46 -0700</lastBuildDate>
     <generator>Jekyll v3.10.0</generator>
     
+    
+      <item>
+        <title>The 2026 Way to Lint Go Code with golangci-lint</title>
+        <pubDate>Wed, 08 Jul 2026 00:00:00 -0700</pubDate>
+        <link>https://whyjun.github.io/golang/The-2026-Way-to-Lint-Go-Code-with-golangci-lint</link>
+        <guid isPermaLink="true">https://whyjun.github.io/golang/The-2026-Way-to-Lint-Go-Code-with-golangci-lint</guid>
+      </item>
     
       <item>
         <title>The 2026 Way to Write Enums in Go</title>
@@ -36,13 +43,6 @@
         <pubDate>Fri, 03 Jul 2026 00:00:00 -0700</pubDate>
         <link>https://whyjun.github.io/blog/How-to-Use-Git-Worktrees-with-Claude-Code</link>
         <guid isPermaLink="true">https://whyjun.github.io/blog/How-to-Use-Git-Worktrees-with-Claude-Code</guid>
-      </item>
-    
-      <item>
-        <title>Storing Heterogeneous Objects in PostgreSQL</title>
-        <pubDate>Mon, 08 Jul 2024 00:00:00 -0700</pubDate>
-        <link>https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL</link>
-        <guid isPermaLink="true">https://whyjun.github.io/blog/Storing-Heterogeneous-Objects-in-PostgreSQL</guid>
       </item>
     
   </channel>

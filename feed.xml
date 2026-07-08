@@ -5,9 +5,121 @@
     <description>Notes from my software engineering journey: what I learn, what I try, and how I set things up.</description>
     <link>https://whyjun.github.io/</link>
     <atom:link href="https://whyjun.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 06 Jul 2026 21:03:23 -0700</pubDate>
-    <lastBuildDate>Mon, 06 Jul 2026 21:03:23 -0700</lastBuildDate>
+    <pubDate>Wed, 08 Jul 2026 08:29:46 -0700</pubDate>
+    <lastBuildDate>Wed, 08 Jul 2026 08:29:46 -0700</lastBuildDate>
     <generator>Jekyll v3.10.0</generator>
+    
+      <item>
+        <title>The 2026 Way to Lint Go Code with golangci-lint</title>
+        <description>&lt;p&gt;Back in 2023 I wrote a Korean post about adopting &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;golangci-lint&lt;/code&gt; on my team. We’d grown enough that reviewers were spending more time explaining idiomatic Go in PR comments than reviewing the actual logic, and we needed something automated to take that job off our plates. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;golangci-lint&lt;/code&gt; was the fix: instead of running &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;govet&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gofmt&lt;/code&gt;, and a dozen other tools one at a time, it runs all of them in parallel and caches the results. Three years later that’s still exactly why I reach for it. What’s changed is everything around it, most of all the config file, which went through a major version bump in 2025.&lt;/p&gt;
+
+&lt;h2 id=&quot;why-golangci-lint-still&quot;&gt;Why golangci-lint, Still&lt;/h2&gt;
+
+&lt;p&gt;The pitch hasn’t moved. Go’s ecosystem has plenty of good standalone linters, but running each one separately is slow and means juggling a dozen install commands and flag sets. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;golangci-lint&lt;/code&gt; wraps them behind one binary, runs them concurrently, and caches analysis results between runs so repeat lints are fast. That’s still the whole value proposition, and it’s still worth it the moment more than one person touches a repo.&lt;/p&gt;
+
+&lt;h2 id=&quot;installing-it&quot;&gt;Installing It&lt;/h2&gt;
+
+&lt;p&gt;I installed &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;golangci-lint&lt;/code&gt; fresh today to write this post, and the install story has tightened up. The docs now actively discourage &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;go install&lt;/code&gt;, calling it “not guaranteed to work” for this project, and point everyone at the binary installer instead. On Windows, that means Git Bash:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl &lt;span class=&quot;nt&quot;&gt;-sSfL&lt;/span&gt; https://golangci-lint.run/install.sh | sh &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-b&lt;/span&gt; &lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;go &lt;span class=&quot;nb&quot;&gt;env &lt;/span&gt;GOPATH&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;/bin v2.12.2
+
+golangci-lint &lt;span class=&quot;nt&quot;&gt;--version&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;golangci-lint has version 2.12.2 built with go1.26.2 from c0d3ddc9 on 2026-05-06T11:07:58Z
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;That’s the current version as of this post. Pin a version in the install command instead of trusting &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;latest&lt;/code&gt;, the same way you’d pin any other build tool.&lt;/p&gt;
+
+&lt;h2 id=&quot;the-config-file-got-a-major-version-bump&quot;&gt;The Config File Got a Major Version Bump&lt;/h2&gt;
+
+&lt;p&gt;This is the part of the 2023 post that’s fully out of date. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;golangci-lint&lt;/code&gt; v2.0.0 shipped in March 2025 with a rewritten config schema, and every &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.golangci.yml&lt;/code&gt; I’d written before that no longer loads as-is. The two changes that matter:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;The file needs a top-level &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;version: &quot;2&quot;&lt;/code&gt;.&lt;/li&gt;
+  &lt;li&gt;Linters and formatters are now separate sections. Tools like &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gofmt&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gofumpt&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;goimports&lt;/code&gt;, and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gci&lt;/code&gt; used to live under &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;linters&lt;/code&gt;; they moved to their own &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;formatters&lt;/code&gt; block, because formatting code and flagging bugs in it are different jobs.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Here’s a minimal config in the new shape, which I ran against a real Go file to confirm it loads and works:&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;version&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2&quot;&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;linters&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;default&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;standard&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;enable&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;errorlint&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;formatters&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;enable&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;gofmt&lt;/span&gt;
+    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;goimports&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;If you’ve still got a v1 config lying around, don’t hand-migrate it. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;golangci-lint migrate&lt;/code&gt; does it for you:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;golangci-lint migrate &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt; .golangci.yml
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;I fed it an old-style config with an &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;errorlint&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gofmt&lt;/code&gt; entry under &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;linters&lt;/code&gt;, and it rewrote the file in place: added &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;version: &quot;2&quot;&lt;/code&gt;, moved &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gofmt&lt;/code&gt; into &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;formatters&lt;/code&gt;, and warned me that &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;run.timeout&lt;/code&gt; no longer applies because v2 disables the timeout by default. It even flagged that comments in the original file don’t survive the migration, so it’s worth a manual diff afterward rather than trusting it blindly.&lt;/p&gt;
+
+&lt;h2 id=&quot;running-it&quot;&gt;Running It&lt;/h2&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;golangci-lint run&lt;/code&gt; still works exactly like before, and the linters it finds are still worth having. I wrote a small function with the exact bug my 2023 post talked about, wrapping an error with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;%s&lt;/code&gt; instead of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;%w&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-go highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;readConfig&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;path&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;error&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;err&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;os&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ReadFile&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;err&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;nil&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+		&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fmt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Errorf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;reading config: %s&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+	&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;nil&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;golangci-lint run ./...
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;main.go:11:43: non-wrapping format verb for fmt.Errorf. Use `%w` to format errors (errorlint)
+		return fmt.Errorf(&quot;reading config: %s&quot;, err)
+		                                        ^
+1 issues:
+* errorlint: 1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Same catch as three years ago: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;%s&lt;/code&gt; loses the wrapped error, so &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;errors.Is&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;errors.As&lt;/code&gt; can’t see through it later, which matters more the bigger the codebase gets.&lt;/p&gt;
+
+&lt;p&gt;One flag did change. The old &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--fast&lt;/code&gt; flag is gone; running it now just fails with an unknown-flag error. Its replacement is &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--fast-only&lt;/code&gt;, which filters the enabled set down to linters tagged fast:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;golangci-lint run &lt;span class=&quot;nt&quot;&gt;--fast-only&lt;/span&gt; ./...
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;On my test file that came back with 0 issues, because &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;errorlint&lt;/code&gt; isn’t tagged as a fast linter and got filtered out, exactly the trade-off you’re opting into when you reach for &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--fast-only&lt;/code&gt; for a quick pre-commit check instead of the full run.&lt;/p&gt;
+
+&lt;h2 id=&quot;visual-studio-code&quot;&gt;Visual Studio Code&lt;/h2&gt;
+
+&lt;p&gt;The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;go.lintTool&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;go.lintFlags&lt;/code&gt; settings I wrote about in 2023 are still there in the Go extension, but &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;go.lintTool&lt;/code&gt; now has an extra option. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;golangci-lint&lt;/code&gt; means v1, and there’s a separate &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;golangci-lint-v2&lt;/code&gt; value for the current major version:&lt;/p&gt;
+
+&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nl&quot;&gt;&quot;go.lintTool&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;golangci-lint-v2&quot;&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;go.lintFlags&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;--fast-only&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;If you’re still on the plain &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;golangci-lint&lt;/code&gt; setting and a v2-only config, the extension will be reading a config it doesn’t understand, so check which value you have set before you assume it’s working.&lt;/p&gt;
+
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;The reason to use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;golangci-lint&lt;/code&gt; hasn’t changed since 2023: one tool, run in parallel, caching results, instead of a dozen linters bolted together by hand. What changed is the config file underneath it, and it changed enough that a three-year-old &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.golangci.yml&lt;/code&gt; won’t load until you either rewrite it by hand or let &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;golangci-lint migrate&lt;/code&gt; do it. Run that once, fix your CI flags if you were relying on &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--fast&lt;/code&gt;, and the rest of the setup carries over untouched. Happy coding!&lt;/p&gt;
+</description>
+        <pubDate>Wed, 08 Jul 2026 00:00:00 -0700</pubDate>
+        <link>https://whyjun.github.io/golang/The-2026-Way-to-Lint-Go-Code-with-golangci-lint</link>
+        <guid isPermaLink="true">https://whyjun.github.io/golang/The-2026-Way-to-Lint-Go-Code-with-golangci-lint</guid>
+        
+        <category>golang</category>
+        
+        <category>tooling</category>
+        
+        <category>lint</category>
+        
+        
+        <category>Golang</category>
+        
+      </item>
     
       <item>
         <title>The 2026 Way to Write Enums in Go</title>
