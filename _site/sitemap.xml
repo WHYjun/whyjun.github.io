@@ -4,6 +4,22 @@
         xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     
     <url>
+        <loc>https://whyjun.github.io/golang/The-2026-Way-to-Lint-Go-Code-with-golangci-lint</loc>
+        
+        <lastmod>2026-07-08T00:00:00-07:00</lastmod>
+        
+
+        
+        <changefreq>weekly</changefreq>
+        
+
+        
+        <priority>0.7</priority>
+        
+
+    </url>
+    
+    <url>
         <loc>https://whyjun.github.io/golang/The-2026-Way-to-Write-Enums-in-Go</loc>
         
         <lastmod>2026-07-06T00:00:00-07:00</lastmod>
