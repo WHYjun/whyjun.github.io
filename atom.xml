@@ -1,4 +1,97 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="https://whyjun.github.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://whyjun.github.io/" rel="alternate" type="text/html" /><updated>2026-07-08T08:29:46-07:00</updated><id>https://whyjun.github.io/atom.xml</id><title type="html">Young’s Notes</title><subtitle>Notes from my software engineering journey: what I learn, what I try, and how I set things up.</subtitle><author><name>Young Choi</name></author><entry xml:lang="en"><title type="html">The 2026 Way to Lint Go Code with golangci-lint</title><link href="https://whyjun.github.io/golang/The-2026-Way-to-Lint-Go-Code-with-golangci-lint" rel="alternate" type="text/html" title="The 2026 Way to Lint Go Code with golangci-lint" /><published>2026-07-08T00:00:00-07:00</published><updated>2026-07-08T00:00:00-07:00</updated><id>https://whyjun.github.io/golang/The-2026-Way-to-Lint-Go-Code-with-golangci-lint</id><content type="html" xml:base="https://whyjun.github.io/golang/The-2026-Way-to-Lint-Go-Code-with-golangci-lint"><![CDATA[<p>Back in 2023 I wrote a Korean post about adopting <code class="language-plaintext highlighter-rouge">golangci-lint</code> on my team. We’d grown enough that reviewers were spending more time explaining idiomatic Go in PR comments than reviewing the actual logic, and we needed something automated to take that job off our plates. <code class="language-plaintext highlighter-rouge">golangci-lint</code> was the fix: instead of running <code class="language-plaintext highlighter-rouge">govet</code>, <code class="language-plaintext highlighter-rouge">gofmt</code>, and a dozen other tools one at a time, it runs all of them in parallel and caches the results. Three years later that’s still exactly why I reach for it. What’s changed is everything around it, most of all the config file, which went through a major version bump in 2025.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="https://whyjun.github.io/atom.xml" rel="self" type="application/atom+xml" /><link href="https://whyjun.github.io/" rel="alternate" type="text/html" /><updated>2026-07-10T23:23:35-07:00</updated><id>https://whyjun.github.io/atom.xml</id><title type="html">Young’s Notes</title><subtitle>Notes from my software engineering journey: what I learn, what I try, and how I set things up.</subtitle><author><name>Young Choi</name></author><entry xml:lang="en"><title type="html">The 2026 Way to Skip Empty Fields in Go JSON</title><link href="https://whyjun.github.io/golang/The-2026-Way-to-Skip-Empty-Fields-in-Go-JSON" rel="alternate" type="text/html" title="The 2026 Way to Skip Empty Fields in Go JSON" /><published>2026-07-10T00:00:00-07:00</published><updated>2026-07-10T00:00:00-07:00</updated><id>https://whyjun.github.io/golang/The-2026-Way-to-Skip-Empty-Fields-in-Go-JSON</id><content type="html" xml:base="https://whyjun.github.io/golang/The-2026-Way-to-Skip-Empty-Fields-in-Go-JSON"><![CDATA[<p>Back in 2023 I wrote a Korean post about the <code class="language-plaintext highlighter-rouge">omitempty</code> struct tag, which drops a field from marshaled JSON when its value is the zero value for its type. That’s still true and still the tag you reach for first. What’s new since then is <code class="language-plaintext highlighter-rouge">omitzero</code>, added in Go 1.24, and it exists because <code class="language-plaintext highlighter-rouge">omitempty</code> has a blind spot that no amount of clever tagging can fix.</p>
+
+<h2 id="omitempty-still-the-baseline">omitempty, Still the Baseline</h2>
+
+<p>Add <code class="language-plaintext highlighter-rouge">,omitempty</code> after a field’s JSON name and the encoder drops that field whenever the value is zero: an empty string, a <code class="language-plaintext highlighter-rouge">0</code>, a <code class="language-plaintext highlighter-rouge">nil</code> pointer, a <code class="language-plaintext highlighter-rouge">nil</code> or empty slice or map.</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">type</span> <span class="n">Person</span> <span class="k">struct</span> <span class="p">{</span>
+	<span class="n">Name</span>      <span class="kt">string</span> <span class="s">`json:"name,omitempty"`</span>
+	<span class="n">Age</span>       <span class="kt">int</span>    <span class="s">`json:"age,omitempty"`</span>
+	<span class="n">Address</span>   <span class="kt">string</span> <span class="s">`json:"address,omitempty"`</span>
+	<span class="n">Telephone</span> <span class="kt">string</span> <span class="s">`json:"telephone,omitempty"`</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">p</span> <span class="o">:=</span> <span class="n">Person</span><span class="p">{</span>
+	<span class="n">Name</span><span class="o">:</span>      <span class="s">"John"</span><span class="p">,</span>
+	<span class="n">Age</span><span class="o">:</span>       <span class="m">0</span><span class="p">,</span>
+	<span class="n">Address</span><span class="o">:</span>   <span class="s">""</span><span class="p">,</span>
+	<span class="n">Telephone</span><span class="o">:</span> <span class="s">"123-456-7890"</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">json</span><span class="o">.</span><span class="n">Marshal</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+<span class="c">// {"name":"John","telephone":"123-456-7890"}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">Age</code> and <code class="language-plaintext highlighter-rouge">Address</code> disappear, <code class="language-plaintext highlighter-rouge">Name</code> and <code class="language-plaintext highlighter-rouge">Telephone</code> survive. This is exactly the 2023 example and it still works exactly like this in Go 1.26.4.</p>
+
+<h2 id="where-omitempty-gives-up">Where omitempty Gives Up</h2>
+
+<p><code class="language-plaintext highlighter-rouge">omitempty</code> only recognizes a fixed list of zero values, and a struct isn’t on it. No matter what its fields hold, a struct is never “empty” as far as <code class="language-plaintext highlighter-rouge">omitempty</code> is concerned. <code class="language-plaintext highlighter-rouge">time.Time</code> is a struct, so a zero <code class="language-plaintext highlighter-rouge">time.Time</code> sails straight through:</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">type</span> <span class="n">Event</span> <span class="k">struct</span> <span class="p">{</span>
+	<span class="n">Name</span>      <span class="kt">string</span>    <span class="s">`json:"name,omitempty"`</span>
+	<span class="n">StartedAt</span> <span class="n">time</span><span class="o">.</span><span class="n">Time</span> <span class="s">`json:"startedAt,omitempty"`</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">e</span> <span class="o">:=</span> <span class="n">Event</span><span class="p">{</span><span class="n">Name</span><span class="o">:</span> <span class="s">"standup"</span><span class="p">}</span>
+<span class="n">json</span><span class="o">.</span><span class="n">Marshal</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+<span class="c">// {"name":"standup","startedAt":"0001-01-01T00:00:00Z"}</span>
+</code></pre></div></div>
+
+<p>I ran this myself rather than trust memory, and there it is: <code class="language-plaintext highlighter-rouge">StartedAt</code> was never set, and the payload still ships January 1, year 1, as if that were a real timestamp.</p>
+
+<h2 id="omitzero-fixes-the-struct-case">omitzero Fixes the Struct Case</h2>
+
+<p>Go 1.24 added <code class="language-plaintext highlighter-rouge">omitzero</code>, a tag that checks the literal zero value of a field’s type, or calls the field’s <code class="language-plaintext highlighter-rouge">IsZero() bool</code> method if it has one. <code class="language-plaintext highlighter-rouge">time.Time</code> has one. Swap the tag and the field disappears:</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">type</span> <span class="n">EventZero</span> <span class="k">struct</span> <span class="p">{</span>
+	<span class="n">Name</span>      <span class="kt">string</span>    <span class="s">`json:"name,omitempty"`</span>
+	<span class="n">StartedAt</span> <span class="n">time</span><span class="o">.</span><span class="n">Time</span> <span class="s">`json:"startedAt,omitzero"`</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ez</span> <span class="o">:=</span> <span class="n">EventZero</span><span class="p">{</span><span class="n">Name</span><span class="o">:</span> <span class="s">"standup"</span><span class="p">}</span>
+<span class="n">json</span><span class="o">.</span><span class="n">Marshal</span><span class="p">(</span><span class="n">ez</span><span class="p">)</span>
+<span class="c">// {"name":"standup"}</span>
+</code></pre></div></div>
+
+<p>Same struct, same unset field, and this time it’s actually gone. That’s the whole reason <code class="language-plaintext highlighter-rouge">omitzero</code> exists: any type with a real <code class="language-plaintext highlighter-rouge">IsZero()</code> method, not just <code class="language-plaintext highlighter-rouge">time.Time</code>, now gets a tag that can see through it.</p>
+
+<h2 id="dont-assume-it-replaces-omitempty-everywhere">Don’t Assume It Replaces omitempty Everywhere</h2>
+
+<p>Here’s the part that caught me off guard. <code class="language-plaintext highlighter-rouge">omitempty</code> drops a slice whenever its length is zero, whether the slice is <code class="language-plaintext highlighter-rouge">nil</code> or an empty-but-allocated <code class="language-plaintext highlighter-rouge">[]int{}</code>. <code class="language-plaintext highlighter-rouge">omitzero</code> does not treat those the same. It only drops a <code class="language-plaintext highlighter-rouge">nil</code> slice. An empty, non-nil slice stays in the output.</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">type</span> <span class="n">Batch</span> <span class="k">struct</span> <span class="p">{</span>
+	<span class="n">Name</span>  <span class="kt">string</span> <span class="s">`json:"name,omitzero"`</span>
+	<span class="n">Items</span> <span class="p">[]</span><span class="kt">int</span>  <span class="s">`json:"items,omitzero"`</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">json</span><span class="o">.</span><span class="n">Marshal</span><span class="p">(</span><span class="n">Batch</span><span class="p">{</span><span class="n">Name</span><span class="o">:</span> <span class="s">"nil-slice"</span><span class="p">})</span>
+<span class="c">// {"name":"nil-slice"}</span>
+
+<span class="n">json</span><span class="o">.</span><span class="n">Marshal</span><span class="p">(</span><span class="n">Batch</span><span class="p">{</span><span class="n">Name</span><span class="o">:</span> <span class="s">"empty-slice"</span><span class="p">,</span> <span class="n">Items</span><span class="o">:</span> <span class="p">[]</span><span class="kt">int</span><span class="p">{}})</span>
+<span class="c">// {"name":"empty-slice","items":[]}</span>
+</code></pre></div></div>
+
+<p>I checked the same case with <code class="language-plaintext highlighter-rouge">omitempty</code> on an identical struct, and it drops both:</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">json</span><span class="o">.</span><span class="n">Marshal</span><span class="p">(</span><span class="n">BatchEmpty</span><span class="p">{</span><span class="n">Name</span><span class="o">:</span> <span class="s">"empty-slice"</span><span class="p">,</span> <span class="n">Items</span><span class="o">:</span> <span class="p">[]</span><span class="kt">int</span><span class="p">{}})</span>
+<span class="c">// {"name":"empty-slice"}</span>
+</code></pre></div></div>
+
+<p>This isn’t a bug in my code, it’s the documented behavior, and there’s an <a href="https://github.com/golang/go/issues/75036">open issue</a> tracking how often it trips people up. If you swap <code class="language-plaintext highlighter-rouge">omitempty</code> for <code class="language-plaintext highlighter-rouge">omitzero</code> on a slice field expecting identical output, an empty-but-initialized slice is where the two tags quietly part ways.</p>
+
+<h2 id="what-to-use-where">What to Use Where</h2>
+
+<p>Keep <code class="language-plaintext highlighter-rouge">omitempty</code> for strings, numbers, maps, and slices, where “empty means empty” already matches what you want. Reach for <code class="language-plaintext highlighter-rouge">omitzero</code> on struct-valued fields like <code class="language-plaintext highlighter-rouge">time.Time</code>, or your own types with an <code class="language-plaintext highlighter-rouge">IsZero() bool</code> method, where <code class="language-plaintext highlighter-rouge">omitempty</code> simply can’t help. Don’t reach for <code class="language-plaintext highlighter-rouge">omitzero</code> on a slice just because it sounds like the newer, better tag; check whether your slices are ever the non-nil-but-empty kind first.</p>
+
+<p>One more thing worth knowing: Go 1.26 also ships an experimental <code class="language-plaintext highlighter-rouge">encoding/json/v2</code> package behind <code class="language-plaintext highlighter-rouge">GOEXPERIMENT=jsonv2</code>, a separate effort from <code class="language-plaintext highlighter-rouge">omitzero</code> and not the default yet. Go 1.27 is expected to flip that default, but that’s a different post.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p><code class="language-plaintext highlighter-rouge">omitempty</code> from 2023 hasn’t changed and is still the right first move. <code class="language-plaintext highlighter-rouge">omitzero</code>, new in Go 1.24, covers the case <code class="language-plaintext highlighter-rouge">omitempty</code> was never built for: struct fields with a real notion of “zero” that isn’t nil or an empty literal. Just don’t assume the two tags agree on everything, because on slices they don’t, and I’d rather you find that out here than in production. Happy coding!</p>]]></content><author><name>Young Choi</name></author><category term="Golang" /><category term="golang" /><category term="json" /><summary type="html"><![CDATA[Back in 2023 I wrote a Korean post about the omitempty struct tag, which drops a field from marshaled JSON when its value is the zero value for its type. That’s still true and still the tag you reach for first. What’s new since then is omitzero, added in Go 1.24, and it exists because omitempty has a blind spot that no amount of clever tagging can fix.]]></summary></entry><entry xml:lang="en"><title type="html">The 2026 Way to Lint Go Code with golangci-lint</title><link href="https://whyjun.github.io/golang/The-2026-Way-to-Lint-Go-Code-with-golangci-lint" rel="alternate" type="text/html" title="The 2026 Way to Lint Go Code with golangci-lint" /><published>2026-07-08T00:00:00-07:00</published><updated>2026-07-08T00:00:00-07:00</updated><id>https://whyjun.github.io/golang/The-2026-Way-to-Lint-Go-Code-with-golangci-lint</id><content type="html" xml:base="https://whyjun.github.io/golang/The-2026-Way-to-Lint-Go-Code-with-golangci-lint"><![CDATA[<p>Back in 2023 I wrote a Korean post about adopting <code class="language-plaintext highlighter-rouge">golangci-lint</code> on my team. We’d grown enough that reviewers were spending more time explaining idiomatic Go in PR comments than reviewing the actual logic, and we needed something automated to take that job off our plates. <code class="language-plaintext highlighter-rouge">golangci-lint</code> was the fix: instead of running <code class="language-plaintext highlighter-rouge">govet</code>, <code class="language-plaintext highlighter-rouge">gofmt</code>, and a dozen other tools one at a time, it runs all of them in parallel and caches the results. Three years later that’s still exactly why I reach for it. What’s changed is everything around it, most of all the config file, which went through a major version bump in 2025.</p>
 
 <h2 id="why-golangci-lint-still">Why golangci-lint, Still</h2>
 
@@ -805,52 +898,4 @@ claude
 </span><span class="p">}</span><span class="w">
 </span></code></pre></div></div>
 
-<p>위에서 볼 수 있듯이, <code class="language-plaintext highlighter-rouge">Age</code>와 <code class="language-plaintext highlighter-rouge">Address</code> 필드가 사라진 것을 확인할 수 있습니다.</p>]]></content><author><name>Young Choi</name></author><category term="Golang" /><category term="golang" /><summary type="html"><![CDATA[Go로 웹 서버를 개발하다 보면 JSON 데이터를 주고 받는 경우가 많이 있습니다. struct를 JSON으로 바꿀 때 값이 Zero Value(각 type별 기본 값)이거나 nil인 경우 그 값을 보내지 않아야할 때가 있습니다. 이런 경우, omitempty 태그를 활용하면 JSON에서 쉽게 생략할 수 있습니다.]]></summary></entry><entry xml:lang="ko"><title type="html">golangcli-lint로 Go 코드 규칙 적용하기</title><link href="https://whyjun.github.io/golang/Use-GolangCI-Lint" rel="alternate" type="text/html" title="golangcli-lint로 Go 코드 규칙 적용하기" /><published>2023-03-08T00:00:00-08:00</published><updated>2023-03-08T00:00:00-08:00</updated><id>https://whyjun.github.io/golang/Use-GolangCI-Lint</id><content type="html" xml:base="https://whyjun.github.io/golang/Use-GolangCI-Lint"><![CDATA[<p>개발팀 사이즈가 커지면서 관리해야 하는 리포지토리의 개수가 늘어났고 각각의 프로젝트가 팀을 리드하는 개발자에 따라 자유분방한 모습으로 진화했습니다. 특히 Go 언어를 처음으로 사용하는 개발자들이 늘어나면서 코드 리뷰 과정에서 Idiomatic Go에 대해서 설명하고 작성하는데 시간을 꽤 소모하게 되었습니다. 그러다보니 실제로 리뷰가 되어야 하는 부분보다 더 많은 시간을 쏟게 되는 경우가 늘어났고 이를 방지하기 위해 자동화된 도구가 필요하다라는 피드백이 나오기 시작했습니다.</p>
-
-<p>다행히도 Go 커뮤니티에는 다양한 Lint 도구들이 이미 개발되어 있었는데 대표적으로 <code class="language-plaintext highlighter-rouge">govet</code>, <code class="language-plaintext highlighter-rouge">gofmt</code>, <code class="language-plaintext highlighter-rouge">golint</code> 등이 있습니다. 이러한 도구들은 좋은 Go 코드를 작성하기 위해 필요한 부분들을 다 체크하지만 각각 따로 돌려야 한다는 단점이 있습니다. 이러한 단점을 극복하기 위해 저희 팀은 <code class="language-plaintext highlighter-rouge">golangci-lint</code>를 사용하기로 했습니다.</p>
-
-<p><code class="language-plaintext highlighter-rouge">golangci-lint</code>는 Lint 도구는 아니지만 다양한 Lint 도구들을 한번에 돌릴 수 있게 도와줍니다. 단순히 도구들을 순서대로 돌리는 것이 아니라 병렬적으로 돌리는 동시에 분석 결과값을 캐싱함으로써 정적 분석을 매우 빠르게 끝낼 수 있습니다. 그리고 회사에 많은 개발자들이 사용하고 있는 Visual Studio Code를 지원하고 이 점을 활용해 <code class="language-plaintext highlighter-rouge">settings.json</code>에 설정 몇 가지를 추가하는 것으로 코드 규칙을 지키지 않을 경우 Warning 메세지를 바로 띄워주어 개발자들이 빠르게 고칠 수 있게 도와줍니다.</p>
-
-<p><img src="https://repository-images.githubusercontent.com/132145189/05239680-dfaf-11e9-9646-2c3ef2f5f8d4" alt="golangci-lint log" class="align-center" /></p>
-
-<h2 id="설치하기">설치하기</h2>
-
-<p>Mac과 Windows가 아닌 다른 환경에서 설치하는 방법은 <a href="https://golangci-lint.run/usage/install/">공식 문서</a>에 자세히 나와있습니다.</p>
-
-<h3 id="mac">Mac</h3>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>brew <span class="nb">install </span>golangci-lint
-brew upgrade golangci-lint
-
-golangci-lint version
-</code></pre></div></div>
-
-<h3 id="windows">Windows</h3>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Git for Windows를 설치할 때 같이 설치되는 Git Bash에 아래 명령어를 입력하시면 설치됩니다.</span>
-<span class="c"># 실제 binary는 $(go env GOPATH)/bin/golangci-lint에 있습니다</span>
-curl <span class="nt">-sSfL</span> https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh <span class="nt">-s</span> <span class="nt">--</span> <span class="nt">-b</span> <span class="si">$(</span>go <span class="nb">env </span>GOPATH<span class="si">)</span>/bin 
-
-golangci-lint <span class="nt">--version</span>
-</code></pre></div></div>
-
-<h2 id="사용하기">사용하기</h2>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>golangci-lint run
-</code></pre></div></div>
-
-<p>위 명령어를 입력하면 <code class="language-plaintext highlighter-rouge">golangci-lint</code> 기본으로 설정되어 있는 Lint 도구들로 코드를 분석합니다. 어떠한 도구들을 사용하는지 확인하고 싶으면 <code class="language-plaintext highlighter-rouge">golangci-lint help linters</code>로 확인할 수 있습니다. <code class="language-plaintext highlighter-rouge">golangci-lint</code>를 직접 설정하고 싶다면 <a href="https://golangci-lint.run/usage/configuration/">공식 문서</a>를 참고해서 <code class="language-plaintext highlighter-rouge">.golangci.yml</code> 파일을 작성하시면 됩니다.</p>
-
-<h2 id="visual-studio-code에-추가하기">Visual Studio Code에 추가하기</h2>
-
-<p>Visual Studio Code 설정에 들어가서 <code class="language-plaintext highlighter-rouge">settings.json</code>을 연 다음, 아래 설정을 추가하면 Visual Studio Code에서 Warning 메세지를 확인할 수 있습니다.</p>
-
-<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">"go.lintTool"</span><span class="p">:</span><span class="w"> </span><span class="s2">"golangci-lint"</span><span class="w">
-</span><span class="nl">"go.lintFlags"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
-    </span><span class="s2">"--fast"</span><span class="w">
-</span><span class="p">]</span><span class="w">
-</span></code></pre></div></div>
-
-<h2 id="사용-후기">사용 후기</h2>
-
-<p>실제로 적용해보니 코드 리뷰로 잡아내지 못한 이슈들이 꽤 있었습니다. 대표적으로 error를 <code class="language-plaintext highlighter-rouge">fmt.Errorf</code>로 래핑할 때, <code class="language-plaintext highlighter-rouge">%w</code>를 사용하지 않았던 부분입니다. <code class="language-plaintext highlighter-rouge">errors</code> 패키지를 잘 활용하지 않았다보니 알아차리지 못했지만 프로젝트의 사이즈가 커지면서 어떤 error인지를 확인해야 하는 경우가 빈번하게 발생했는데 <code class="language-plaintext highlighter-rouge">%w</code>가 아닌 <code class="language-plaintext highlighter-rouge">%s</code>나 <code class="language-plaintext highlighter-rouge">%v</code>를 사용했을 때는 <code class="language-plaintext highlighter-rouge">errors.UnWrap()</code> 함수를 사용할 수 없고 그 때문에 <code class="language-plaintext highlighter-rouge">errors.Is</code>와 <code class="language-plaintext highlighter-rouge">errors.As</code>도 활용할 수 없다는 것을 알게 되었습니다. 이처럼 Linter는 하나의 정해진 코드 규칙을 모든 개발자가 지킬 수 있게 해준다는 점을 넘어서 코드에 있는 버그들을 개발자들이 일찍 알아차릴 수 있게 해줍니다.</p>]]></content><author><name>Young Choi</name></author><category term="Golang" /><category term="golang" /><summary type="html"><![CDATA[개발팀 사이즈가 커지면서 관리해야 하는 리포지토리의 개수가 늘어났고 각각의 프로젝트가 팀을 리드하는 개발자에 따라 자유분방한 모습으로 진화했습니다. 특히 Go 언어를 처음으로 사용하는 개발자들이 늘어나면서 코드 리뷰 과정에서 Idiomatic Go에 대해서 설명하고 작성하는데 시간을 꽤 소모하게 되었습니다. 그러다보니 실제로 리뷰가 되어야 하는 부분보다 더 많은 시간을 쏟게 되는 경우가 늘어났고 이를 방지하기 위해 자동화된 도구가 필요하다라는 피드백이 나오기 시작했습니다.]]></summary></entry></feed>
+<p>위에서 볼 수 있듯이, <code class="language-plaintext highlighter-rouge">Age</code>와 <code class="language-plaintext highlighter-rouge">Address</code> 필드가 사라진 것을 확인할 수 있습니다.</p>]]></content><author><name>Young Choi</name></author><category term="Golang" /><category term="golang" /><summary type="html"><![CDATA[Go로 웹 서버를 개발하다 보면 JSON 데이터를 주고 받는 경우가 많이 있습니다. struct를 JSON으로 바꿀 때 값이 Zero Value(각 type별 기본 값)이거나 nil인 경우 그 값을 보내지 않아야할 때가 있습니다. 이런 경우, omitempty 태그를 활용하면 JSON에서 쉽게 생략할 수 있습니다.]]></summary></entry></feed>
