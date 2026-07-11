@@ -5,9 +5,119 @@
     <description>Notes from my software engineering journey: what I learn, what I try, and how I set things up.</description>
     <link>https://whyjun.github.io/</link>
     <atom:link href="https://whyjun.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 08 Jul 2026 08:29:46 -0700</pubDate>
-    <lastBuildDate>Wed, 08 Jul 2026 08:29:46 -0700</lastBuildDate>
+    <pubDate>Fri, 10 Jul 2026 23:23:35 -0700</pubDate>
+    <lastBuildDate>Fri, 10 Jul 2026 23:23:35 -0700</lastBuildDate>
     <generator>Jekyll v3.10.0</generator>
+    
+      <item>
+        <title>The 2026 Way to Skip Empty Fields in Go JSON</title>
+        <description>&lt;p&gt;Back in 2023 I wrote a Korean post about the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;omitempty&lt;/code&gt; struct tag, which drops a field from marshaled JSON when its value is the zero value for its type. That’s still true and still the tag you reach for first. What’s new since then is &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;omitzero&lt;/code&gt;, added in Go 1.24, and it exists because &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;omitempty&lt;/code&gt; has a blind spot that no amount of clever tagging can fix.&lt;/p&gt;
+
+&lt;h2 id=&quot;omitempty-still-the-baseline&quot;&gt;omitempty, Still the Baseline&lt;/h2&gt;
+
+&lt;p&gt;Add &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;,omitempty&lt;/code&gt; after a field’s JSON name and the encoder drops that field whenever the value is zero: an empty string, a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;0&lt;/code&gt;, a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nil&lt;/code&gt; pointer, a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nil&lt;/code&gt; or empty slice or map.&lt;/p&gt;
+
+&lt;div class=&quot;language-go highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Person&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;Name&lt;/span&gt;      &lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;`json:&quot;name,omitempty&quot;`&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;Age&lt;/span&gt;       &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;    &lt;span class=&quot;s&quot;&gt;`json:&quot;age,omitempty&quot;`&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;Address&lt;/span&gt;   &lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;`json:&quot;address,omitempty&quot;`&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;Telephone&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;`json:&quot;telephone,omitempty&quot;`&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-go highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;p&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Person&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;Name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;      &lt;span class=&quot;s&quot;&gt;&quot;John&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;Age&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;       &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;Address&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;   &lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;Telephone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;123-456-7890&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Marshal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;// {&quot;name&quot;:&quot;John&quot;,&quot;telephone&quot;:&quot;123-456-7890&quot;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Age&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Address&lt;/code&gt; disappear, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Name&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Telephone&lt;/code&gt; survive. This is exactly the 2023 example and it still works exactly like this in Go 1.26.4.&lt;/p&gt;
+
+&lt;h2 id=&quot;where-omitempty-gives-up&quot;&gt;Where omitempty Gives Up&lt;/h2&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;omitempty&lt;/code&gt; only recognizes a fixed list of zero values, and a struct isn’t on it. No matter what its fields hold, a struct is never “empty” as far as &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;omitempty&lt;/code&gt; is concerned. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;time.Time&lt;/code&gt; is a struct, so a zero &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;time.Time&lt;/code&gt; sails straight through:&lt;/p&gt;
+
+&lt;div class=&quot;language-go highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Event&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;Name&lt;/span&gt;      &lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt;    &lt;span class=&quot;s&quot;&gt;`json:&quot;name,omitempty&quot;`&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;StartedAt&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;time&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Time&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;`json:&quot;startedAt,omitempty&quot;`&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-go highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;e&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;standup&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Marshal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;// {&quot;name&quot;:&quot;standup&quot;,&quot;startedAt&quot;:&quot;0001-01-01T00:00:00Z&quot;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;I ran this myself rather than trust memory, and there it is: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;StartedAt&lt;/code&gt; was never set, and the payload still ships January 1, year 1, as if that were a real timestamp.&lt;/p&gt;
+
+&lt;h2 id=&quot;omitzero-fixes-the-struct-case&quot;&gt;omitzero Fixes the Struct Case&lt;/h2&gt;
+
+&lt;p&gt;Go 1.24 added &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;omitzero&lt;/code&gt;, a tag that checks the literal zero value of a field’s type, or calls the field’s &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;IsZero() bool&lt;/code&gt; method if it has one. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;time.Time&lt;/code&gt; has one. Swap the tag and the field disappears:&lt;/p&gt;
+
+&lt;div class=&quot;language-go highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;EventZero&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;Name&lt;/span&gt;      &lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt;    &lt;span class=&quot;s&quot;&gt;`json:&quot;name,omitempty&quot;`&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;StartedAt&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;time&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Time&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;`json:&quot;startedAt,omitzero&quot;`&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-go highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;ez&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;EventZero&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;standup&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Marshal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ez&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;// {&quot;name&quot;:&quot;standup&quot;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Same struct, same unset field, and this time it’s actually gone. That’s the whole reason &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;omitzero&lt;/code&gt; exists: any type with a real &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;IsZero()&lt;/code&gt; method, not just &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;time.Time&lt;/code&gt;, now gets a tag that can see through it.&lt;/p&gt;
+
+&lt;h2 id=&quot;dont-assume-it-replaces-omitempty-everywhere&quot;&gt;Don’t Assume It Replaces omitempty Everywhere&lt;/h2&gt;
+
+&lt;p&gt;Here’s the part that caught me off guard. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;omitempty&lt;/code&gt; drops a slice whenever its length is zero, whether the slice is &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nil&lt;/code&gt; or an empty-but-allocated &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;[]int{}&lt;/code&gt;. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;omitzero&lt;/code&gt; does not treat those the same. It only drops a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nil&lt;/code&gt; slice. An empty, non-nil slice stays in the output.&lt;/p&gt;
+
+&lt;div class=&quot;language-go highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Batch&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;Name&lt;/span&gt;  &lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;`json:&quot;name,omitzero&quot;`&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;Items&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;  &lt;span class=&quot;s&quot;&gt;`json:&quot;items,omitzero&quot;`&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-go highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Marshal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Batch&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;nil-slice&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;// {&quot;name&quot;:&quot;nil-slice&quot;}&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Marshal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Batch&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;empty-slice&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Items&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{}})&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;// {&quot;name&quot;:&quot;empty-slice&quot;,&quot;items&quot;:[]}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;I checked the same case with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;omitempty&lt;/code&gt; on an identical struct, and it drops both:&lt;/p&gt;
+
+&lt;div class=&quot;language-go highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Marshal&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;BatchEmpty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;empty-slice&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Items&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{}})&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;// {&quot;name&quot;:&quot;empty-slice&quot;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This isn’t a bug in my code, it’s the documented behavior, and there’s an &lt;a href=&quot;https://github.com/golang/go/issues/75036&quot;&gt;open issue&lt;/a&gt; tracking how often it trips people up. If you swap &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;omitempty&lt;/code&gt; for &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;omitzero&lt;/code&gt; on a slice field expecting identical output, an empty-but-initialized slice is where the two tags quietly part ways.&lt;/p&gt;
+
+&lt;h2 id=&quot;what-to-use-where&quot;&gt;What to Use Where&lt;/h2&gt;
+
+&lt;p&gt;Keep &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;omitempty&lt;/code&gt; for strings, numbers, maps, and slices, where “empty means empty” already matches what you want. Reach for &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;omitzero&lt;/code&gt; on struct-valued fields like &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;time.Time&lt;/code&gt;, or your own types with an &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;IsZero() bool&lt;/code&gt; method, where &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;omitempty&lt;/code&gt; simply can’t help. Don’t reach for &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;omitzero&lt;/code&gt; on a slice just because it sounds like the newer, better tag; check whether your slices are ever the non-nil-but-empty kind first.&lt;/p&gt;
+
+&lt;p&gt;One more thing worth knowing: Go 1.26 also ships an experimental &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;encoding/json/v2&lt;/code&gt; package behind &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;GOEXPERIMENT=jsonv2&lt;/code&gt;, a separate effort from &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;omitzero&lt;/code&gt; and not the default yet. Go 1.27 is expected to flip that default, but that’s a different post.&lt;/p&gt;
+
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;omitempty&lt;/code&gt; from 2023 hasn’t changed and is still the right first move. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;omitzero&lt;/code&gt;, new in Go 1.24, covers the case &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;omitempty&lt;/code&gt; was never built for: struct fields with a real notion of “zero” that isn’t nil or an empty literal. Just don’t assume the two tags agree on everything, because on slices they don’t, and I’d rather you find that out here than in production. Happy coding!&lt;/p&gt;
+</description>
+        <pubDate>Fri, 10 Jul 2026 00:00:00 -0700</pubDate>
+        <link>https://whyjun.github.io/golang/The-2026-Way-to-Skip-Empty-Fields-in-Go-JSON</link>
+        <guid isPermaLink="true">https://whyjun.github.io/golang/The-2026-Way-to-Skip-Empty-Fields-in-Go-JSON</guid>
+        
+        <category>golang</category>
+        
+        <category>json</category>
+        
+        
+        <category>Golang</category>
+        
+      </item>
     
       <item>
         <title>The 2026 Way to Lint Go Code with golangci-lint</title>

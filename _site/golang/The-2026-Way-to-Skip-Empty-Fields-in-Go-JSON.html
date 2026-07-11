@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<!--
+    So Simple Jekyll Theme 3.2.0
+    Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+    Free for personal and commercial use under the MIT license
+    https://github.com/mmistakes/so-simple-theme/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+
+  
+    
+    <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>The 2026 Way to Skip Empty Fields in Go JSON | Young’s Notes</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="The 2026 Way to Skip Empty Fields in Go JSON" />
+<meta name="author" content="Young Choi" />
+<meta property="og:locale" content="ko_KR" />
+<meta name="description" content="Back in 2023 I wrote a Korean post about the omitempty struct tag, which drops a field from marshaled JSON when its value is the zero value for its type. That’s still true and still the tag you reach for first. What’s new since then is omitzero, added in Go 1.24, and it exists because omitempty has a blind spot that no amount of clever tagging can fix." />
+<meta property="og:description" content="Back in 2023 I wrote a Korean post about the omitempty struct tag, which drops a field from marshaled JSON when its value is the zero value for its type. That’s still true and still the tag you reach for first. What’s new since then is omitzero, added in Go 1.24, and it exists because omitempty has a blind spot that no amount of clever tagging can fix." />
+<link rel="canonical" href="https://whyjun.github.io/golang/The-2026-Way-to-Skip-Empty-Fields-in-Go-JSON" />
+<meta property="og:url" content="https://whyjun.github.io/golang/The-2026-Way-to-Skip-Empty-Fields-in-Go-JSON" />
+<meta property="og:site_name" content="Young’s Notes" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2026-07-10T00:00:00-07:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="The 2026 Way to Skip Empty Fields in Go JSON" />
+<meta name="twitter:site" content="@youngchoi_dev" />
+<meta name="twitter:creator" content="@https://x.com/youngchoi_dev" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Young Choi"},"dateModified":"2026-07-10T00:00:00-07:00","datePublished":"2026-07-10T00:00:00-07:00","description":"Back in 2023 I wrote a Korean post about the omitempty struct tag, which drops a field from marshaled JSON when its value is the zero value for its type. That’s still true and still the tag you reach for first. What’s new since then is omitzero, added in Go 1.24, and it exists because omitempty has a blind spot that no amount of clever tagging can fix.","headline":"The 2026 Way to Skip Empty Fields in Go JSON","mainEntityOfPage":{"@type":"WebPage","@id":"https://whyjun.github.io/golang/The-2026-Way-to-Skip-Empty-Fields-in-Go-JSON"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://whyjun.github.io/assets/images/young-choi-gopher-image.png"},"name":"Young Choi"},"url":"https://whyjun.github.io/golang/The-2026-Way-to-Skip-Empty-Fields-in-Go-JSON"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  
+
+  <script>
+    /* Cut the mustard */
+    if ( 'querySelector' in document && 'addEventListener' in window ) {
+      document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + 'js';
+    }
+  </script>
+
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/skins/default.css">
+  
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,700,700i|Lora:400,400i,700,700i">
+  <link rel="alternate" type="application/atom+xml" title="Young&#39;s Notes" href="/atom.xml">
+<!-- start custom head snippets -->
+
+<!-- insert favicons. use http://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+</head>
+
+
+  <body class="layout--post  the-2026-way-to-skip-empty-fields-in-go-json">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#primary-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    
+  <div class="navigation-wrapper">
+    <a href="#menu-toggle" id="menu-toggle">Menu</a>
+    <nav id="primary-nav" class="site-nav animated drop">
+      <ul><li><a href="/posts/">Posts</a></li><li><a href="/categories/">Categories</a></li><li><a href="/tags/">Tags</a></li><li><a href="/search/">Search</a></li></ul>
+    </nav>
+  </div><!-- /.navigation-wrapper -->
+
+
+    <header class="masthead">
+  <div class="wrap">
+    
+      <a href="/" class="site-logo" rel="home" title="Young's Notes">
+        <img src="/assets/images/young-choi-gopher-image.png" class="site-logo-img animated fadeInDown" alt="Young's Notes">
+      </a>
+    
+    
+    
+      
+        <div class="site-title animated fadeIn"><a href="/">Young's Notes</a></div>
+      
+      <p class="site-description animated fadeIn" itemprop="description">Notes from my software engineering journey: what I learn, what I try, and how I set things up.</p>
+    
+  </div>
+</header><!-- /.masthead -->
+
+
+    <main id="main" class="main-content" aria-label="Content">
+  <article class="h-entry">
+    
+
+    <div class="page-wrapper">
+      <header class="page-header">
+        
+        
+        <h1 id="page-title" class="page-title p-name">The 2026 Way to Skip Empty Fields in Go JSON
+</h1>
+        
+      </header>
+
+      <div class="page-sidebar">
+        <div class="page-author h-card p-author"><img src="/assets/images/young-choi-gopher-image.png" class="author-avatar u-photo" alt="Young Choi"><div class="author-info"><div class="author-name">
+        <span class="p-name">Young Choi</span>
+      </div><ul class="author-links"><li class="author-link">
+            <a class="u-url" rel="me" href="https://github.com/whyjun"><i class="fab fa-github-square fa-lg" title="GitHub"></i></a>
+          </li></ul><!-- 
+
+<span class="read-time">3 min read</span>
+ -->
+    <time class="page-date dt-published" datetime="2026-07-10T00:00:00-07:00"><a class="u-url" href="">July 10, 2026</a>
+</time>
+
+  </div>
+</div>
+
+        
+  <h3 class="page-taxonomies-title">Categories</h3>
+  
+  <ul class="page-taxonomies"><li class="page-taxonomy"><a class="p-category" href="/categories/#golang" title="Pages filed under Golang">Golang</a></li>
+  </ul>
+
+
+        <!-- 
+  <h3 class="page-taxonomies-title">Tags</h3>
+  
+  <ul class="page-taxonomies"><li class="page-taxonomy"><a href="/tags/#golang" title="Pages tagged golang" rel="tag">golang</a></li><li class="page-taxonomy"><a href="/tags/#json" title="Pages tagged json" rel="tag">json</a></li>
+  </ul>
+ -->
+
+      </div>
+
+      <div class="page-content">
+        <div class="e-content">
+          <p>Back in 2023 I wrote a Korean post about the <code class="language-plaintext highlighter-rouge">omitempty</code> struct tag, which drops a field from marshaled JSON when its value is the zero value for its type. That’s still true and still the tag you reach for first. What’s new since then is <code class="language-plaintext highlighter-rouge">omitzero</code>, added in Go 1.24, and it exists because <code class="language-plaintext highlighter-rouge">omitempty</code> has a blind spot that no amount of clever tagging can fix.</p>
+
+<h2 id="omitempty-still-the-baseline">omitempty, Still the Baseline</h2>
+
+<p>Add <code class="language-plaintext highlighter-rouge">,omitempty</code> after a field’s JSON name and the encoder drops that field whenever the value is zero: an empty string, a <code class="language-plaintext highlighter-rouge">0</code>, a <code class="language-plaintext highlighter-rouge">nil</code> pointer, a <code class="language-plaintext highlighter-rouge">nil</code> or empty slice or map.</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">type</span> <span class="n">Person</span> <span class="k">struct</span> <span class="p">{</span>
+	<span class="n">Name</span>      <span class="kt">string</span> <span class="s">`json:"name,omitempty"`</span>
+	<span class="n">Age</span>       <span class="kt">int</span>    <span class="s">`json:"age,omitempty"`</span>
+	<span class="n">Address</span>   <span class="kt">string</span> <span class="s">`json:"address,omitempty"`</span>
+	<span class="n">Telephone</span> <span class="kt">string</span> <span class="s">`json:"telephone,omitempty"`</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">p</span> <span class="o">:=</span> <span class="n">Person</span><span class="p">{</span>
+	<span class="n">Name</span><span class="o">:</span>      <span class="s">"John"</span><span class="p">,</span>
+	<span class="n">Age</span><span class="o">:</span>       <span class="m">0</span><span class="p">,</span>
+	<span class="n">Address</span><span class="o">:</span>   <span class="s">""</span><span class="p">,</span>
+	<span class="n">Telephone</span><span class="o">:</span> <span class="s">"123-456-7890"</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">json</span><span class="o">.</span><span class="n">Marshal</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+<span class="c">// {"name":"John","telephone":"123-456-7890"}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">Age</code> and <code class="language-plaintext highlighter-rouge">Address</code> disappear, <code class="language-plaintext highlighter-rouge">Name</code> and <code class="language-plaintext highlighter-rouge">Telephone</code> survive. This is exactly the 2023 example and it still works exactly like this in Go 1.26.4.</p>
+
+<h2 id="where-omitempty-gives-up">Where omitempty Gives Up</h2>
+
+<p><code class="language-plaintext highlighter-rouge">omitempty</code> only recognizes a fixed list of zero values, and a struct isn’t on it. No matter what its fields hold, a struct is never “empty” as far as <code class="language-plaintext highlighter-rouge">omitempty</code> is concerned. <code class="language-plaintext highlighter-rouge">time.Time</code> is a struct, so a zero <code class="language-plaintext highlighter-rouge">time.Time</code> sails straight through:</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">type</span> <span class="n">Event</span> <span class="k">struct</span> <span class="p">{</span>
+	<span class="n">Name</span>      <span class="kt">string</span>    <span class="s">`json:"name,omitempty"`</span>
+	<span class="n">StartedAt</span> <span class="n">time</span><span class="o">.</span><span class="n">Time</span> <span class="s">`json:"startedAt,omitempty"`</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">e</span> <span class="o">:=</span> <span class="n">Event</span><span class="p">{</span><span class="n">Name</span><span class="o">:</span> <span class="s">"standup"</span><span class="p">}</span>
+<span class="n">json</span><span class="o">.</span><span class="n">Marshal</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+<span class="c">// {"name":"standup","startedAt":"0001-01-01T00:00:00Z"}</span>
+</code></pre></div></div>
+
+<p>I ran this myself rather than trust memory, and there it is: <code class="language-plaintext highlighter-rouge">StartedAt</code> was never set, and the payload still ships January 1, year 1, as if that were a real timestamp.</p>
+
+<h2 id="omitzero-fixes-the-struct-case">omitzero Fixes the Struct Case</h2>
+
+<p>Go 1.24 added <code class="language-plaintext highlighter-rouge">omitzero</code>, a tag that checks the literal zero value of a field’s type, or calls the field’s <code class="language-plaintext highlighter-rouge">IsZero() bool</code> method if it has one. <code class="language-plaintext highlighter-rouge">time.Time</code> has one. Swap the tag and the field disappears:</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">type</span> <span class="n">EventZero</span> <span class="k">struct</span> <span class="p">{</span>
+	<span class="n">Name</span>      <span class="kt">string</span>    <span class="s">`json:"name,omitempty"`</span>
+	<span class="n">StartedAt</span> <span class="n">time</span><span class="o">.</span><span class="n">Time</span> <span class="s">`json:"startedAt,omitzero"`</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ez</span> <span class="o">:=</span> <span class="n">EventZero</span><span class="p">{</span><span class="n">Name</span><span class="o">:</span> <span class="s">"standup"</span><span class="p">}</span>
+<span class="n">json</span><span class="o">.</span><span class="n">Marshal</span><span class="p">(</span><span class="n">ez</span><span class="p">)</span>
+<span class="c">// {"name":"standup"}</span>
+</code></pre></div></div>
+
+<p>Same struct, same unset field, and this time it’s actually gone. That’s the whole reason <code class="language-plaintext highlighter-rouge">omitzero</code> exists: any type with a real <code class="language-plaintext highlighter-rouge">IsZero()</code> method, not just <code class="language-plaintext highlighter-rouge">time.Time</code>, now gets a tag that can see through it.</p>
+
+<h2 id="dont-assume-it-replaces-omitempty-everywhere">Don’t Assume It Replaces omitempty Everywhere</h2>
+
+<p>Here’s the part that caught me off guard. <code class="language-plaintext highlighter-rouge">omitempty</code> drops a slice whenever its length is zero, whether the slice is <code class="language-plaintext highlighter-rouge">nil</code> or an empty-but-allocated <code class="language-plaintext highlighter-rouge">[]int{}</code>. <code class="language-plaintext highlighter-rouge">omitzero</code> does not treat those the same. It only drops a <code class="language-plaintext highlighter-rouge">nil</code> slice. An empty, non-nil slice stays in the output.</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">type</span> <span class="n">Batch</span> <span class="k">struct</span> <span class="p">{</span>
+	<span class="n">Name</span>  <span class="kt">string</span> <span class="s">`json:"name,omitzero"`</span>
+	<span class="n">Items</span> <span class="p">[]</span><span class="kt">int</span>  <span class="s">`json:"items,omitzero"`</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">json</span><span class="o">.</span><span class="n">Marshal</span><span class="p">(</span><span class="n">Batch</span><span class="p">{</span><span class="n">Name</span><span class="o">:</span> <span class="s">"nil-slice"</span><span class="p">})</span>
+<span class="c">// {"name":"nil-slice"}</span>
+
+<span class="n">json</span><span class="o">.</span><span class="n">Marshal</span><span class="p">(</span><span class="n">Batch</span><span class="p">{</span><span class="n">Name</span><span class="o">:</span> <span class="s">"empty-slice"</span><span class="p">,</span> <span class="n">Items</span><span class="o">:</span> <span class="p">[]</span><span class="kt">int</span><span class="p">{}})</span>
+<span class="c">// {"name":"empty-slice","items":[]}</span>
+</code></pre></div></div>
+
+<p>I checked the same case with <code class="language-plaintext highlighter-rouge">omitempty</code> on an identical struct, and it drops both:</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">json</span><span class="o">.</span><span class="n">Marshal</span><span class="p">(</span><span class="n">BatchEmpty</span><span class="p">{</span><span class="n">Name</span><span class="o">:</span> <span class="s">"empty-slice"</span><span class="p">,</span> <span class="n">Items</span><span class="o">:</span> <span class="p">[]</span><span class="kt">int</span><span class="p">{}})</span>
+<span class="c">// {"name":"empty-slice"}</span>
+</code></pre></div></div>
+
+<p>This isn’t a bug in my code, it’s the documented behavior, and there’s an <a href="https://github.com/golang/go/issues/75036">open issue</a> tracking how often it trips people up. If you swap <code class="language-plaintext highlighter-rouge">omitempty</code> for <code class="language-plaintext highlighter-rouge">omitzero</code> on a slice field expecting identical output, an empty-but-initialized slice is where the two tags quietly part ways.</p>
+
+<h2 id="what-to-use-where">What to Use Where</h2>
+
+<p>Keep <code class="language-plaintext highlighter-rouge">omitempty</code> for strings, numbers, maps, and slices, where “empty means empty” already matches what you want. Reach for <code class="language-plaintext highlighter-rouge">omitzero</code> on struct-valued fields like <code class="language-plaintext highlighter-rouge">time.Time</code>, or your own types with an <code class="language-plaintext highlighter-rouge">IsZero() bool</code> method, where <code class="language-plaintext highlighter-rouge">omitempty</code> simply can’t help. Don’t reach for <code class="language-plaintext highlighter-rouge">omitzero</code> on a slice just because it sounds like the newer, better tag; check whether your slices are ever the non-nil-but-empty kind first.</p>
+
+<p>One more thing worth knowing: Go 1.26 also ships an experimental <code class="language-plaintext highlighter-rouge">encoding/json/v2</code> package behind <code class="language-plaintext highlighter-rouge">GOEXPERIMENT=jsonv2</code>, a separate effort from <code class="language-plaintext highlighter-rouge">omitzero</code> and not the default yet. Go 1.27 is expected to flip that default, but that’s a different post.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p><code class="language-plaintext highlighter-rouge">omitempty</code> from 2023 hasn’t changed and is still the right first move. <code class="language-plaintext highlighter-rouge">omitzero</code>, new in Go 1.24, covers the case <code class="language-plaintext highlighter-rouge">omitempty</code> was never built for: struct fields with a real notion of “zero” that isn’t nil or an empty literal. Just don’t assume the two tags agree on everything, because on slices they don’t, and I’d rather you find that out here than in production. Happy coding!</p>
+
+        </div>
+      
+        <a href="https://www.buymeacoffee.com/youngchoi"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=youngchoi&button_colour=FFDD00&font_colour=000000&font_family=Comic&outline_colour=000000&coffee_colour=ffffff"></a>
+
+        <script src="https://utteranc.es/client.js" repo="whyjun/whyjun.github.io" issue-term="title" label="💬 comment"
+          theme="github-light" crossorigin="anonymous" async>
+        </script>
+
+        <!-- 
+        <div class="page-share">
+  <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwhyjun.github.io%2Fgolang%2FThe-2026-Way-to-Skip-Empty-Fields-in-Go-JSON" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--facebook btn--small"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i> <span>Share</span></a>
+  <a href="https://twitter.com/intent/tweet?text=The+2026+Way+to+Skip+Empty+Fields+in+Go+JSON%20https%3A%2F%2Fwhyjun.github.io%2Fgolang%2FThe-2026-Way-to-Skip-Empty-Fields-in-Go-JSON" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--twitter btn--small"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i> <span>Tweet</span></a>
+  <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fwhyjun.github.io%2Fgolang%2FThe-2026-Way-to-Skip-Empty-Fields-in-Go-JSON" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--linkedin btn--small"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i> <span>LinkedIn</span></a>
+  <a href="https://reddit.com/submit?title=The+2026+Way+to+Skip+Empty+Fields+in+Go+JSON&url=https%3A%2F%2Fwhyjun.github.io%2Fgolang%2FThe-2026-Way-to-Skip-Empty-Fields-in-Go-JSON" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" class="btn btn--reddit btn--small"><i class="fab fa-fw fa-reddit" aria-hidden="true"></i> <span>Reddit</span></a>
+</div>
+
+         -->
+
+        <nav class="page-pagination" role="navigation">
+  
+    <a class="page-previous" href="/golang/The-2026-Way-to-Lint-Go-Code-with-golangci-lint">
+      <h4 class="page-pagination-label">Previous</h4>
+      <span class="page-pagination-title">
+        <i class="fas fa-arrow-left"></i> The 2026 Way to Lint Go Code with golangci-lint
+
+      </span>
+    </a>
+  
+
+  
+</nav>
+
+      </div>
+    </div>
+  </article>
+</main>
+
+    <footer id="footer" class="site-footer">
+  <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+<div class="copyright">
+    
+      <p>&copy; 2026 Young's Notes. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://github.com/mmistakes/so-simple-theme" rel="nofollow">So Simple</a>.</p>
+    
+  </div>
+</footer>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://use.fontawesome.com/releases/v5.0.12/js/all.js"></script><!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-73KQ7TR7X4"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-73KQ7TR7X4');
+  </script>
+
+
+  </body>
+
+</html>
